@@ -32,6 +32,7 @@ class Config extends \Djokka
         'plugin_path'=>'assets/plugins',
         'component_path'=>'protected/components',
         'config_path'=>'protected/config',
+        'app_path'=>null,
 
         // Error handler
         'error_redirect'=>false,

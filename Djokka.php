@@ -85,6 +85,15 @@ class Djokka
         return call_user_func(array($class_map[$subclass], 'get'));
     }
 
+    public function lib($subclass)
+    {
+        $class_map = Config::get()->getClassMap();
+        if(!isset($class_map[$subclass])) {
+            throw new Exception('Class library with name '.$subclass.' not found', 500);
+        }
+        return call_user_func(array($class_map[$subclass], 'get'));
+    }
+
     /**
      * Mengambil instance kelas induk kontroller
      * @since 1.0.0
@@ -329,7 +338,7 @@ class Djokka
 
     public function configDir()
     {
-        return $this->realPath($this->config('dir').$this->config('config_path').DS);
+        return $this->realPath($this->config('dir').DS.$this->config('app_path').$this->config('config_path').DS);
     }
 
     /**
@@ -339,7 +348,7 @@ class Djokka
      */
     public function componentDir()
     {
-        return $this->realPath($this->config('dir').DS.$this->config('component_path').DS);
+        return $this->realPath($this->config('dir').DS.$this->config('app_path').$this->config('component_path').DS);
     }
 
     /**
@@ -349,7 +358,7 @@ class Djokka
      */
     public function themeDir()
     {
-        return $this->realPath($this->config('dir').DS.$this->config('theme_path').DS);
+        return $this->realPath($this->config('dir').DS.$this->config('app_path').$this->config('theme_path').DS);
     }
 
     /**
@@ -373,7 +382,7 @@ class Djokka
      */
     public function assetDir()
     {
-        return $this->realPath($this->config('dir').DS.$this->config('asset_path').DS);
+        return $this->realPath($this->config('dir').DS.$this->config('app_path').$this->config('asset_path').DS);
     }
 
     /**
@@ -398,7 +407,7 @@ class Djokka
     public function moduleDir()
     {
         $dir = $this->defval($this->config('ref_dir'), $this->config('dir'));
-        return $this->realPath($dir.DS.$this->config('module_path').DS);
+        return $this->realPath($dir.DS.$this->config('app_path').$this->config('module_path').DS);
     }
 
     /**
@@ -409,7 +418,7 @@ class Djokka
     public function pluginDir()
     {
         $dir = $this->defval($this->config('ref_dir'), $this->config('dir'));
-        return $this->realPath($dir.DS.$this->config('plugin_path').DS);
+        return $this->realPath($dir.DS.$this->config('app_path').$this->config('plugin_path').DS);
     }
 
     /**
@@ -487,7 +496,11 @@ class Djokka
             case 0:
                 return Config::get()->getConfig();
             case 1:
-                return Config::get()->getData(func_get_arg(0));
+                if(!is_array(func_get_arg(0))) {
+                    return Config::get()->getData(func_get_arg(0));
+                } else {
+                    return Config::get()->merge(func_get_arg(0));
+                }
             case 2:
                 Config::get()->setData(func_get_arg(0), func_get_arg(1));
                 break;

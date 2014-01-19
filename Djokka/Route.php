@@ -58,7 +58,7 @@ class Route extends \Djokka
     public function __construct()
     {
         // Mengisi properti yang dibutuhkan
-        $this->path = $this->getPath();
+        $this->path = substr($_SERVER['SCRIPT_NAME'], 0, strrpos($_SERVER['SCRIPT_NAME'], '/'));
         $this->uri = $this->getUri();
         $this->base_url = $this->getBaseUrl();
     }
@@ -74,16 +74,6 @@ class Route extends \Djokka
         $protocol = isset($_SERVER['HTTPS']) && ($_SERVER['HTTPS'] == 'on' || $_SERVER['HTTPS'] == 1) ? 'https' : 'http';
         $path = str_replace('/'.basename($_SERVER['SCRIPT_NAME']), '', $_SERVER['PHP_SELF']);
         return "{$protocol}://{$host}{$path}";
-    }
-
-    /**
-     * Mengambil lokasi root folder web
-     * @since 1.0.0
-     * @return string lokasi root folder web
-     */
-    private function getPath()
-    {
-        return substr($_SERVER['SCRIPT_NAME'], 0, strrpos($_SERVER['SCRIPT_NAME'], '/'));
     }
 
     /**
