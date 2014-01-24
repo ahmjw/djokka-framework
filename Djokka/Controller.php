@@ -118,7 +118,8 @@ class Controller extends \Djokka
         $params = Route::get()->url_params;
         if($var !== null) {
             if($this->config('route_format') == 'path') {
-                return is_numeric($var) ? $params[$var] : $params[array_search($var, $params)+1];
+                if(count($params) > 0)
+                    return is_numeric($var) ? $params[$var] : $params[array_search($var, $params)+1];
             } else {
                 return $params[$var];
             }
@@ -226,48 +227,6 @@ class Controller extends \Djokka
         }
     }
 
-    public function getArchitectureInfo($route, $is_plugin = false) 
-    {
-        $dir = !$is_plugin ? $this->moduleDir() : $this->pluginDir();
-        list($module, $action) = Route::get()->getModule($route, $dir);
-        $class = ucfirst($module);
-        if(is_numeric(strpos($module, '/'))) {
-            $class = ucfirst(String::get()->lastPart('/', $module));
-        }
-        $path = $this->realPath($dir.DS.$module.DS.'controllers'.DS.$class.'.php');
-        if ($this->config('architecture') == null) {
-            $architecture = file_exists($path) ? 'hmvc' : 'modular';
-        } else {
-            $architecture = $this->config('architecture');
-        }
-        switch ($architecture) {
-            case 'hmvc':
-                $params = array();
-                $function = 'action'.ucfirst($action);
-                return array(
-                    'hmvc', array(
-                        'module'=>$module,
-                        'action'=>$action,
-                        'function'=>$function,
-                        'class'=>'Djokka\\'.(!$is_plugin ? 'Controllers' : 'Plugins').'\\'.$class,
-                        'is_plugin'=>$is_plugin,
-                        'params'=>$params,
-                        'dir'=>$dir,
-                        'path'=>$path,
-                    )
-                );
-            case 'modular':
-                return array(
-                    'modular', array(
-                        'dir'=>$dir,
-                        'route'=>$route,
-                        'is_plugin'=>$is_plugin,
-                        'path'=>$this->realPath($dir.$route.'.php')
-                    )
-                );
-        }
-    }
-
     /**
      * Memanggil atau mengeksekusi suatu aksi/modul
      * @since 1.0.0
@@ -282,8 +241,8 @@ class Controller extends \Djokka
             $route = $plugin;
             $is_plugin = true;
         }
-        list($architecture, $info) = $this->getArchitectureInfo($route, $is_plugin);
-        if($architecture == 'hmvc') {
+        $info = $route == $this->config('route') ? $this->config('module_info') : Route::get()->getModuleInfo($route, $is_plugin);
+        if($info['architecture'] == 'hmvc') {
             return Hmvc::get()->getViewContent($info, $params);
         } else {
             return Modular::get()->getViewContent($info, $params);

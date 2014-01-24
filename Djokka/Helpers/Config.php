@@ -36,8 +36,8 @@ class Config extends \Djokka
 
         // Error handler
         'error_redirect'=>false,
-        'module_error'=>'/index/error',
-        'module_forbidden'=>'/index/signin',
+        'module_error'=>'index/error',
+        'module_forbidden'=>'index/signin',
 
         // Controller configurarion
         'main_module'=>'index',

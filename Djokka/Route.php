@@ -11,6 +11,8 @@
 
 namespace Djokka;
 
+use Djokka\Helpers\String;
+
 /**
  * Kelas Djokka\Route adalah kelas pustaka framework. Dipergunakan untuk mengakses
  * informasi suatu rute yang digunakan oleh web
@@ -132,12 +134,13 @@ class Route extends \Djokka
         if(preg_match('/models|views|controllers/i', $router)) {
             throw new \Exception("Page is not accessible", 500);
         }
-        list($module, $action, $params) = $this->getModule($router);
+        $info = $this->getModuleInfo($router);
         $this->url_params = $params;
         $this->uris = explode('/', $this->uri);
-        $this->config('module', $module);
-        $this->config('action', $action);
-        $this->config('route', $module.'/'.$action);
+        $this->config('module_info', $info);
+        $this->config('module', $info['module']);
+        $this->config('action', $info['action']);
+        $this->config('route', $info['route']);
     }
 
     /**
@@ -146,15 +149,20 @@ class Route extends \Djokka
      * @param $router adalah alur terformat yang akan dimasukkan
      * @return informasi rute dalam bentuk array
      */
-    public function getModule($router, $dir = null)
+    public function getModuleInfo($router, $is_plugin = false)
     {
-        $dir = $dir != null ? $dir : $this->moduleDir();
-        $module = null;
+        $dir = !$is_plugin ? $this->moduleDir() : $this->pluginDir();
+        $module = 'index';
+        $action = 'index';
+        $class = null;
+        $route = null;
+        $is_partial = false;
+        $has_sub = false;
         $params = array();
 
         if(is_numeric(strrpos($router, '/'))) {
-            $action = null;
             if($router[0] != '/') {
+                $has_sub = true;
                 // Untuk rute get
                 if($this->config('route_format') == 'get') {
                     $module = substr($router, 0, strrpos($router, '/'));
@@ -170,27 +178,65 @@ class Route extends \Djokka
                     foreach ($routes as $route) {
                         if(!$route) continue;
                         if($i == 0) $module = $route;
-                        $trace_proc .= $route.'/';
-                        $proc = $dir.DS.$trace_proc;
-                        if(!file_exists($proc)) {
-                            $action = $i > 0 ? $route : $routes[1];
+                        if(is_numeric(strrpos($route, '-'))) {
+                            $i++;
+                            $part = explode('-', $route);
+                            $route = $part[0].DS.'controllers'.DS.$part[1];
+                            $module .= '/'.$part[0].'-'.$part[1];
+                            $class = ucfirst($part[1]);
+                            $action = $routes[$i];
+                            $path = $this->realPath($dir.$trace_proc.$part[0].DS.'controllers'.DS.ucfirst($part[1])).'.php';
+                            $is_partial = true;
                             break;
+                        } else {
+                            $trace_proc .= $route.'/';
+                            $path = $this->realPath($dir.$trace_proc);
+                            if(!file_exists($path)) {
+                                $action = $i > 0 ? $route : $routes[1];
+                                break;
+                            }
+                            if($i > 0) {
+                                $module .= '/'.$route;
+                            }
                         }
-                        if($i > 0) $module .= '/'.$route;
                         $i++;
                     }
                     $action = $action != null ? $action : 'index';
                     $params = array_slice($routes, $i + 1);
                 }
-            } else {
-                $action = 'index';
             }
         } else {
             $module = !empty($router) ? $router: $this->config('main_module');
-            $action = 'index';
         }
-        $this->modules = array($module, $action, $params);
-        return $this->modules;
+        if(!$is_partial) {
+            $class = $has_sub ? ucfirst(String::get()->lastPart('/', $module)) : ucfirst($module);
+            $path = $this->realPath($dir.$module.DS.'controllers'.DS.$class.'.php');
+        }
+        $architecture = $router != $this->config('module_error') && file_exists($path) ? 'hmvc' : 'modular';
+        if($architecture == 'hmvc') {
+            return array(
+                'architecture'=>$architecture,
+                'module'=>$module,
+                'action'=>$action,
+                'route'=>$module.'/'.$action,
+                'function'=>'action'.ucfirst($action),
+                'class'=>'Djokka\\'.(!$is_plugin ? 'Controllers' : 'Plugins').'\\'.$class,
+                'params'=>$params,
+                'dir'=>$dir,
+                'path'=>$path,
+                'is_partial'=>$is_partial,
+                'is_plugin'=>$is_plugin
+            );
+        } else {
+            return array(
+                'architecture'=>$architecture,
+                'module'=>$module,
+                'action'=>$action,
+                'dir'=>$dir,
+                'path'=>$dir.$router.'.php',
+                'is_plugin'=>$is_plugin
+            );
+        }
     }
 
     /**
