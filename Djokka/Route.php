@@ -155,6 +155,8 @@ class Route extends \Djokka
         $module = 'index';
         $action = 'index';
         $class = null;
+        $home_class = null;
+        $partial_class = null;
         $route = null;
         $is_partial = false;
         $has_sub = false;
@@ -179,15 +181,19 @@ class Route extends \Djokka
                         if(!$route) continue;
                         if($i == 0) $module = $route;
                         if(is_numeric(strrpos($route, '-'))) {
-                            $i++;
                             $part = explode('-', $route);
-                            $route = $part[0].DS.'controllers'.DS.$part[1];
-                            $module .= '/'.$part[0].'-'.$part[1];
-                            $class = ucfirst($part[1]);
-                            $action = $routes[$i];
                             $path = $this->realPath($dir.$trace_proc.$part[0].DS.'controllers'.DS.ucfirst($part[1])).'.php';
-                            $is_partial = true;
-                            break;
+                            if(is_file($path) && file_exists($path)) {
+                                $i++;
+                                $route = $part[0].DS.'controllers'.DS.$part[1];
+                                $home_class = $module.DS.$part[0];
+                                $partial_class = $part[1];
+                                $class = ucfirst($part[1]);
+                                $module .= '/'.$part[0].'-'.$part[1];
+                                $action = $routes[$i];
+                                $is_partial = true;
+                                break;
+                            }
                         } else {
                             $trace_proc .= $route.'/';
                             $path = $this->realPath($dir.$trace_proc);
@@ -211,8 +217,10 @@ class Route extends \Djokka
         if(!$is_partial) {
             $class = $has_sub ? ucfirst(String::get()->lastPart('/', $module)) : ucfirst($module);
             $path = $this->realPath($dir.$module.DS.'controllers'.DS.$class.'.php');
+            $architecture = $router != $this->config('module_error') && file_exists($path) ? 'hmvc' : 'modular';
+        } else {
+            $architecture = 'hmvc';
         }
-        $architecture = $router != $this->config('module_error') && file_exists($path) ? 'hmvc' : 'modular';
         if($architecture == 'hmvc') {
             return array(
                 'architecture'=>$architecture,
@@ -220,6 +228,8 @@ class Route extends \Djokka
                 'action'=>$action,
                 'route'=>$module.'/'.$action,
                 'function'=>'action'.ucfirst($action),
+                'home_class'=>$home_class,
+                'partial_class'=>$partial_class,
                 'class'=>'Djokka\\'.(!$is_plugin ? 'Controllers' : 'Plugins').'\\'.$class,
                 'params'=>$params,
                 'dir'=>$dir,
