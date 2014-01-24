@@ -215,7 +215,8 @@ class Route extends \Djokka
             $module = !empty($router) ? $router: $this->config('main_module');
         }
         if(!$is_partial) {
-            $class = $has_sub ? ucfirst(String::get()->lastPart('/', $module)) : ucfirst($module);
+            $class = $has_sub && is_numeric(strrpos($module, '/')) ? 
+                ucfirst(String::get()->lastPart('/', $module)) : ucfirst($module);
             $path = $this->realPath($dir.$module.DS.'controllers'.DS.$class.'.php');
             $architecture = $router != $this->config('module_error') && file_exists($path) ? 'hmvc' : 'modular';
         } else {
