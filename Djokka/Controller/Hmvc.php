@@ -62,7 +62,8 @@ class Hmvc extends Core
                 $keys = array();
                 $pattern = preg_replace_callback('/\(([a-zA-Z_](?:[a-zA-Z0-9_]+)?):(.*?)\)/i', function($matches) use(&$keys) {
                     $keys[] = $matches[1];
-                    return '('.$this->defval($matches[2], '.+').')';
+                    $group = $matches[2] !== null ? $matches[2] : '.+';
+                    return '('.$group.')';
                 }, $route[0]);
                 $pattern = '/'.str_replace('/', '\/', $pattern).'/i';
                 if(preg_match($pattern, Route::get()->getUri(), $match)) {
