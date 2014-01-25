@@ -115,9 +115,10 @@ class Db extends \Djokka
         $criteria = $params[0];
         $criterias = array_slice($params, 1);
         $i = 0;
-        return preg_replace_callback('/\?/i', function($matches) use($criterias, &$i) {
+        $connection = $this->connection;
+        return preg_replace_callback('/\?/i', function($matches) use($connection, $criterias, &$i) {
             $i++;
-            return "'".$this->connection->real_escape_string($criterias[$i-1])."'";
+            return "'".$connection->real_escape_string($criterias[$i-1])."'";
         }, $criteria);
     }
 
@@ -130,7 +131,8 @@ class Db extends \Djokka
                     $criteria = $arg[0];
                     $criterias = array_slice($arg, 1);
                     $i = 0;
-                    $where = preg_replace_callback('/\?/i', function($matches) use($criterias, &$i) {
+                    $connection = $this->connection;
+                    $where = preg_replace_callback('/\?/i', function($matches) use($connection, $criterias, &$i) {
                         $i++;
                         return "'".addslashes($criterias[$i-1])."'";
                     }, $criteria);
@@ -146,7 +148,8 @@ class Db extends \Djokka
                 $criteria = $args[0];
                 $criterias = array_slice($args, 1);
                 $i = 0;
-                $sql .= preg_replace_callback('/\?/i', function($matches) use($criterias, &$i) {
+                $connection = $this->connection;
+                $sql .= preg_replace_callback('/\?/i', function($matches) use($connection, $criterias, &$i) {
                     $i++;
                     return "'".addslashes($criterias[$i-1])."'";
                 }, $criteria);
@@ -182,7 +185,8 @@ class Db extends \Djokka
             $criteria = $args[0];
             $criterias = array_slice($args, 1);
             $i = 0;
-            $sql .= preg_replace_callback('/\?/i', function($matches) use($criterias, &$i) {
+            $connection = $this->connection;
+            $sql .= preg_replace_callback('/\?/i', function($matches) use($connection, $criterias, &$i) {
                 $i++;
                 return "'".addslashes($criterias[$i-1])."'";
             }, $criteria);
@@ -289,9 +293,10 @@ class Db extends \Djokka
         if(is_array($sql)) {
             $criterias = array_slice($sql, 1);
             $i = 0;
-            $sql = preg_replace_callback('/\?/i', function($matches) use($criterias, &$i) {
+            $connection = $this->connection;
+            $sql = preg_replace_callback('/\?/i', function($matches) use($connection, $criterias, &$i) {
                 $i++;
-                return "'".$this->connection->real_escape_string($criterias[$i-1])."'";
+                return "'".$connection->real_escape_string($criterias[$i-1])."'";
             }, $sql);
             $sql = $sql[0];
         }
@@ -304,13 +309,14 @@ class Db extends \Djokka
         }
     }
 
-    public function getScalar($sql) {
+    public function getData($sql) {
         if(is_array($sql)) {
             $criterias = array_slice($sql, 1);
             $i = 0;
-            $sql = preg_replace_callback('/\?/i', function($matches) use($criterias, &$i) {
+            $connection = $this->connection;
+            $sql = preg_replace_callback('/\?/i', function($matches) use($connection, $criterias, &$i) {
                 $i++;
-                return "'".$this->connection->real_escape_string($criterias[$i-1])."'";
+                return "'".$connection->real_escape_string($criterias[$i-1])."'";
             }, $sql);
             $sql = $sql[0];
         }
@@ -332,9 +338,10 @@ class Db extends \Djokka
             if(is_array($sql)) {
                 $criterias = array_slice($sql, 1);
                 $i = 0;
-                $sql = preg_replace_callback('/\?/i', function($matches) use($criterias, &$i) {
+                $connection = $this->connection;
+                $sql = preg_replace_callback('/\?/i', function($matches) use($connection, $criterias, &$i) {
                     $i++;
-                    return "'".$this->connection->real_escape_string($criterias[$i-1])."'";
+                    return "'".$connection->real_escape_string($criterias[$i-1])."'";
                 }, $sql);
                 $sql = $sql[0];
             }
@@ -375,7 +382,8 @@ class Db extends \Djokka
             if(is_array($sql)) {
                 $criterias = array_slice($sql, 1);
                 $i = 0;
-                $sql = preg_replace_callback('/\?/i', function($matches) use($criterias, &$i) {
+                $connection = $this->connection;
+                $sql = preg_replace_callback('/\?/i', function($matches) use($connection, $criterias, &$i) {
                     $i++;
                     return "'".addslashes($criterias[$i-1])."'";
                 }, $sql);
@@ -408,7 +416,8 @@ class Db extends \Djokka
             if(is_array($sql)) {
                 $criterias = array_slice($sql, 1);
                 $i = 0;
-                $sql = preg_replace_callback('/\?/i', function($matches) use($criterias, &$i) {
+                $connection = $this->connection;
+                $sql = preg_replace_callback('/\?/i', function($matches) use($connection, $criterias, &$i) {
                     $i++;
                     return "'".addslashes($criterias[$i-1])."'";
                 }, $sql);
@@ -442,7 +451,8 @@ class Db extends \Djokka
             if(is_array($sql)) {
                 $criterias = array_slice($sql, 1);
                 $i = 0;
-                $sql = preg_replace_callback('/\?/i', function($matches) use($criterias, &$i) {
+                $connection = $this->connection;
+                $sql = preg_replace_callback('/\?/i', function($matches) use($connection, $criterias, &$i) {
                     $i++;
                     return "'".addslashes($criterias[$i-1])."'";
                 }, $sql);
