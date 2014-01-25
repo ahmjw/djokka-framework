@@ -186,7 +186,7 @@ class Validation extends \Djokka
      */
     private function unique($model, $field, $params = array())
     {
-        $primary = $model->schema('primary');
+        $primary = $model->getPrimaryKey('primary');
         $sql = 'SELECT COUNT('.$primary.') AS count FROM '.$model->table().
             ' WHERE '.$field.' = ? AND '.$primary.' != ?';
         $exists = $this('Db')->getArray(array($sql, $model->{$field}, $model->{$primary}));
