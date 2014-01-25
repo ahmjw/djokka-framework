@@ -339,12 +339,12 @@ class Model extends \Djokka
      * @param $params adalah parameter tambahan untuk mengatur proses penyimpanan model
      * @return objek resource hasil operasi penyimpanan model
      */
-    public function save($params = array())
+    public function save($availables = null)
     {
-        return $this->isNew() ? $this->insert($params) : $this->update($params);
+        return $this->isNew() ? $this->insert($availables) : $this->update($availables);
     }
 
-    public function insert()
+    public function insert($availables = null)
     {
         if(!$this->isNew()) {
             throw new \Exception("This operation just active in new instance", 500);
@@ -353,11 +353,13 @@ class Model extends \Djokka
             return;
         }
         $into = $values = null;
-        $availables = array();
-        $schema = $this->schema()->TableStructure;
-        foreach ($schema['fields'] as $field) {
-            if($schema['describe'][$field]['Extra'] != 'auto_increment' && isset($this->{$field})) {
-                $availables[] = $field;
+        if($availables === null) {
+            $availables = array();
+            $schema = $this->schema()->TableStructure;
+            foreach ($schema['fields'] as $field) {
+                if($schema['describe'][$field]['Extra'] != 'auto_increment' && isset($this->{$field})) {
+                    $availables[] = $field;
+                }
             }
         }
         $i = 0;
@@ -384,21 +386,24 @@ class Model extends \Djokka
      * @param $params adalah parameter tambahan untuk mengatur pembentukan query SQL
      * @return string query SQL yang telah terbentuk
      */
-    public function update()
+    public function update($availables = null)
     {
         if(!$this->validate()) {
             return;
         }
-        $fields = $this->schema()->TableStructure['fields'];
-        if($fields == null) {
-            throw new \Exception("No field in update list", 500);
-        }
-        $availables = array();
-        foreach ($fields as $field) {
-            if(isset($this->{$field})) {
-                $availables[] = $field;
+        if($availables === null) {
+            $fields = $this->schema()->TableStructure['fields'];
+            if($fields == null) {
+                throw new \Exception("No field in update list", 500);
+            }
+            $availables = array();
+            foreach ($fields as $field) {
+                if(isset($this->{$field})) {
+                    $availables[] = $field;
+                }
             }
         }
+
         $set = null;
         $count = count($availables) - 1;
         $i = 0;
@@ -444,6 +449,10 @@ class Model extends \Djokka
             $resource->free_result();
             return $record;
         }
+    }
+
+    public function getData()
+    {
     }
 
     public function find() {
