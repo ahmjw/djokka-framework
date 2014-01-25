@@ -12,6 +12,7 @@
 namespace Djokka\Controller;
 
 use Djokka\View;
+use Djokka\Route;
 use Djokka\Model\Pager;
 use Djokka\View\Asset;
 use Djokka\Controller as Core;
@@ -54,11 +55,27 @@ class Hmvc extends Core
             throw new \Exception("Class $class is not declared in file $path", 500);
         }
         $instance = new $info['class'];
-        if($request = $this->config('router_action')) {
-            $info['function'] = 'action'.ucfirst($request);
-            $info['params'] = $this->config('router_params');
-            $this->config('router_action', null);
-            $this->config('router_params', null);
+
+        // Self router aliasing
+        if(method_exists($instance, 'routes') && ($routes = call_user_func(array($instance, 'routes')))) {
+            foreach ($routes as $route) {
+                $keys = array();
+                $pattern = preg_replace_callback('/\(([a-zA-Z_](?:[a-zA-Z0-9_]+)?):(.*?)\)/i', function($matches) use(&$keys) {
+                    $keys[] = $matches[1];
+                    return '('.$this->defval($matches[2], '.+').')';
+                }, $route[0]);
+                $pattern = '/'.str_replace('/', '\/', $pattern).'/i';
+                if(preg_match($pattern, Route::get()->getUri(), $match)) {
+                    $values = array_slice($match, 1);
+                    $params = array();
+                    foreach ($values as $i => $value) {
+                        $params[$keys[$i]] = $value;
+                    }
+                    $info['function'] = 'action'.ucfirst($route[1]);
+                    $info['params'] = $params;
+                    break;
+                }
+            }
         }
         
         // Mengeksekusi suatu aksi

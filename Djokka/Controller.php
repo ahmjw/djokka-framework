@@ -140,28 +140,6 @@ class Controller extends \Djokka
         Asset::get()->add($url);
     }
 
-    public function route() {
-        switch (func_num_args()) {
-            case 2:
-                $this->config('router_action', func_get_arg(0));
-                $this->config('router_params', func_get_arg(1));
-                break;
-            case 3:
-                if(preg_match('/'.func_get_arg(1).'/i', Route::get()->getUri(), $matches)) {
-                    $this->config('router_action', func_get_arg(0));
-                    $matches = array_slice($matches, 1);
-                    $properties = func_get_arg(2);
-                    $params = array();
-                    foreach ($matches as $key => $match) {
-                        $params[$properties[$key]] = $match;
-                    }
-                    $this->config('router_params', $params);
-                    return true;
-                }
-                break;
-        }
-    }
-
     /**
      * Mengambil atau menentukan nama tema yang sedang aktif
      * @since 1.0.0
