@@ -305,7 +305,7 @@ class Djokka
         if($this->config('error_redirect') === true && $exception->getCode() == 403) {
             $page = $this->config('module').'/'.$this->config('action');
             if($page != $redirect = $this->config('module_forbidden')) {
-                Controller::get()->redirect($redirect);
+                Controller::get()->redirect('/' . $redirect);
             } else {
                 $this->exceptionOutput($exception);
             }
@@ -436,7 +436,7 @@ class Djokka
         }
     }
 
-    public function using($class) {
+    public function using($class, &$var = null) {
         $path = $this->componentDir().$class.'.php';
         if(!file_exists($path)) {
             throw new Exception("Failed to importing object file. File not found in path $path", 404);
@@ -448,6 +448,7 @@ class Djokka
         if(!class_exists($class)) {
             throw new Exception("Class $class is not defiend in file $path", 500);
         }
+        $var = new $class;
     }
 
     /**
