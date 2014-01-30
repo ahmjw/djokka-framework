@@ -82,36 +82,58 @@ class Validation extends \Djokka
             $fields = $rule[0];
             $action = $rule[1];
             $params = array_slice($rule, 2);
-            if(!in_array($action, get_class_methods($this))) {
-                if(in_array($action, get_class_methods($model))) {
-                    // Melakukan validasi
-                    foreach (explode(',', $fields) as $field) {
-                        $field = trim($field);
-                        if(($this->unvalidates && in_array($field, $this->unvalidates)) ||
-                            $field == '' || $model->error($field) != null) continue;
-                        call_user_func_array(array($model, $action), array(
-                            'field'=>$field,
-                            'params'=>$params
-                        ));
-                    }
-                } else {
-                    throw new \Exception("No validation with name $action", 500);
+            
+            if(preg_match('/,/i', $rule[1])) {
+                foreach (explode(',', $rule[1]) as $action) {
+                    $this->execute($model, $action, $fields, $params);
                 }
             } else {
-                // Melakukan validasi
+                $this->execute($model, $action, $fields, $params);
+            }
+        }
+        return !$model->hasError();
+    }
+
+    private function execute($model, $action, $fields, $params)
+    {
+        // Searching single validation with parameters
+        if(preg_match('/^([a-zA-Z][a-zA-Z0-9]*)\((.*)\)$/i', $action, $match)) {
+            $action = $match[1];
+            $params = explode(',', $match[2]);
+        }
+        // If no validation
+        if(!in_array($action, get_class_methods($this))) {
+            if(in_array($action, get_class_methods($model))) {
+                // Reading all fields
                 foreach (explode(',', $fields) as $field) {
                     $field = trim($field);
+                    // Skip when any conditions
                     if(($this->unvalidates && in_array($field, $this->unvalidates)) ||
                         $field == '' || $model->error($field) != null) continue;
-                    call_user_func_array(array($this, $action), array(
-                        'model'=>$model,
+                    // Call validation function inside model
+                    call_user_func_array(array($model, $action), array(
                         'field'=>$field,
                         'params'=>$params
                     ));
                 }
+            } else {
+                throw new \Exception("No validation with name $action", 500);
+            }
+        } else {
+            // Reading all fields
+            foreach (explode(',', $fields) as $field) {
+                $field = trim($field);
+                // Skip when any conditions
+                if(($this->unvalidates && in_array($field, $this->unvalidates)) ||
+                    $field == '' || $model->error($field) != null) continue;
+                // Call validation function
+                call_user_func_array(array($this, $action), array(
+                    'model'=>$model,
+                    'field'=>$field,
+                    'params'=>$params
+                ));
             }
         }
-        return !$model->hasError();
     }
 
     /**
@@ -142,6 +164,36 @@ class Validation extends \Djokka
             $message = isset($params['message']) ?
                 str_replace('{attr}', $model->label($field), $params['message']) :
                 $model->label($field).' is required';
+            $model->error($field, $message);
+        }
+    }
+
+    private function numeric($model, $field, $params = array())
+    {
+        if(!is_numeric($model->{$field})) {
+            $message = isset($params['message']) ?
+                str_replace('{attr}', $model->label($field), $params['message']) :
+                $model->label($field).' only allow numeric value';
+            $model->error($field, $message);
+        }
+    }
+
+    private function alphabet($model, $field, $params = array())
+    {
+        if(is_numeric($model->{$field})) {
+            $message = isset($params['message']) ?
+                str_replace('{attr}', $model->label($field), $params['message']) :
+                $model->label($field).' only allow alphabet value';
+            $model->error($field, $message);
+        }
+    }
+
+    private function maxLength($model, $field, $params = array())
+    {
+        if(strlen($model->{$field}) > $params[0]) {
+            $message = isset($params['message']) ?
+                str_replace('{attr}', $model->label($field), $params['message']) :
+                $model->label($field).' is over '.$params[0].' characters';
             $model->error($field, $message);
         }
     }
