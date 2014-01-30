@@ -501,4 +501,16 @@ class Db extends \Djokka
         }
     }
 
+    public function getTables()
+    {
+        $items = $this->getArrays('SHOW TABLES', true);
+        if(count($items) > 0) {
+            $tables = array();
+            foreach ($items as $item) {
+                $tables[] = $item[0];
+            }
+            return $tables;
+        }
+    }
+
 }
