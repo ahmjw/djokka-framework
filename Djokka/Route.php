@@ -185,11 +185,20 @@ class Route extends \Djokka
                             $path = $this->realPath($dir.$trace_proc.$part[0].DS.'controllers'.DS.ucfirst($part[1])).'.php';
                             if(is_file($path) && file_exists($path)) {
                                 $i++;
-                                $route = $part[0].DS.'controllers'.DS.$part[1];
-                                $home_class = $module.DS.$part[0];
-                                $partial_class = $part[1];
-                                $class = ucfirst($part[1]);
-                                $module .= '/'.$part[0].'-'.$part[1];
+                                if(is_numeric(strrpos($module, '-'))) {
+                                    $route = $part[0].DS.'controllers'.DS.$part[1];
+                                    $home_class = $part[0];
+                                    $partial_class = $part[1];
+                                    $class = ucfirst($part[1]);
+                                    $module = $part[0].'-'.$part[1];
+                                } else {
+                                    $route = $part[0].DS.'controllers'.DS.$part[1];
+                                    $home_class = $module.DS.$part[0];
+                                    $partial_class = $part[1];
+                                    $class = ucfirst($part[1]);
+                                    $module .= '/'.$part[0].'-'.$part[1];
+                                }
+                                
                                 $action = $routes[$i];
                                 $is_partial = true;
                                 break;
