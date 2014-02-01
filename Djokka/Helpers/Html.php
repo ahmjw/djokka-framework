@@ -17,7 +17,7 @@ namespace Djokka\Helpers;
  * @author Ahmad Jawahir <rawndummy@gmail.com>
  * @since 1.0.0
  */
-class Html
+class Html extends \Djokka
 {
 
     /**
