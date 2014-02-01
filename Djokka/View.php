@@ -77,6 +77,9 @@ class View extends \Djokka
                 }
             } else {
                 $path = $this->realPath("$info[dir]/$info[home_class]/views/$info[partial_class]/{$route}.php");
+                if(!file_exists($path)) {
+                    throw new \Exception("View file not found in path $path", 404);
+                }
             }
             // Menentukan kelas induk kontroller
             $this->active = false;
