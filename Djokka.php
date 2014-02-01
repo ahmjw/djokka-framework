@@ -23,6 +23,7 @@ use Djokka\Helpers\User;
 /**
  * Mempersingkat pembatas folder
  */
+define('DJOKKA', true);
 define('DS', DIRECTORY_SEPARATOR);
 defined('HANDLE_ERROR') or define('HANDLE_ERROR', false);
 
