@@ -63,7 +63,7 @@ class Linker extends \Djokka
         }
     }
 
-    public function appendGetLink($module, $params)
+    public function appendLink($module, $params)
     {
         return $this->getLink($module).'?'.Route::get()->urlParam('get', $params);
     }
@@ -76,23 +76,28 @@ class Linker extends \Djokka
     public function getLink($module)
     {
         // Menentukan pemisah
-        $separator = $this->getSeparator();
+        $sprtr = $this->getSeparator();
         // Menentukan lokasi URL
+        $url = null;
+        $base = Route::get()->getBaseUrl();
         if(!is_numeric(strpos($module, '/'))) {
-            return Route::get()->getBaseUrl().$separator.$this->config('module').'/'.$module;
-        } else {
+            $url = $base.$sprtr.$this->config('module').$sprtr.$module;
+        } else if($module[0] == '-') {
+            $url = $base.$sprtr.$this->config('module').'-'.substr($module, 1, strlen($module));
+        }else {
             if($module[0] != '/') {
-                return Route::get()->getBaseUrl().$separator.$this->config('module').'/'.$module;
+                $url = $base.$sprtr.$this->config('module').$sprtr.$module;
             } else {
-                return Route::get()->getBaseUrl().$separator.substr($module, 1, strlen($module));
+                $url = $base.$sprtr.substr($module, 1, strlen($module));
             }
         }
+        return $url;
     }
 
     public function getLinkParameter($module, $parameter)
     {
         // Menentukan pemisah
-        $separator = $this->getSeparator();
+        $sprtr = $this->getSeparator();
         // Menentukan lokasi URL
         if(is_string($parameter)) {
             $params = $this->renderParameterString($parameter);
@@ -100,12 +105,12 @@ class Linker extends \Djokka
             $params = $this->renderParameter($parameter);
         }
         if(!is_numeric(strpos($module, '/'))) {
-            return Route::get()->getBaseUrl().$separator.$this->config('module').'/'.$module.$params;
+            return Route::get()->getBaseUrl().$sprtr.$this->config('module').'/'.$module.$params;
         } else {
             if($module[0] != '/') {
-                return Route::get()->getBaseUrl().$separator.$this->config('module').'/'.$module.$params;
+                return Route::get()->getBaseUrl().$sprtr.$this->config('module').'/'.$module.$params;
             } else {
-                return Route::get()->getBaseUrl().$separator.substr($module, 1, strlen($module)).$params;
+                return Route::get()->getBaseUrl().$sprtr.substr($module, 1, strlen($module)).$params;
             }
         }
     }
