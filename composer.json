@@ -8,11 +8,11 @@
 	    {
 	        "name": "Ahmad Jawahir",
 	        "email": "rawndummy@gmail.com",
-	        "homepage": "http://djokka.com"
+	        "homepage": "http://twitter.com/ahmjw"
 	    }
 	],
     "require": {
-        "php": ">=5.3.2"
+        "php": ">=5.3"
     },
 	"autoload": {
 		"psr-0":{
