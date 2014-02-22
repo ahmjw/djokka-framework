@@ -4,11 +4,13 @@
     "homepage": "https://djokka.com",
     "keywords": ["PHP", "HMVC", "Framework"],
     "license": "Creative Commons",
-    "authors": {
-        "name": "Ahmad Jawahor",
-        "email": "rawndummy@gmail.com",
-        "homepage": "http://djokka.com"
-    },
+    "authors": [
+	    {
+	        "name": "Ahmad Jawahir",
+	        "email": "rawndummy@gmail.com",
+	        "homepage": "http://djokka.com"
+	    }
+	],
     "require": {
         "php": ">=5.3.*"
     },
