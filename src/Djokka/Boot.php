@@ -12,12 +12,10 @@ namespace Djokka;
 
 use Djokka\Helpers\Config;
 
-/**
- * Mempersingkat pembatas folder
- */
 define('DJOKKA', true);
 define('DS', DIRECTORY_SEPARATOR);
 defined('HANDLE_ERROR') or define('HANDLE_ERROR', false);
+define('SYSTEM_DIR', __DIR__ . DS . '..' . DS . '..' . DS);
 
 include_once 'Base.php';
 
@@ -29,7 +27,6 @@ include_once 'Base.php';
  */
 class Boot extends Base
 {
-
     /**
      * @var Menampung instance dari kelas
      * @access private
@@ -57,11 +54,59 @@ class Boot extends Base
      */
     public function registerAutoload()
     {
+        // Error and exception handling
         if(HANDLE_ERROR === true) {
-            set_error_handler(array($this, 'errorHandler'), E_ALL ^ E_NOTICE);
+            register_shutdown_function(array(__CLASS__, 'onShutdown'));
+            set_error_handler(array(__CLASS__, 'handleError'), E_ALL ^ E_NOTICE);
+            set_exception_handler(array(__CLASS__, 'handleException'));
+            ini_set('display_errors', 'off');
+            error_reporting(E_ALL ^ E_NOTICE);
         }
+        // Internal class autoloader
         spl_autoload_register(array($this, 'autoload'));
-        set_exception_handler(array($this, 'exceptionHandler'));
+    }
+
+    /**
+     * Executed after script execution finishes
+     * @since 1.0.3
+     */
+    public static function onShutdown()
+    {
+        if (($error = error_get_last()) !== null) {
+            self::handleError($error["type"], $error["message"], $error["file"], $error["line"]);
+        }
+    }
+
+    /**
+     * Handling error and throw as an exception
+     * @param mixed $num Error code
+     * @param mixed $str Error message
+     * @param mixed $file File path of error
+     * @param mixed $line Line of error in file
+     * @param optional $context Argument
+     * @throws \ErrorException to send error as exception
+     * @since 1.0.3
+     */
+    public static function handleError($num, $str, $file, $line, $context = null)
+    {
+        self::handleException(new \ErrorException( $str, 0, $num, $file, $line));
+    }
+
+    /**
+     * Render an exception as output
+     * @param mixed $e \Exception instance of exception
+     * @since 1.0.3
+     */
+    public static function handleException(\Exception $e)
+    {
+        //if (ob_get_level() > 0) {
+            ob_end_clean();
+        //}
+        $path = SYSTEM_DIR . 'resources' . DIRECTORY_SEPARATOR . 'errors' . DIRECTORY_SEPARATOR . 'view.php';
+        echo View::getInstance()->outputBuffering($path, array(
+            'e' => $e
+        ));
+        exit();
     }
 
     /**
@@ -107,12 +152,12 @@ class Boot extends Base
         }
         $content = Controller::get()->import($route);
         if(HANDLE_ERROR === true && !empty(self::$errors)) {
-            header('Content-type: application/json');
+            /*header('Content-type: application/json');
             echo json_encode(array(
                 'errors'=>self::$errors
-            ));
+            ));*/
         } else {
-            echo View::get()->renderTheme($content);
+            echo View::getInstance()->renderTheme($content);
         }
     }
 
@@ -167,6 +212,7 @@ class Boot extends Base
      * @since 1.0.0
      * @param $exception adalah objek eksepsi dari sistem
      * @access private
+     * @deprecated
      */
     private function exceptionRender($exception)
     {
@@ -210,6 +256,7 @@ class Boot extends Base
      * @since 1.0.0
      * @param $exception adalah objek eksepsi dari sistem
      * @access private
+     * @deprecated
      */
     private function exceptionOutput($exception)
     {
@@ -238,7 +285,7 @@ class Boot extends Base
      * Menangani semua error yang dilemparkan
      * @since 1.0.0
      * @param $exception adalah objek eksepsi dari sistem
-     * @access public
+     * @deprecated
      */
     public function exceptionHandler($exception)
     {
@@ -274,6 +321,9 @@ class Boot extends Base
         }
     }
 
+    /**
+     * @deprecated
+     */
     public function errorHandler($level, $message, $file, $line, $context)
     {
         self::$errors[] = array(
