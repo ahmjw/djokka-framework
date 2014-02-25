@@ -11,6 +11,7 @@
 
 namespace Djokka;
 
+use Djokka\Base;
 use Djokka\Model\SchemaCollection;
 use Djokka\Model\TableCollection;
 use Djokka\Model\ModelCollection;
@@ -23,7 +24,7 @@ use Djokka\Helpers\String;
  * @author Ahmad Jawahir <rawndummy@gmail.com>
  * @since 1.0.0
  */
-class Model extends \Djokka
+class Model extends Base
 {
     const FIND = 1;
     const FIND_ALL = 2;
@@ -451,8 +452,60 @@ class Model extends \Djokka
         }
     }
 
-    public function getData()
+    public function findData()
     {
+        $use_pk_opt = false;
+        switch (func_num_args()) {
+            case 1:
+                $params = func_get_arg(0);
+                $field = is_array($params) && isset($params['select']) ? $params['select'] : '*';
+                break;
+            case 2:
+                $params = func_get_arg(0);
+                $use_pk_opt = (bool)func_get_arg(1);
+                $field = $this->getPrimaryKey();
+                if($field == null) {
+                    throw new \Exception("This table or view doesn't have a primary key", 500);
+                }
+                break;
+        }
+        if(func_num_args() > 0) {
+            $table = $this->table();
+            $clear = isset($params['clear']) ? $params['clear'] : true;
+
+            // Membentuk query SQL
+            $db = $this->db()->select($field);
+            if(is_array($params)) {
+                if(isset($params['where'])){
+                    $this->____dataset['params'] = array('where'=>$params['where']);
+                    $db->Where($params['where']);
+                }
+                if(isset($params['group'])){
+                    $db->Group($params['group']);
+                }
+                if(isset($params['order'])){
+                    $db->Order($params['order']);
+                }
+            } else {
+                $primary = $this->getPrimaryKey();
+                if($primary == null) {
+                    throw new \Exception("This table or view doesn't have a primary key", 500);
+                }
+                $where = array($primary.'=?', $params);
+                $this->____dataset['params']['where'] = $where;
+                $db->where($where);
+            }
+        } else {
+            $db = $this->db()->select();
+        }
+        // Membaca record dari database
+        $resource = $this->db()->execute();
+        if($row = $resource->fetch_assoc()) {
+            $record = clone $this;
+            foreach ($row as $key => $value) {
+                return stripslashes($value);
+            }
+        }
     }
 
     public function find() {
