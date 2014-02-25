@@ -51,12 +51,12 @@ class Controller extends Base
 
     public function view($name, $params = array())
     {
-        View::get()->mergeView($name, $params);
+        View::getInstance()->mergeView($name, $params);
     }
 
     public function getView($name, $params = array())
     {
-        return View::get()->getView($this, $name, $params);
+        return View::getInstance()->getView($this, $name, $params);
     }
 
     /**
@@ -89,7 +89,7 @@ class Controller extends Base
      */
     public function getContent()
     {
-        return View::get()->getContent();
+        return View::getInstance()->getContent();
     }
 
     /**
