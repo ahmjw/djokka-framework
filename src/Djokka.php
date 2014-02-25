@@ -38,6 +38,7 @@ return Djokka::get();
  * index.php pada root web. Kelas ini mengendalikan keseluruhan sistem.
  * @author Ahmad Jawahir <rawndummy@gmail.com>
  * @since 1.0.0
+ * @deprecated
  */
 class Djokka
 {
