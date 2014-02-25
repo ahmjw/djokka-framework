@@ -11,6 +11,7 @@
 
 namespace Djokka;
 
+use Djokka\Base;
 use Djokka\Route;
 use Djokka\View\Asset;
 use Djokka\Helpers\String;
@@ -25,7 +26,7 @@ use Djokka\Controller\Plugin;
  * @author Ahmad Jawahir <rawndummy@gmail.com>
  * @since 1.0.0
  */
-class Controller extends \Djokka
+class Controller extends Base
 {
     /**
      * @var Menampung instance dari kelas
