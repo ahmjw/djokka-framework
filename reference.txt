@@ -1,0 +1,2 @@
+- Fix Error in DOMDocument
+http://stackoverflow.com/questions/6090667/php-domdocument-errors-warnings-on-html5-tags
