@@ -1,22 +1,23 @@
 {
-	"name": "djokka/djokka-framework",
-    "description": "HMVC PHP Framework",
+    "name": "djokka/djokka-framework",
+    "description": "Djokka Framework, HMVC PHP Framework",
     "homepage": "https://djokka.com",
-    "keywords": ["PHP", "HMVC", "Framework"],
+    "keywords": ["php", "hmvc", "framework"],
     "license": "Creative Commons",
     "authors": [
-	    {
-	        "name": "Ahmad Jawahir",
-	        "email": "rawndummy@gmail.com",
-	        "homepage": "http://twitter.com/ahmjw"
-	    }
-	],
+        {
+            "name": "Ahmad Jawahir",
+            "email": "rawndummy@gmail.com",
+            "homepage": "http://twitter.com/ahmjw"
+        }
+    ],
+    "minimum-stability": "dev",
     "require": {
         "php": ">=5.3"
     },
-	"autoload": {
-		"psr-0":{
-			"Djokka":"src"
-		}
-	}
+    "autoload": {
+        "psr-0":{
+            "Djokka":"src"
+        }
+    }
 }
