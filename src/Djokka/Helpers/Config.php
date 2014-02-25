@@ -63,6 +63,7 @@ class Config extends Base
         'layout'=>'index',
         'json'=>false,
         'debug_json_mode'=>false,
+        'pager'=>null,
 
         'connection'=>0
     );
@@ -194,7 +195,10 @@ class Config extends Base
 
     public function getData($data)
     {
-        return $this->data[$data];
+        if(isset($this->data[$data])) {
+            return $this->data[$data];
+        }
+        return;
     }
 
     public function setData($data, $value)
