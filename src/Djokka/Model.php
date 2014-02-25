@@ -230,7 +230,7 @@ class Model extends Base
     public function label($property = null)
     {
         if(!empty($this->schema())) {
-            return $this->defval($this->schema()->Labels[$property], ucfirst($property));
+            return isset($this->schema()->Labels[$property]) ? $this->schema()->Labels[$property] : ucfirst($property);
         } else {
             return ucfirst($property);
         }
