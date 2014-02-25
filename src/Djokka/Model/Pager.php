@@ -53,7 +53,7 @@ class Pager extends Base
 
     public function result() {
         $pager = $this->config('pager');
-        $field = isset($pager['select']) ? $pager['select'] : $this->defval($pager['primary'], '*');
+        $field = isset($pager['select']) ? $pager['select'] : $this->defval($pager['primary_key'], '*');
         $table = isset($pager['from']) ? $pager['from'] : $pager['table'];
         if(isset($pager['where'])) {
             $where = $pager['where'];
@@ -81,11 +81,13 @@ class Pager extends Base
      */
     public function init($args = array())
     {
-        list($limit, $page) = $args;
-        if($page == null && isset($_GET['page'])) {
-            $page = $_GET['page'];
+        if(count($args) == 2) {
+            list($limit, $page) = $args;
+            $page = !empty($page) ? $page : 1;
+        } else {
+            $limit = $args[0];
+            $page = isset($_GET['page']) && !empty($_GET['page']) ? abs(intval($_GET['page'])) : 1;
         }
-        $page = empty($page) || $page == 0 ? 1 : $page;
         if(empty($page)) {
             $offset = 0;
         } else {

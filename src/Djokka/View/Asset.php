@@ -167,7 +167,9 @@ class Asset extends Base
         if(empty($content)) throw new \Exception("Theme has no content or theme is empty", 500);
         
         // Membuat objek DOM
-        @Dom::get()->loadHTML($content);
+        libxml_use_internal_errors(true);
+        Dom::get()->loadHTML($content);
+        libxml_clear_errors();
         $header = Dom::get()->getElementsByTagName('head')->item(0);
         $body = Dom::get()->getElementsByTagName('body')->item(0);
 

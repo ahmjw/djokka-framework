@@ -71,6 +71,7 @@ class Html extends Base
     {
         $options['name'] = $name;
         $params['auto_index'] = isset($params['auto_index']) ? $params['auto_index'] : true;
+        $rendered = '';
         if($items) {
             foreach ($items as $values => $display) {
                 if($params['auto_index'] === true) {

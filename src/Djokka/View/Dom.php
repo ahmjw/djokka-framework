@@ -59,7 +59,9 @@ class Dom extends \DomDocument
     {
         if($content == null) return;
 
-        @$this->helper->loadHTML($content);
+        libxml_use_internal_errors(true);
+        $this->helper->loadHTML($content);
+        libxml_clear_errors();
         $pAttach = $this->helper->getElementsByTagName('body');
         $document = $this->getElementById($element);
 

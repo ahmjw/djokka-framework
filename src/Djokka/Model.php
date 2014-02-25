@@ -90,12 +90,12 @@ class Model extends Base
 
     public function __set($property, $value) {
         if(in_array('table', get_class_methods($this))) {
-            $fields = SchemaCollection::get()->tables[$this->table()]['fields'];
+            /*$fields = SchemaCollection::get()->tables[$this->table()]['fields'];
             if($fields != null) {
                 if(!in_array($property, $fields)) {
                     $this->____dataset['externals'][] = $property;
                 }
-            }
+            }*/
         }
         $this->{$property} = $value;
     }
@@ -164,7 +164,10 @@ class Model extends Base
             case 0:
                 return $this->____dataset;
             case 1:
-                return $this->____dataset[func_get_arg(0)];
+                if (isset($this->____dataset[func_get_arg(0)])) {
+                    return $this->____dataset[func_get_arg(0)];
+                }
+                break;
             case 2:
                 $this->____dataset[func_get_arg(0)] = func_get_arg(1);
                 break;
@@ -226,7 +229,11 @@ class Model extends Base
      */
     public function label($property = null)
     {
-        return $this->defval($this->schema()->Labels[$property], ucfirst($property));
+        if(!empty($this->schema())) {
+            return $this->defval($this->schema()->Labels[$property], ucfirst($property));
+        } else {
+            return ucfirst($property);
+        }
     }
 
     /**
@@ -288,7 +295,10 @@ class Model extends Base
             case 0:
                 return Validation::get()->errors;
             case 1:
-                return Validation::get()->errors[func_get_arg(0)];
+                if (isset(Validation::get()->errors[func_get_arg(0)])) {
+                    return Validation::get()->errors[func_get_arg(0)];
+                }
+                break;
             case 2:
                 Validation::get()->errors[func_get_arg(0)] = func_get_arg(1);
                 break;

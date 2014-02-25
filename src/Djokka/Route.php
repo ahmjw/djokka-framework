@@ -136,7 +136,7 @@ class Route extends Base
             throw new \Exception("Page is not accessible", 500);
         }
         $info = $this->getModuleInfo($router);
-        $this->url_params = $params;
+        //$this->url_params = $params;
         $this->uris = explode('/', $this->uri);
         $this->config('module_info', $info);
         $this->config('module', $info['module']);
@@ -253,6 +253,7 @@ class Route extends Base
                 'architecture'=>$architecture,
                 'module'=>$module,
                 'action'=>$action,
+                'route'=>$module.'/'.$action,
                 'dir'=>$dir,
                 'path'=>$dir.$router.'.php',
                 'is_plugin'=>$is_plugin

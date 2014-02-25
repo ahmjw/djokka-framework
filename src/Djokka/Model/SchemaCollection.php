@@ -50,7 +50,10 @@ class SchemaCollection
             case 0:
                 return $this->modules;
             case 1:
-                return $this->modules[func_get_arg(0)];
+                if (isset($this->modules[func_get_arg(0)])) {
+                    return $this->modules[func_get_arg(0)];
+                }
+                break;
             case 2:
                 $this->modules[func_get_arg(0)] = func_get_arg(1);
                 break;
