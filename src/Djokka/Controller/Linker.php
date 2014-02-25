@@ -11,6 +11,7 @@
 
 namespace Djokka\Controller;
 
+use Djokka\Base;
 use Djokka\Route;
 
 /**
@@ -19,7 +20,7 @@ use Djokka\Route;
  * @author Ahmad Jawahir <rawndummy@gmail.com>
  * @since 1.0.0
  */
-class Linker extends \Djokka
+class Linker extends Base
 {
     /**
      * @var Menampung instance dari kelas
