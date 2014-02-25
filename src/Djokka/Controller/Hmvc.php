@@ -99,7 +99,7 @@ class Hmvc extends Core
         );
 
         if($this->config('json') === false) {
-            return View::get()->renderContent($info, $instance);
+            return View::getInstance()->renderContent($info, $instance);
         } else {
             return $return;
         }

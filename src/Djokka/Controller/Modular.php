@@ -91,7 +91,7 @@ class Modular extends Core
         }
         $content = parent::getCore()->render($module_path, $params);
         if($this->config('json') === false) {
-            View::get()->setContent(utf8_decode($content));
+            View::getInstance()->setContent(utf8_decode($content));
         }
         return $content;
     }
