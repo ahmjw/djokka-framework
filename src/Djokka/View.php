@@ -2,9 +2,10 @@
 
 namespace Djokka;
 
+use Djokka\Base;
 use Djokka\View\Asset;
 
-class View extends \Djokka 
+class View extends Base
 {
     private $content;
     private $index = -1;

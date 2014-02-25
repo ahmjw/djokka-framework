@@ -11,6 +11,7 @@
 
 namespace Djokka\Model;
 
+use Djokka\Base;
 use Djokka\Db;
 
 /**
@@ -19,7 +20,7 @@ use Djokka\Db;
  * @author Ahmad Jawahir <rawndummy@gmail.com>
  * @since 1.0.0
  */
-class Pager extends \Djokka
+class Pager extends Base
 {
 
     /**

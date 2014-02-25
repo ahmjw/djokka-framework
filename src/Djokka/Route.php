@@ -11,6 +11,7 @@
 
 namespace Djokka;
 
+use Djokka\Base;
 use Djokka\Helpers\String;
 
 /**
@@ -19,7 +20,7 @@ use Djokka\Helpers\String;
  * @author Ahmad Jawahir <rawndummy@gmail.com>
  * @since 1.0.0
  */
-class Route extends \Djokka
+class Route extends Base
 {
     /**
      * @var Menampung informasi modul yang sedang diakses

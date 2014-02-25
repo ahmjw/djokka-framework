@@ -11,13 +11,15 @@
 
 namespace Djokka\Helpers;
 
+use Djokka\Base;
+
 /**
  * Kelas Djokka\Config adalah kelas pustaka framework. Dipergunakan untuk mengatur
  * konfigurasi yang digunakan pada web
  * @author Ahmad Jawahir <rawndummy@gmail.com>
  * @since 1.0.0
  */
-class Config extends \Djokka
+class Config extends Base
 {
     /**
      * @var Menampung data konfigurasi web

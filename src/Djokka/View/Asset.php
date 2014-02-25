@@ -11,6 +11,7 @@
 
 namespace Djokka\View;
 
+use Djokka\Base;
 use Djokka\Helpers\String;
 use Djokka\Controller;
 
@@ -20,7 +21,7 @@ use Djokka\Controller;
  * @author Ahmad Jawahir <rawndummy@gmail.com>
  * @since 1.0.0
  */
-class Asset extends \Djokka
+class Asset extends Base
 {
 
     private $header_script_files = array();

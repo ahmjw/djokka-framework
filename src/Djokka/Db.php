@@ -11,13 +11,15 @@
 
 namespace Djokka;
 
+use Djokka\Base;
+
 /**
  * Kelas Djokka\Db adalah kelas pustaka framework. Dipergunakan untuk keperluan akses
  * database
  * @author Ahmad Jawahir <rawndummy@gmail.com>
  * @since 1.0.0
  */
-class Db extends \Djokka
+class Db extends Base
 {
     public $Query;
     public $Select;

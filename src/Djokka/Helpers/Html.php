@@ -11,13 +11,15 @@
 
 namespace Djokka\Helpers;
 
+use Djokka\Base;
+
 /**
  * Kelas Djokka\Html adalah kelas pustaka framework. Dipergunakan untuk membantu
  * pembuatan elemen HTML
  * @author Ahmad Jawahir <rawndummy@gmail.com>
  * @since 1.0.0
  */
-class Html extends \Djokka
+class Html extends Base
 {
 
     /**

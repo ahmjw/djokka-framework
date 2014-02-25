@@ -11,13 +11,15 @@
 
 namespace Djokka\Model;
 
+use Djokka\Base;
+
 /**
  * Kelas Djokka\Validation adalah kelas pustaka framework. Dipergunakan untuk melakukan
  * validasi terhadap model
  * @author Ahmad Jawahir <rawndummy@gmail.com>
  * @since 1.0.0
  */
-class Validation extends \Djokka
+class Validation extends Base
 {
     public $errors = array();
 
