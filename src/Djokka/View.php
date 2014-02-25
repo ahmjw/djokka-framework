@@ -26,12 +26,34 @@ class View extends Base
      * @param $class adalah nama kelas (opsional)
      * @return objek instance kelas
      */
-    public static function get($class = __CLASS__)
+    public static function getInstance($class = __CLASS__)
     {
         if(self::$instance == null) {
             self::$instance = new $class;
         }
         return self::$instance;
+    }
+
+    /**
+     * Run output buffering to render the view
+     * @param mixed $viewName string Name of the view
+     * @param mixed $vars Array data to extract to the view
+     * @return string Output buffering result from the view file
+     */
+    public function outputBuffering($viewName, array $vars = null)
+    {
+        ob_start();
+        if (!empty($vars)) {
+            extract($vars);
+        }
+        include $viewName;
+        return ob_get_clean();
+    }
+
+    private function getPath($viewName)
+    {
+        return BASE_DIR . DIRECTORY_SEPARATOR . 'modules' . DIRECTORY_SEPARATOR . $this->_module .
+            DIRECTORY_SEPARATOR . 'views' . DIRECTORY_SEPARATOR . $viewName . '.php';
     }
 
     public function getContent()
@@ -100,9 +122,9 @@ class View extends Base
     {
         // Jika dalam mode JSON
         if($this->config('json') === true || HANDLE_ERROR === true) {
-            header('Content-type: application/json');
+            /*header('Content-type: application/json');
             echo json_encode($content);
-            return;
+            return;*/
         }
         if($this->use_theme) {
             $theme_path = $this->realPath($this->themeDir().$this->config('theme').DS.$this->config('layout').'.php');
@@ -136,7 +158,7 @@ class View extends Base
     }
 
     public function getView($instance, $view, $params = array()) {
-        $path = $this->themeDir().$this->config('theme').DS.'views'.DS.$module.DS.$view.'.php';
+        $path = $this->themeDir().$this->config('theme').DS.'views'.DS.$this->config('module').DS.$view.'.php';
         if(!file_exists($path)) {
             $path = $this->moduleDir().$this->config('module').DS.'views'.DS.$view.'.php';
             if(!file_exists($path)) {
