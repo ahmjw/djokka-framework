@@ -22,7 +22,7 @@ use Djokka\Helpers\String;
 /**
  * Kelas pustaka yang bertugas untuk memproses dan mengendalikan model yang terdapat di dalam suatu modul
  */
-abstract class Model extends Base
+abstract class ActiveRecord extends Base
 {
     /**
      * Instance dari kelas ini
@@ -32,7 +32,7 @@ abstract class Model extends Base
     /**
      * Data penting yang dibutuhkan oleh model
      */
-    protected $____dataset = array(
+    public $____dataset = array(
         'is_new'=>true,
         'module'=>null,
         'params'=>array(),
@@ -61,7 +61,7 @@ abstract class Model extends Base
      * @param optional $is_new apakah model akan dimuat sebagai data baru atau data lama
      * @return object
      */
-    private static function getObject($class, $module, $is_new = true)
+    public function makeObject($class, $module, $is_new = true)
     {
         $schema = SchemaCollection::get();
         if(!$schema->existsModel($class)) {
@@ -210,13 +210,11 @@ abstract class Model extends Base
      */
     public function schema($use_module = false)
     {
-        if(in_array('table', get_class_methods($this))) {
-            if($use_module === true) {
-                SchemaCollection::get()->setCurrentModule($this->____dataset['module']);
-                return SchemaCollection::get();
-            } else {
-                return SchemaCollection::get()->module($this->____dataset['module']);
-            }
+        if($use_module === true) {
+            SchemaCollection::get()->setCurrentModule($this->____dataset['module']);
+            return SchemaCollection::get();
+        } else {
+            return SchemaCollection::get()->module($this->____dataset['module']);
         }
     }
 
@@ -264,7 +262,8 @@ abstract class Model extends Base
      */
     public function getPrimaryKey()
     {
-        return $this->defval($this->schema()->TableStructure['primary_key'], $this->dataset('primary_key'));
+        return 'id';
+        //return $this->defval($this->schema()->TableStructure['primary_key'], $this->dataset('primary_key'));
     }
 
     /**
