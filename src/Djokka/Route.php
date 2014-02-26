@@ -3,9 +3,8 @@
 /**
  * @author Ahmad Jawahir <rawndummy@gmail.com>
  * @link http://www.djokka.com
- * @license http://www.djokka.com?r=index/license
+ * @license http://creativecommons.org/licenses/by-nc-sa/4.0/deed.en_US
  * @copyright Copyright &copy; 2013 Djokka Media
- * @package \Djokka\
  * @version 1.0.0
  */
 
@@ -23,14 +22,24 @@ use Djokka\Helpers\String;
 class Route extends Base
 {
     /**
-     * @var Menampung informasi modul yang sedang diakses
-     * @access private
+     * Menampung informasi modul yang sedang diakses
      * @since 1.0.0
      */
     private $modules = array();
 
+    /**
+     * Informasi URI (Uniform Resource Identifier) yang terkandung dalam URL
+     */
     private $uri;
+
+    /**
+     * Nama direktori project web
+     */
     private $path;
+
+    /**
+     * Alamat URL (Uniform Resource Locator) awal
+     */
     private $base_url;
 
     /**

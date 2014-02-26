@@ -3,9 +3,8 @@
 /**
  * @author Ahmad Jawahir <rawndummy@gmail.com>
  * @link http://www.djokka.com
- * @license http://www.djokka.com?r=index/license
+ * @license http://creativecommons.org/licenses/by-nc-sa/4.0/deed.en_US
  * @copyright Copyright &copy; 2013 Djokka Media
- * @package \Djokka\
  * @version 1.0.0
  */
 
@@ -21,17 +20,33 @@ use Djokka\Helpers\String;
 /**
  * Kelas Djokka\Model adalah kelas pustaka framework. Dipergunakan untuk mengendalikan,
  * mengelola, dan mengakses data model
- * @author Ahmad Jawahir <rawndummy@gmail.com>
  * @since 1.0.0
  */
 class Model extends Base
 {
+    /**
+     * @deprecated
+     */
     const FIND = 1;
+
+    /**
+     * @deprecated
+     */
     const FIND_ALL = 2;
+
+    /**
+     * @deprecated
+     */
     const SCALAR = 3;
 
+    /**
+     * Instance dari kelas ini
+     */
     private static $instance;
 
+    /**
+     * Data penting yang dibutuhkan oleh model
+     */
     protected $____dataset = array(
         'is_new'=>true,
         'module'=>null,
@@ -54,6 +69,13 @@ class Model extends Base
         return self::$instance;
     }
 
+    /**
+     * Mengambil instance suatu model dari peta model
+     * @param mixed $class Nama kelas model
+     * @param mixed $module Nama modul tempat meletakkan model tersebut
+     * @param optional $is_new apakah model akan dimuat sebagai data baru atau data lama
+     * @return object
+     */
     private static function getObject($class, $module, $is_new = true)
     {
         $schema = SchemaCollection::get();
@@ -88,6 +110,11 @@ class Model extends Base
         return $this->{$property};
     }
 
+    /**
+     * Memasukkan data ke dalam peta tabel ketika terjadi inisialisasi
+     * @param mixed $property string Nama properti
+     * @param mixed $value Nilai dari properti
+     */
     public function __set($property, $value) {
         if(in_array('table', get_class_methods($this))) {
             /*$fields = SchemaCollection::get()->tables[$this->table()]['fields'];
@@ -100,18 +127,33 @@ class Model extends Base
         $this->{$property} = $value;
     }
 
+    /**
+     * Fungsi yang digunakan untuk menetapkan nama tabel yang diwakili oleh model
+     * @return string
+     */
     public function table()
     {
     }
 
+    /**
+     * Fungsi yang digunakan untuk menetapkan label-label yang digunakan oleh model
+     * @return array
+     */
     public function labels()
     {
     }
 
+    /**
+     * Fungsi yang digunakan untuk menetapkan aturan-aturan validasi yang digunakan oleh model
+     * @return string
+     */
     public function rules()
     {
     }
 
+    /**
+     * Memasukkan data model ke dalam pemetaan
+     */
     private function preload()
     {
         if($this->labels() != null) {
@@ -174,6 +216,11 @@ class Model extends Base
         }
     }
 
+    /**
+     * Mengambil skema tabel yang digunakan oleh model
+     * @param optional $use_module boolean menentukan apakah pencarian menggunakan module
+     * @return array
+     */
     public function schema($use_module = false)
     {
         if(in_array('table', get_class_methods($this))) {
@@ -186,6 +233,12 @@ class Model extends Base
         }
     }
 
+    /**
+     * Menentukan aturan validasi terhadap suatu model
+     * @param mixed $field string Nama field yang akan diberi aturan
+     * @param mixed $rules aturan validasi yang akan diberikan pada field tersebut
+     * @param optional $params array Parameter yang dibutuhkan oleh aturan validasi yang digunakan
+     */
     public function setRules($field, $rules, $params = array())
     {
         Validation::get()->setRules($field, $rules, $params);
@@ -201,21 +254,36 @@ class Model extends Base
         return $this->____dataset['is_new'];
     }
 
+    /**
+     * Menetapkan status model sebagai data baru atau data lama
+     * @param mixed $status boolean status model sebagai data lama atau data baru
+     */
     public function setIsNew($status)
     {
         $this->____dataset['is_new'] = (bool)$status;
     }
 
+    /**
+     * Menetapkan status model sebagai data baru
+     */
     public function setNew()
     {
         $this->____dataset['is_new'] = true;
     }
 
+    /**
+     * Mengambil nama field yang menjadi primary key dari tabel yang diwakili oleh model
+     * @return string
+     */
     public function getPrimaryKey()
     {
         return $this->defval($this->schema()->TableStructure['primary_key'], $this->dataset('primary_key'));
     }
 
+    /**
+     * Menetapkan nama field yang menjadi primary key dari tabel yang diwakili oleh model
+     * @param mixed $key string Nama field
+     */
     public function setPrimaryKey($key)
     {
         $this->dataset('primary_key', $key);
@@ -229,7 +297,7 @@ class Model extends Base
      */
     public function label($property = null)
     {
-        if(!empty($this->schema())) {
+        if($this->schema() != null) {
             return isset($this->schema()->Labels[$property]) ? $this->schema()->Labels[$property] : ucfirst($property);
         } else {
             return ucfirst($property);
@@ -258,6 +326,9 @@ class Model extends Base
         return $this;
     }
 
+    /**
+     * Mengosongkan nilai field/properti pada model
+     */
     public function clear() 
     {
         foreach ($this as $key => $value) {
@@ -265,6 +336,10 @@ class Model extends Base
         }
     }
 
+    /**
+     * Mengambil objek asli model
+     * @param optional $is_new boolean Objek diambil sebagai data baru atau data lama
+     */
     public function origin($is_new = false)
     {
         return self::getObject(get_class($this), $this->____dataset['module'], (bool)$is_new);
@@ -345,7 +420,7 @@ class Model extends Base
     }
 
     /**
-     * Melakukan operasi penyimpanan model
+     * Melakukan operasi penyimpanan model (otomatis menentukan ditambah atau diubah)
      * @since 1.0.0
      * @param $params adalah parameter tambahan untuk mengatur proses penyimpanan model
      * @return objek resource hasil operasi penyimpanan model
@@ -355,6 +430,12 @@ class Model extends Base
         return $this->isNew() ? $this->insert($availables) : $this->update($availables);
     }
 
+    /**
+     * Menambah data baru
+     * @since 1.0.0
+     * @param optional $availables array Nama-nama field yang akan digunakan
+     * @return boolean
+     */
     public function insert($availables = null)
     {
         if(!$this->isNew()) {
@@ -391,11 +472,10 @@ class Model extends Base
     }
 
     /**
-     * Membentuk query SQL untuk operasi penyimpanan record model. Operasi penyimpanan
-     * dapat berupa INSERT ataupun UPDATE
+     * Mengubah data lama
      * @since 1.0.0
-     * @param $params adalah parameter tambahan untuk mengatur pembentukan query SQL
-     * @return string query SQL yang telah terbentuk
+     * @param optional $availables array Nama-nama field yang akan digunakan
+     * @return boolean
      */
     public function update($availables = null)
     {
@@ -440,6 +520,11 @@ class Model extends Base
         return $this->db()->query($this->db()->delete()->Query);
     }
 
+    /**
+     * Mengeksekusi perintah SQL dan mengikat hasilnya pada model
+     * @since 1.0.0
+     * @return object
+     */
     public function query()
     {
         $args = func_get_args();
@@ -462,6 +547,11 @@ class Model extends Base
         }
     }
 
+    /**
+     * Mengambil nilai field dari perintah SQL yang menyaring satu field
+     * @since 1.0.0
+     * @return int|string|float
+     */
     public function findData()
     {
         $use_pk_opt = false;
@@ -518,6 +608,11 @@ class Model extends Base
         }
     }
 
+    /**
+     * Mengambil satu record/baris dari suatu tabel menggunakan model
+     * @since 1.0.0
+     * @return object
+     */
     public function find() {
         $use_pk_opt = false;
         switch (func_num_args()) {
@@ -575,6 +670,11 @@ class Model extends Base
         }
     }
 
+    /**
+     * Mengambil lebih dari satu record/baris dari suatu tabel menggunakan model
+     * @since 1.0.0
+     * @return array
+     */
     public function findAll($params = array()) {
         $table = $this->table();
         $field = is_array($params) && isset($params['select']) ? $params['select'] : '*';
@@ -614,6 +714,13 @@ class Model extends Base
         return $collection;
     }
 
+    /**
+     * Memuat berkas model dari mengambil objek model
+     * @param mixed $name string Nama model yang akan dimuat
+     * @param optional $is_new boolean status apakah model dimuat sebagai data baru atau data lama
+     * @since 1.0.0
+     * @return object
+     */
     public function load($name, $is_new = false) {
         if(preg_match('/^\/([a-zA-Z][a-zA-Z0-9]+)$/i', $name, $match)) {
             $path = $this->moduleDir()."models".DS."$match[1].php";
@@ -633,6 +740,12 @@ class Model extends Base
         return $instance = $class::getObject($class, $name, $is_new);
     }
 
+
+    /**
+     * Memuat pengeksekusi perintah SQL untuk model
+     * @param optional $from string Nama tabel atau dipadukan dengan perintah JOIN
+     * @return objek kelas {@link Djokka\Db}
+     */
     public function db($from = null) {
         Db::get()->From = $this->defval($from, $this->table());
         if(isset($this->____dataset['params']['where'])) {
@@ -641,6 +754,11 @@ class Model extends Base
         return Db::get();
     }
 
+    /**
+     * Memanggil view melalui model
+     * @deprecated
+     * @return string
+     */
     public function view($name, $params = array())
     {
         return Controller::get()->getView($name, $params);

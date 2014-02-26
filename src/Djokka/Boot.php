@@ -3,9 +3,10 @@
 /**
  * @author Ahmad Jawahir <rawndummy@gmail.com>
  * @link http://www.djokka.com
- * @license http://www.djokka.com?r=index/license
+ * @license http://creativecommons.org/licenses/by-nc-sa/4.0/deed.en_US
  * @copyright Copyright &copy; 2013 Djokka Media
- * @version 1.0.0
+ * @since 1.0.3
+ * @version 1.0.3
  */
 
 namespace Djokka;
@@ -20,30 +21,27 @@ define('SYSTEM_DIR', __DIR__ . DS . '..' . DS . '..' . DS);
 include_once 'Base.php';
 
 /**
- * Kelas Djokka adalah kelas inti framework. Dimuat pertama kali oleh
- * index.php pada root web. Kelas ini mengendalikan keseluruhan sistem.
- * @author Ahmad Jawahir <rawndummy@gmail.com>
+ * Kelas yang digunakan untuk melakukan boot/pemuatan sistem
  * @since 1.0.0
  */
 class Boot extends Base
 {
     /**
-     * @var Menampung instance dari kelas
-     * @access private
+     * Instance dari kelas ini
      * @since 1.0.0
      */
     private static $instance;
 
     /**
-     * Mengambil instance secara Singleton Pattern
+     * Mengambil instance kelas ini secara Singleton Pattern
      * @since 1.0.0
      * @param $class adalah nama kelas (opsional)
      * @return objek instance kelas
      */
-    public static function getInstance($class = __CLASS__)
+    public static function getInstance()
     {
         if(self::$instance == null) {
-            self::$instance = new $class;
+            self::$instance = new static();
         }
         return self::$instance;
     }
@@ -67,7 +65,7 @@ class Boot extends Base
     }
 
     /**
-     * Executed after script execution finishes
+     * Mengambil error terakhir ketika proses berakhir
      * @since 1.0.3
      */
     public static function onShutdown()
@@ -78,13 +76,13 @@ class Boot extends Base
     }
 
     /**
-     * Handling error and throw as an exception
-     * @param mixed $num Error code
-     * @param mixed $str Error message
-     * @param mixed $file File path of error
-     * @param mixed $line Line of error in file
-     * @param optional $context Argument
-     * @throws \ErrorException to send error as exception
+     * Menangani error dan melemparnya sebagai Exception
+     * @param mixed $num Kode error
+     * @param mixed $str Pesan error
+     * @param mixed $file Lokasi berkas yang ditemukan error
+     * @param mixed $line Baris kode pada berkas yang ditemukan error
+     * @param optional $context Argumen atau parameter
+     * @throws \ErrorException untuk menjadikan error sebagai Exception
      * @since 1.0.3
      */
     public static function handleError($num, $str, $file, $line, $context = null)
@@ -93,8 +91,8 @@ class Boot extends Base
     }
 
     /**
-     * Render an exception as output
-     * @param mixed $e \Exception instance of exception
+     * Menampilkan Exception atau error sebagai HTML
+     * @param mixed $e object Instance object Exception
      * @since 1.0.3
      */
     public static function handleException(\Exception $e)
@@ -117,9 +115,8 @@ class Boot extends Base
     public function autoload($class)
     {
         $path = null;
-        if(preg_match('/^'.__NAMESPACE__.'/i', $class)) {
-            $class = str_replace(__NAMESPACE__.DIRECTORY_SEPARATOR, null, $class);
-            $path = $this->realPath(__DIR__.DIRECTORY_SEPARATOR.$class.'.php');
+        if(preg_match('/^'.__NAMESPACE__.'(.*)$/i', $class, $match)) {
+            $path = $this->realPath(__DIR__.$this->realPath($match[1]).'.php');
             if(!file_exists($path)) {
                 throw new \Exception("Class file not found in path $path", 404);
             }
@@ -184,12 +181,17 @@ class Boot extends Base
         return $this;
     }
 
+    /**
+     * Mengubah suatu string menjadi format path yang benar
+     * @since 1.0.0
+     * @return string
+     */
     public function realPath($path) {
         return preg_replace("/([\/\\\]+)/i", DS, $path);
     }
 
     /**
-     * Sub fungsi kelas
+     * Membaca, menambah atau mengubah nilai konfigurasi
      */
     public function config() {
         switch (func_num_args()) {
@@ -246,6 +248,12 @@ class Boot extends Base
         echo $html;
     }
 
+    /**
+     * Mengubah suatu string menjadi format path yang benar
+     * @since 1.0.0
+     * @deprecated
+     * @return string
+     */
     public function exception($code, $message)
     {
         throw new \Exception($message, $code);
@@ -255,7 +263,6 @@ class Boot extends Base
      * Menampilkan hasil error, termasuk ke header dokumen web
      * @since 1.0.0
      * @param $exception adalah objek eksepsi dari sistem
-     * @access private
      * @deprecated
      */
     private function exceptionOutput($exception)

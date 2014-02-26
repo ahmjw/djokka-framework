@@ -3,27 +3,25 @@
 /**
  * @author Ahmad Jawahir <rawndummy@gmail.com>
  * @link http://www.djokka.com
- * @license http://www.djokka.com?r=index/license
+ * @license http://creativecommons.org/licenses/by-nc-sa/4.0/deed.en_US
  * @copyright Copyright &copy; 2013 Djokka Media
- * @package \Djokka\
  * @version 1.0.0
  */
 
 namespace Djokka\Helpers;
 
+use Djokka\Base;
 use Djokka\Helpers\String;
 
 /**
  * Kelas Djokka\File adalah kelas pustaka framework. Dipergunakan untuk keperluan akses
  * atau manipulasi file pada folder web
- * @author Ahmad Jawahir <rawndummy@gmail.com>
  * @since 1.0.0
  */
-class File extends \Djokka
+class File extends Base
 {
     /**
-     * @var Menampung instance dari kelas
-     * @access private
+     * Menampung instance dari kelas
      * @since 1.0.0
      */
     private static $instance;

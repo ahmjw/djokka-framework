@@ -16,20 +16,58 @@ use Djokka\Base;
 /**
  * Kelas Djokka\Db adalah kelas pustaka framework. Dipergunakan untuk keperluan akses
  * database
- * @author Ahmad Jawahir <rawndummy@gmail.com>
  * @since 1.0.0
  */
 class Db extends Base
 {
+    /**
+     * Perintah SQL yang dihasilkan
+     */
     public $Query;
+
+    /**
+     * Pembentuk perintah SQL SELECT
+     */
     public $Select;
+
+    /**
+     * Pembentuk perintah SQL FROM
+     */
     public $From;
+
+    /**
+     * Pembentuk perintah SQL WHERE
+     */
     public $Where;
+
+    /**
+     * Pembentuk perintah SQL GROUP BY
+     */
     public $Group;
+
+    /**
+     * Pembentuk perintah SQL ORDER BY
+     */
     public $Order;
+
+    /**
+     * Pembentuk perintah SQL LIMIT
+     */
     public $Limit;
+
+    /**
+     * Pembentuk perintah SQL INSERT INTO
+     */
     public $Insert;
+
+    /**
+     * Pembentuk perintah SQL VALUES
+     */
     public $Values;
+
+    /**
+     * Koneksi database yang digunakan
+     */
     private $connection;
 
     /**
@@ -60,6 +98,10 @@ class Db extends Base
         return $this;
     }
 
+    /**
+     * Mengambil koneksi yang digunakan database
+     * @return object
+     */
     public function getConnection() {
         return $this->connection;
     }
@@ -75,6 +117,10 @@ class Db extends Base
         return $this->getArrays('DESC '.$this->From);
     }
 
+    /**
+     * Membentuk perintah SQL UPDATE
+     * @return object
+     */
     public function update($data) {
         $sql = "UPDATE {$this->From} SET ";
         if(is_array($data)) {
@@ -97,6 +143,10 @@ class Db extends Base
         return $this;
     }
 
+    /**
+     * Membentuk perintah SQL INSERT INTO
+     * @return object
+     */
     public function insert() {
         $sql = "INSERT INTO {$this->From} ";
         switch (func_num_args()) {
@@ -112,6 +162,10 @@ class Db extends Base
         return $this;
     }
 
+    /**
+     * Mengamankan dari SQL injection menggunakan penyimbolan parameter
+     * @return string
+     */
     public function replaceWith($params = array())
     {
         $criteria = $params[0];
@@ -124,6 +178,10 @@ class Db extends Base
         }, $criteria);
     }
 
+    /**
+     * Membentuk perintah SQL WHERE untuk penyaringan
+     * @return object
+     */
     public function where() {
         $sql = $this->Query.' WHERE ';
         switch (func_num_args()) {
@@ -162,6 +220,10 @@ class Db extends Base
         return $this;
     }
 
+    /**
+     * Mengambil jumlah data yang dihasilkan dari perintah SQL yang dijalankan
+     * @return int
+     */
     public function count() {
         switch (func_num_args()) {
             case 0:
@@ -176,6 +238,10 @@ class Db extends Base
         }
     }
 
+    /**
+     * Membentuk perintah SQL DELETE untuk menghapus data
+     * @return object
+     */
     public function delete() {
         $this->Select = $str;
         $this->Query = 'DELETE '.$str;
@@ -200,6 +266,10 @@ class Db extends Base
         return $this;
     }
 
+    /**
+     * Membentuk perintah SQL SELECT
+     * @return object
+     */
     public function select($str = '*') {
         $this->Select = $str;
         $this->Query = 'SELECT '.$str;
@@ -208,30 +278,50 @@ class Db extends Base
         return $this;
     }
 
+    /**
+     * Membentuk perintah SQL FROM
+     * @return object
+     */
     public function from($str) {
         $this->From = $str;
         $this->Query .= ' FROM '.$str;
         return $this;
     }
 
+    /**
+     * Membentuk perintah SQL GROUP BY
+     * @return object
+     */
     public function group($str) {
         $this->Group = $str;
         $this->Query .= ' GROUP BY '.$str;
         return $this;
     }
 
+    /**
+     * Membentuk perintah SQL ORDER BY
+     * @return object
+     */
     public function order($str) {
         $this->Order = $str;
         $this->Query .= ' ORDER BY '.$str;
         return $this;
     }
 
+    /**
+     * Membentuk perintah SQL LIMIT
+     * @return object
+     */
     public function limit($str) {
         $this->Limit = $str;
         $this->Query .= ' LIMIT '.$str;
         return $this;
     }
 
+    /**
+     * Mengeksekusi perintah SQL
+     * @return object
+     */
     public function execute() {
 
         if($resource = $this->query($this->Query)) {
@@ -243,6 +333,9 @@ class Db extends Base
         }
     }
 
+    /**
+     * @deprecated
+     */
     public function getProperty()
     {
         foreach ($this as $key => $value) {
@@ -311,6 +404,10 @@ class Db extends Base
         }
     }
 
+    /**
+     * Mengambil nilai field pada perintah SQL yang menyaring satu field
+     * @return string|int|float
+     */
     public function getData($sql) {
         if(is_array($sql)) {
             $criterias = array_slice($sql, 1);
@@ -475,6 +572,11 @@ class Db extends Base
         }
     }
 
+    /**
+     * Mengambil skema/struktur tabel
+     * @param mixed $table string Nama tabel yang akan diambil
+     * @return array
+     */
     public function getTableSchema($table)
     {
         $this->From = $table;
@@ -503,6 +605,10 @@ class Db extends Base
         }
     }
 
+    /**
+     * Mengambil daftar tabel yang terdapat di dalam database
+     * @return array
+     */
     public function getTables()
     {
         $items = $this->getArrays('SHOW TABLES', true);

@@ -3,9 +3,8 @@
 /**
  * @author Ahmad Jawahir <rawndummy@gmail.com>
  * @link http://www.djokka.com
- * @license http://www.djokka.com?r=index/license
+ * @license http://creativecommons.org/licenses/by-nc-sa/4.0/deed.en_US
  * @copyright Copyright &copy; 2013 Djokka Media
- * @package \Djokka\
  * @version 1.0.0
  */
 
@@ -14,15 +13,13 @@ namespace Djokka\Helpers;
 /**
  * Kelas Djokka\String adalah kelas pustaka framework. Dipergunakan untuk mengakses,
  * mengelola, dan memanipulasi data sesi pada web
- * @author Ahmad Jawahir <rawndummy@gmail.com>
  * @since 1.0.0
  */
 class String
 {
 
     /**
-     * @var Menampung instance dari kelas
-     * @access private
+     * Menampung instance dari kelas
      * @since 1.0.0
      */
     private static $instance;
@@ -103,7 +100,14 @@ class String
         return str_replace('\\', DS, str_replace('/', DS, $path));
     }
 
-    public function replaceWith($text, $symbol, $params = array())
+    /**
+     * Melakukan replace/ganti berdasarkan simbol dan pasangan data yang dimasukkan
+     * @param mixed $text string Teks yang akan diproses
+     * @param mixed $symbol string|char Simbol yang akan diganti
+     * @param mixed $params array Pasangan data yang akan menggantikan simbol berdasarkan urutan
+     * @return string
+     */
+    public function replaceWith($text, $symbol, $params)
     {
         $i = 0;
         return preg_replace_callback('/\''.$symbol.'/i', function($matches) use($params, &$i) {

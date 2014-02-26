@@ -3,9 +3,8 @@
 /**
  * @author Ahmad Jawahir <rawndummy@gmail.com>
  * @link http://www.djokka.com
- * @license http://www.djokka.com?r=index/license
+ * @license http://creativecommons.org/licenses/by-nc-sa/4.0/deed.en_US
  * @copyright Copyright &copy; 2013 Djokka Media
- * @package \Djokka\
  * @version 1.0.0
  */
 
@@ -16,22 +15,32 @@ use Djokka\Base;
 /**
  * Kelas Djokka\Validation adalah kelas pustaka framework. Dipergunakan untuk melakukan
  * validasi terhadap model
- * @author Ahmad Jawahir <rawndummy@gmail.com>
  * @since 1.0.0
  */
 class Validation extends Base
 {
+    /**
+     * Daftar error yang dihasilkan
+     */
     public $errors = array();
 
+    /**
+     * Daftar aturan validasi yang telah dimuat
+     */
     public $rules = array();
 
+    /**
+     * Daftar nama field yang validasinya akan diabaikan
+     */
     public $unvalidates = array();
 
+    /**
+     * Menandai validasi diaktifkan atau tidak
+     */
     public $unvalidate = false;
 
     /**
-     * @var Menampung instance dari kelas
-     * @access private
+     * Menampung instance dari kelas
      * @since 1.0.0
      */
     private static $instance;
@@ -50,6 +59,12 @@ class Validation extends Base
         return self::$instance;
     }
 
+    /**
+     * Memasukkan aturan validasi untuk model
+     * @param mixed $field string Nama field
+     * @param mixed $rules string Nama aturan validasi
+     * @param optional $params array Parameter yang dibutuhkan untuk aturan validasi yang digunakan
+     */
     public function setRules($field, $rules, $params)
     {
         $this->rules[] = array_merge($this->rules, array_merge(array(
@@ -57,6 +72,9 @@ class Validation extends Base
         ), $params));
     }
 
+    /**
+     * Membersihkan daftar aturan validasi
+     */
     public function clearRules()
     {
         unset($this->rules);
@@ -96,6 +114,14 @@ class Validation extends Base
         return !$model->hasError();
     }
 
+    /**
+     * Melakukan validasi terhadap suatu model
+     * @param mixed $model object Objek model yang akan divalidasi
+     * @param mixed $action string Nama aturan validasi yang digunakan
+     * @param mixed $fields string Nama field pada model yang akan divalidasi
+     * @param mixed $params array Parameter yang dibutuhkan oleh aturan validasi
+     * @throws \Exception Jika nama aturan validasi tidak tersedia
+     */
     private function execute($model, $action, $fields, $params)
     {
         // Searching single validation with parameters
@@ -145,7 +171,7 @@ class Validation extends Base
      * @param $field adalah field/properti model
      * @param $params adalah parameter yang dimasukkan dalam aturan validasi
      * @access private
-     * @return status validasi
+     * @return boolean status validasi
      */
     private function length($model, $field, $params = array())
     {
@@ -158,7 +184,7 @@ class Validation extends Base
      * @param $field adalah field/properti model
      * @param $params adalah parameter yang dimasukkan dalam aturan validasi
      * @access private
-     * @return status validasi
+     * @return boolean status validasi
      */
     private function required($model, $field, $params = array())
     {
@@ -170,6 +196,15 @@ class Validation extends Base
         }
     }
 
+    /**
+     * Melakukan validasi apakah suatu field termasuk angka atau bukan
+     * @since 1.0.2
+     * @param $model adalah objek model yang akan divalidasi
+     * @param $field adalah field/properti model
+     * @param $params adalah parameter yang dimasukkan dalam aturan validasi
+     * @access private
+     * @return boolean status validasi
+     */
     private function numeric($model, $field, $params = array())
     {
         if(!is_numeric($model->{$field})) {
@@ -180,6 +215,15 @@ class Validation extends Base
         }
     }
 
+    /**
+     * Melakukan validasi apakah suatu field termasuk huruf atau bukan
+     * @since 1.0.0
+     * @param $model adalah objek model yang akan divalidasi
+     * @param $field adalah field/properti model
+     * @param $params adalah parameter yang dimasukkan dalam aturan validasi
+     * @access private
+     * @return boolean status validasi
+     */
     private function alphabet($model, $field, $params = array())
     {
         if(is_numeric($model->{$field})) {
@@ -190,6 +234,15 @@ class Validation extends Base
         }
     }
 
+    /**
+     * Melakukan validasi apakah suatu field tidak melebihi panjang yang ditentukan
+     * @since 1.0.0
+     * @param $model adalah objek model yang akan divalidasi
+     * @param $field adalah field/properti model
+     * @param $params adalah parameter yang dimasukkan dalam aturan validasi
+     * @access private
+     * @return boolean status validasi
+     */
     private function maxLength($model, $field, $params = array())
     {
         if(strlen($model->{$field}) > $params[0]) {
@@ -220,6 +273,15 @@ class Validation extends Base
         }
     }
 
+    /**
+     * Melakukan validasi apakah suatu field memiliki nilai yang sama dengan field lain yang ditentukan
+     * @since 1.0.0
+     * @param $model adalah objek model yang akan divalidasi
+     * @param $field adalah field/properti model
+     * @param $params adalah parameter yang dimasukkan dalam aturan validasi
+     * @access private
+     * @return boolean status validasi
+     */
     private function compare($model, $field, $params = array()) {
         if($model->{$field} != $params[0]) {
             $message = isset($params['message']) ?

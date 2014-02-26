@@ -1,25 +1,55 @@
 <?php
 
+/**
+ * @author Ahmad Jawahir <rawndummy@gmail.com>
+ * @link http://www.djokka.com
+ * @license http://creativecommons.org/licenses/by-nc-sa/4.0/deed.en_US
+ * @copyright Copyright &copy; 2013 Djokka Media
+ * @version 1.0.2
+ */
+
 namespace Djokka\Model;
 
+/**
+ * Kelas ini digunakan untuk membentuk koleksi model
+ * @since 1.0.2
+ */
 class ModelCollection
 {
+    /**
+     * Resource yang dihasilkan dari hasil eksekusi perintah SQL yang dilakukan database
+     */
 	private $resource;
+
+    /**
+     * Parameter yang dimasukkan untuk penyaringan hasil
+     */
     private $parameters = array();
+
+    /**
+     * Model yang meminta koleksi
+     */
 	private $model;
+
+    /**
+     * Jumlah baris yang dihasilkan dari hasil eksekusi perintah SQL
+     */
 	public $RowCount;
+
+    /**
+     * Jumlah kolom yang dihasilkan dari hasil eksekusi perintah SQL
+     */
 	public $FieldCount;
 
     /**
-     * @var Menampung instance dari kelas
-     * @access private
-     * @since 1.0.0
+     * Menampung instance dari kelas
+     * @since 1.0.2
      */
     private static $instance;
 
     /**
      * Mengambil instance secara Singleton Pattern
-     * @since 1.0.0
+     * @since 1.0.2
      * @param $class adalah nama kelas (opsional)
      * @return objek instance kelas
      */
@@ -31,6 +61,9 @@ class ModelCollection
         return self::$instance;
     }
 
+    /**
+     * Memasukkan koleksi model ke dalam suatu properti
+     */
 	public function __get($property)
 	{
 		if($property == 'Rows') {
@@ -47,11 +80,19 @@ class ModelCollection
 		return $this->{$property};
 	}
 
+    /**
+     * Menetapkan objek model yang melakukan permintaan koleksi
+     * @param mixed $model object Objek model
+     */
 	public function setModel($model)
 	{
 		$this->model = $model;
 	}
 
+    /**
+     * Memberikan data ke dalam koleksi model
+     * @param mixed $db object Objek dari kelas {@link Djokka\Db}
+     */
 	public function setDb($db)
 	{
 		foreach ($db as $key => $value) {
@@ -64,6 +105,10 @@ class ModelCollection
 		$this->FieldCount = $this->resource->field_count;
 	}
 
+    /**
+     * Mengambil objek model dari hasil parsing perintah SQL
+     * @return object
+     */
     public function getModel()
     {
         $model = $this->model;
@@ -80,6 +125,10 @@ class ModelCollection
         return $model;
     }
 
+    /**
+     * Menetapkan parameter yang akan menyaring hasil
+     * @param mixed $parameters array Parameter untuk penyaringan
+     */
     public function setParameters($parameters)
     {
         $this->parameters = $parameters;

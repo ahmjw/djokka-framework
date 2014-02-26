@@ -3,9 +3,8 @@
 /**
  * @author Ahmad Jawahir <rawndummy@gmail.com>
  * @link http://www.djokka.com
- * @license http://www.djokka.com?r=index/license
+ * @license http://creativecommons.org/licenses/by-nc-sa/4.0/deed.en_US
  * @copyright Copyright &copy; 2013 Djokka Media
- * @package \Djokka\
  * @version 1.0.0
  */
 
@@ -14,15 +13,13 @@ namespace Djokka\Helpers;
 /**
  * Kelas Djokka\Session adalah kelas pustaka framework. Dipergunakan untuk mengakses,
  * mengelola, dan memanipulasi data sesi pada web
- * @author Ahmad Jawahir <rawndummy@gmail.com>
  * @since 1.0.0
  */
 class Session
 {
 
     /**
-     * @var Menampung instance dari kelas
-     * @access private
+     * Menampung instance dari kelas
      * @since 1.0.0
      */
     private static $instance;
@@ -53,15 +50,28 @@ class Session
      *   dengan nilai yang dimasukkan
      * @return sesi web
      */
-    public function getSession() {
+    public function getSession() 
+    {
         return $_SESSION['djokka'];
     }
 
-    public function getData($data) {
+    /**
+     * Mengambil data session berdasarkan nama key
+     * @param mixed $data string Nama key session
+     * @return alltypes
+     */
+    public function getData($data) 
+    {
         return $_SESSION['djokka'][$data];
     }
 
-    public function setData($data, $value) {
+    /**
+     * Menetapkan data session berdasarkan nama key
+     * @param mixed $data string Nama key session
+     * @param mixed $value alltypes Nilai yang akan diberikan pada session sesuai nama key
+     */
+    public function setData($data, $value) 
+    {
         $_SESSION['djokka'][$data] = $value;
     }
 

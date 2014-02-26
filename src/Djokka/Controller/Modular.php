@@ -3,9 +3,8 @@
 /**
  * @author Ahmad Jawahir <rawndummy@gmail.com>
  * @link http://www.djokka.com
- * @license http://www.djokka.com?r=index/license
+ * @license http://creativecommons.org/licenses/by-nc-sa/4.0/deed.en_US
  * @copyright Copyright &copy; 2013 Djokka Media
- * @package \Djokka\
  * @version 1.0.1
  */
 
@@ -22,7 +21,6 @@ use Djokka\Helpers\User;
 /**
  * Kelas Djokka\Controller adalah kelas pustaka framework. Dipergunakan untuk mengatur
  * konfigurasi yang digunakan pada web
- * @author Ahmad Jawahir <rawndummy@gmail.com>
  * @since 1.0.0
  */
 class Modular extends Core
@@ -32,8 +30,7 @@ class Modular extends Core
     private $params;
 
     /**
-     * @var Menampung instance dari kelas
-     * @access private
+     * Menampung instance dari kelas
      * @since 1.0.1
      */
     private static $instance;
@@ -52,6 +49,12 @@ class Modular extends Core
         return self::$instance;
     }
 
+    /**
+     * Mengambil konten view pada modul yang menggunakan arsitektur modular
+     * @param mixed $info array Informasi modul
+     * @param optional $param array Parameter yang akan dikirimkan untuk fungsi aksi
+     * @return string
+     */
     public function getViewContent($info, $params) {
         // Memuat view yang terletak pada folder tema
         $theme_view = $this->realPath($this->themeDir().$this->theme().DS.'views'.DS.$info['route']);

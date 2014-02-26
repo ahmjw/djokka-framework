@@ -3,9 +3,8 @@
 /**
  * @author Ahmad Jawahir <rawndummy@gmail.com>
  * @link http://www.djokka.com
- * @license http://www.djokka.com?r=index/license
+ * @license http://creativecommons.org/licenses/by-nc-sa/4.0/deed.en_US
  * @copyright Copyright &copy; 2013 Djokka Media
- * @package \Djokka\
  * @version 1.0.1
  */
 
@@ -26,8 +25,7 @@ class Plugin extends Core
     public $url;
 
     /**
-     * @var Menampung instance dari kelas
-     * @access private
+     * Menampung instance dari kelas
      * @since 1.0.1
      */
     private static $instance;
@@ -46,6 +44,9 @@ class Plugin extends Core
         return self::$instance;
     }
 
+    /**
+     * Konstruktor kelas
+     */
     public function __construct() {
         if(get_class($this) != __CLASS__) {
             $class = $this('String')->lastPart('\\', get_class($this));
@@ -54,6 +55,11 @@ class Plugin extends Core
         }
     }
 
+    /**
+     * Menambahkan link file CSS atau Javascript hanya pada halaman yang sedang dibuka
+     * @since 1.0.1
+     * @param mixed $file string Alamat berkas CSS atau Javascript
+     */
     public function asset($file) {
         Asset::get()->add($this->url.$file);
     }

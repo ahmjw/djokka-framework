@@ -3,9 +3,8 @@
 /**
  * @author Ahmad Jawahir <rawndummy@gmail.com>
  * @link http://www.djokka.com
- * @license http://www.djokka.com?r=index/license
+ * @license http://creativecommons.org/licenses/by-nc-sa/4.0/deed.en_US
  * @copyright Copyright &copy; 2013 Djokka Media
- * @package \Djokka\
  * @version 1.0.0
  */
 
@@ -17,22 +16,19 @@ use Djokka\Db;
 /**
  * Kelas Djokka\Config adalah kelas pustaka framework. Dipergunakan untuk mengatur
  * konfigurasi yang digunakan pada web
- * @author Ahmad Jawahir <rawndummy@gmail.com>
  * @since 1.0.0
  */
 class Pager extends Base
 {
 
     /**
-     * @var Menampung data konfigurasi web
-     * @access private
+     * Menampung data konfigurasi web
      * @since 1.0.0
      */
     private $data = array();
 
     /**
-     * @var Menampung instance dari kelas
-     * @access private
+     * Menampung instance dari kelas
      * @since 1.0.0
      */
     private static $instance;
@@ -51,7 +47,13 @@ class Pager extends Base
         return self::$instance;
     }
 
-    public function result() {
+    /**
+     * Mengambil hasil output dari pembagian halaman
+     * @since 1.0.0
+     * @return array
+     */
+    public function result() 
+    {
         $pager = $this->config('pager');
         $field = isset($pager['select']) ? $pager['select'] : $this->defval($pager['primary_key'], '*');
         $table = isset($pager['from']) ? $pager['from'] : $pager['table'];

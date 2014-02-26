@@ -3,33 +3,31 @@
 /**
  * @author Ahmad Jawahir <rawndummy@gmail.com>
  * @link http://www.djokka.com
- * @license http://www.djokka.com?r=index/license
+ * @license http://creativecommons.org/licenses/by-nc-sa/4.0/deed.en_US
  * @copyright Copyright &copy; 2013 Djokka Media
- * @package \Djokka\
  * @version 1.0.0
  */
 
 namespace Djokka\Helpers;
 
+use Djokka\Base;
+
 /**
  * Kelas Djokka\User adalah kelas pustaka framework. Dipergunakan untuk mengakses dan
  * mengelola data user web
- * @author Ahmad Jawahir <rawndummy@gmail.com>
  * @since 1.0.0
  */
-class User extends \Djokka
+class User extends Base
 {
 
     /**
-     * @var Menampung data user web
-     * @access private
+     * Menampung data user web
      * @since 1.0.0
      */
     private static $data;
 
     /**
-     * @var Menampung instance dari kelas
-     * @access private
+     * Menampung instance dari kelas
      * @since 1.0.0
      */
     private static $instance;
@@ -96,11 +94,22 @@ class User extends \Djokka
         Session::get()->clear('user');
     }
 
-    public function getUser() {
+    /**
+     * Mengambil data user
+     * @return object|arrray|single-type
+     */
+    public function getUser() 
+    {
         return $this->session('user');
     }
 
-    public function getUserByType($type) {
+    /**
+     * Mengambil data user berdasarkan jenis/tipe
+     * @param mixed $type string Jenis/type user yang akan diambil
+     * @return object|array|single-type
+     */
+    public function getUserByType($type) 
+    {
         $user = $this->session('user');
         if(is_array($user)) {
             return $user[$type];

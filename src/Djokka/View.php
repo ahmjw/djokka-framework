@@ -1,5 +1,13 @@
 <?php
 
+/**
+ * @author Ahmad Jawahir <rawndummy@gmail.com>
+ * @link http://www.djokka.com
+ * @license http://creativecommons.org/licenses/by-nc-sa/4.0/deed.en_US
+ * @copyright Copyright &copy; 2013 Djokka Media
+ * @version 1.0.1
+ */
+
 namespace Djokka;
 
 use Djokka\Base;
@@ -7,15 +15,33 @@ use Djokka\View\Asset;
 
 class View extends Base
 {
+    /**
+     * Konten web
+     */
     private $content;
+
+    /**
+     * Nilai indeks view pada pemanggilan HMVC
+     */
     private $index = -1;
+
+    /**
+     * Daftar view yang telah terpanggil
+     */
     private $views = array();
+
+    /**
+     * Menandai pengolah view telah aktif atau belum
+     */
     private $active = false;
+
+    /**
+     * Menandai sistem mengaktifkan pengolah tema atau tidak
+     */
     private $use_theme = true;
 
     /**
-     * @var Menampung instance dari kelas
-     * @access private
+     * Menampung instance dari kelas
      * @since 1.0.1
      */
     private static $instance;
@@ -50,40 +76,75 @@ class View extends Base
         return ob_get_clean();
     }
 
+    /**
+     * Mengambil lokasi direktori view
+     * @param mixed $viewName string Nama view
+     * @return string
+     */
     private function getPath($viewName)
     {
         return BASE_DIR . DIRECTORY_SEPARATOR . 'modules' . DIRECTORY_SEPARATOR . $this->_module .
             DIRECTORY_SEPARATOR . 'views' . DIRECTORY_SEPARATOR . $viewName . '.php';
     }
 
+    /**
+     * Mengambil konten web
+     * @return string
+     */
     public function getContent()
     {
         return $this->content;
     }
 
+    /**
+     * Menentukan konten web
+     * @param mixed $content string Konten web
+     */
     public function setContent($content) {
         $this->content = $content;
     }
 
+    /**
+     * Mengambil daftar view yang telah terpanggil
+     * @return array
+     */
     public function getViews()
     {
         return $this->views;
     }
 
+    /**
+     * Mengambil indeks terakhir view yang terpanggil
+     * @return int
+     */
     public function getIndex()
     {
         return $this->index;
     }
 
+    /**
+     * Mengecek apakah bagian pengolah diaktifkan atau tidak
+     * @return boolean
+     */
     public function isActive()
     {
         return $this->active;
     }
 
+    /**
+     * Menetapkan status apakah pengolah tema digunakan atau tidak
+     * @param mixed $condition boolean
+     */
     public function setUseTheme($condition) {
         $this->use_theme = $condition;
     }
 
+    /**
+     * Memproses konten web berdasarkan informasi modul
+     * @param mixed $info array Informasi terkait modul yang akan diproses
+     * @param mixed $instance object Instance dari modul yang akan diproses
+     * @return string
+     */
     public function renderContent($info, $instance) {
         // Melakukan pembacaan view
         if($this->active && !empty($this->views)) {
@@ -118,6 +179,11 @@ class View extends Base
         }
     }
 
+    /**
+     * Memproses konten tema
+     * @param mixed $content string Konten web yang akan diproses ke tema
+     * @return string
+     */
     public function renderTheme($content) 
     {
         // Jika dalam mode JSON
@@ -157,6 +223,13 @@ class View extends Base
         $this->active = true;
     }
 
+    /**
+     * Mengambil konten view
+     * @param mixed $instance object Instance modul yang akan memproses
+     * @param mixed $view string Nama view yang akan diproses
+     * @param optional $param array Parameter yang akan diekstrak ke bagian view
+     * @return string
+     */
     public function getView($instance, $view, $params = array()) {
         $path = $this->themeDir().$this->config('theme').DS.'views'.DS.$this->config('module').DS.$view.'.php';
         if(!file_exists($path)) {

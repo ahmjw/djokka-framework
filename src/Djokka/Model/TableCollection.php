@@ -1,20 +1,31 @@
 <?php
 
+/**
+ * @author Ahmad Jawahir <rawndummy@gmail.com>
+ * @link http://www.djokka.com
+ * @license http://creativecommons.org/licenses/by-nc-sa/4.0/deed.en_US
+ * @copyright Copyright &copy; 2013 Djokka Media
+ * @version 1.0.2
+ */
+
 namespace Djokka\Model;
 
+/**
+ * Kelas ini digunakan untuk membentuk koleksi skema/struktur tabel untuk keperluan optimasi sistem
+ * @since 1.0.2
+ */
 class TableCollection
 {
 
     /**
-     * @var Menampung instance dari kelas
-     * @access private
-     * @since 1.0.1
+     * Menampung instance dari kelas
+     * @since 1.0.2
      */
     private static $instance;
 
     /**
      * Mengambil instance secara Singleton Pattern
-     * @since 1.0.1
+     * @since 1.0.2
      * @param $class adalah nama kelas (opsional)
      * @return objek instance kelas
      */
@@ -26,6 +37,9 @@ class TableCollection
         return self::$instance;
     }
 
+    /**
+     * Mengakses koleksi struktur tabel
+     */
 	public function table() {
 		switch (func_num_args()) {
 			case 1:
@@ -43,6 +57,10 @@ class TableCollection
 		}
 	}
 
+	/**
+     * Mengecek apakah tabel telah dimuat atau belum
+     * @return boolean
+     */
 	public function exists($name) {
 		return isset($this->{$name});
 	}

@@ -3,9 +3,8 @@
 /**
  * @author Ahmad Jawahir <rawndummy@gmail.com>
  * @link http://www.djokka.com
- * @license http://www.djokka.com?r=index/license
+ * @license http://creativecommons.org/licenses/by-nc-sa/4.0/deed.en_US
  * @copyright Copyright &copy; 2013 Djokka Media
- * @package \Djokka\
  * @version 1.0.0
  */
 
@@ -16,58 +15,59 @@ use Djokka\Base;
 /**
  * Kelas Djokka\Config adalah kelas pustaka framework. Dipergunakan untuk mengatur
  * konfigurasi yang digunakan pada web
- * @author Ahmad Jawahir <rawndummy@gmail.com>
  * @since 1.0.0
  */
 class Config extends Base
 {
     /**
-     * @var Menampung data konfigurasi web
-     * @access private
+     * Menampung data konfigurasi web
      * @since 1.0.0
      */
     private $data = array(
         // System path
-        'theme_path'=>'themes',
-        'asset_path'=>'assets',
-        'module_path'=>'protected/modules',
-        'plugin_path'=>'assets/plugins',
-        'component_path'=>'protected/components',
-        'config_path'=>'protected/config',
-        'app_path'=>null,
+        'theme_path'=>'themes', // Lokasi folder tema
+        'asset_path'=>'assets', // Lokasi folder aset
+        'module_path'=>'protected/modules', // Lokasi folder module
+        'plugin_path'=>'assets/plugins', // Lokasi folder plugin
+        'component_path'=>'protected/components', // Lokasi folder komponen
+        'config_path'=>'protected/config', // Lokasi folder konfigurasi
+        'app_path'=>null, // Lokasi folder project/aplikasi web
 
         // Error handler
-        'error_redirect'=>false,
-        'module_error'=>'index/error',
-        'module_forbidden'=>'index/signin',
+        'error_redirect'=>false, // Menandai apakah dilakukan pengalihan halaman saat terjadi error
+        'module_error'=>'index/error', // Nama modul tujuan pengalihan jika terjadi error
+        'module_forbidden'=>'index/signin', // Nama modul tujuan pengalihan saat terjadi error akses ditolak
 
         // Controller configurarion
-        'main_module'=>'index',
-        'modular_parent'=>null,
-        'module'=>null,
-        'architecture'=>null,
+        'main_module'=>'index', // Nama modul utama
+        'modular_parent'=>null, // Nama kelas induk untuk modul arsitektur modular
+        'module'=>null, // Nama modul yang sedang diakses
+        'architecture'=>null, // Arsitektur yang akan digunakan
 
         // Router configuration
-        'get_router'=>'r',
-        'route_format'=>'path',
-        'route_max_depth'=>20,
-        'route_params'=>array(),
-        'router_action'=>null,
-        'ref_dir'=>null,
-        'router'=>null,
-        'asset_url'=>null,
-        'theme_url'=>null,
+        'get_router'=>'r', // Nama key untuk format rute GET
+        'route_format'=>'path', // Format rute yang akan digunakan
+        'route_max_depth'=>20, // Maksimum kedalaman hirarki modul
+        'route_params'=>array(), // Parameter yang tersedia untuk Route-Aliasing
+        'router_action'=>null, // Aksi yang menjadi target untuk Route-Aliasing
+        'ref_dir'=>null, // Lokasi folder untuk mengganti lokasi folder standar pada suatu kondisi tertentu
+        'router'=>null, // Pengolah rute untuk Route-Aliasing
+        'asset_url'=>null, // URL untuk aset
+        'theme_url'=>null, // URL untuk tema
 
         // View configuration
-        'theme'=>'default',
-        'layout'=>'index',
-        'json'=>false,
-        'debug_json_mode'=>false,
-        'pager'=>null,
+        'theme'=>'default', // Nama tema yang sedang digunakan web
+        'layout'=>'index', // Nama layout yang sedang digunakan web
+        'json'=>false, // Menandai apakah output web menggunakan format JSON atau tidak
+        'debug_json_mode'=>false, // Menandai apakah debug dilakukan menggunakan format JSON atau tidak
+        'pager'=>null, // Data sementar untuk pager/pembagi halaman
 
-        'connection'=>0
+        'connection'=>0 // Indeks koneksi database yang akan digunakan pada fitur multi-database
     );
 
+    /**
+     * Peta kelas yang akan menjadi anggota pustaka yang dapat dipanggil
+     */
     private $class_map = array(
         'Session'=>'Djokka\\Helpers\\Session',
         'User'=>'Djokka\\Helpers\\User',
@@ -84,8 +84,7 @@ class Config extends Base
     );
 
     /**
-     * @var Menampung instance dari kelas
-     * @access private
+     * Menampung instance dari kelas
      * @since 1.0.0
      */
     private static $instance;
@@ -104,6 +103,9 @@ class Config extends Base
         return self::$instance;
     }
 
+    /**
+     * Konstruktor kelas
+     */
     public function __construct() {
         if(isset($_SERVER['SCRIPT_NAME']) && isset($_SERVER['DOCUMENT_ROOT'])) {
             $dir = String::get()->unlastPart('/', $_SERVER['SCRIPT_NAME']);
@@ -114,6 +116,9 @@ class Config extends Base
         }
     }
 
+    /**
+     * Membaca nilai konfigurasi yang diletakkan di dalam berkas konfigurasi dan memasukkannya ke dalam sistem
+     */
     public function render() {
         $dir = $this->configDir();
         $path = $dir.'main.php';
@@ -149,6 +154,10 @@ class Config extends Base
         }
     }
 
+    /**
+     * Mengambil data peta kelas
+     * @return array
+     */
     public function getClassMap() {
         return $this->class_map;
     }
@@ -188,11 +197,21 @@ class Config extends Base
     {
         return $this->data;
     }
+
+    /**
+     * Menetapkan konfigurasi secara langsung
+     * @param mixed $data array Pasangan key dan value konfigurasi yang akan dimasukkan
+     */
     public function setConfig($data)
     {
-        return $this->data = $data;
+        $this->data = $data;
     }
 
+    /**
+     * Mengambil nilai konfigurasi berdasarkan key
+     * @param mixed $data string Nama key konfigurasi yang akan diambil
+     * @return int|string|float|object|array|bool
+     */
     public function getData($data)
     {
         if(isset($this->data[$data])) {
@@ -201,9 +220,14 @@ class Config extends Base
         return;
     }
 
+    /**
+     * Menetapkan nilai konfigurasi berdasarkan key
+     * @param mixed $data string Nama key konfigurasi yang akan ditetapkan
+     * @param mixed $value alltype Nilai konfigurasi yang akan diberikan pada konfigurasi berdasarkan key
+     */
     public function setData($data, $value)
     {
-        return $this->data[$data] = $value;
+        $this->data[$data] = $value;
     }
 
 }

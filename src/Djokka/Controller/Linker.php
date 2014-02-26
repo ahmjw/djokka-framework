@@ -3,9 +3,8 @@
 /**
  * @author Ahmad Jawahir <rawndummy@gmail.com>
  * @link http://www.djokka.com
- * @license http://www.djokka.com?r=index/license
+ * @license http://creativecommons.org/licenses/by-nc-sa/4.0/deed.en_US
  * @copyright Copyright &copy; 2013 Djokka Media
- * @package \Djokka\
  * @version 1.0.1
  */
 
@@ -17,14 +16,12 @@ use Djokka\Route;
 /**
  * Kelas Djokka\Controller adalah kelas pustaka framework. Dipergunakan untuk mengatur
  * konfigurasi yang digunakan pada web
- * @author Ahmad Jawahir <rawndummy@gmail.com>
  * @since 1.0.0
  */
 class Linker extends Base
 {
     /**
-     * @var Menampung instance dari kelas
-     * @access private
+     * Menampung instance dari kelas
      * @since 1.0.1
      */
     private static $instance;
@@ -43,11 +40,20 @@ class Linker extends Base
         return self::$instance;
     }
 
+    /**
+     * Mengambil pembatas URL berdasarkan format rute
+     * @return string
+     */
     public function getSeparator()
     {
         return $this->config('route_format') == 'get' ? '?r=' : '/';
     }
 
+    /**
+     * Membentuk URL dengan melakukan penambatan metode GET
+     * @param mixed $module string Rute module
+     * @return string
+     */
     public function appendGet($module)
     {
         $params = Route::get()->urlParam('get', $module);
@@ -64,16 +70,32 @@ class Linker extends Base
         }
     }
 
+    /**
+     * Membentuk URL dengan melakukan penambatan metode GET dengan tambahan parameter
+     * @param mixed $module string Rute module
+     * @param mixed $module array Parameter tambahan untuk URL
+     * @return string
+     */
     public function appendLink($module, $params)
     {
         return $this->getLink($module).'?'.Route::get()->urlParam('get', $params);
     }
 
+    /**
+     * Mengolah parameter untuk URL
+     * @param mixed $params array Parameter tambahan untuk URL
+     * @return string
+     */
     public function renderParameter($params)
     {
         return Route::get()->urlParam($this->config('route_format'), $params);
     }
 
+    /**
+     * Mengambil URL suatu modul
+     * @param mixed $module string Rute modul
+     * @return string
+     */
     public function getLink($module)
     {
         // Menentukan pemisah
@@ -95,6 +117,12 @@ class Linker extends Base
         return $url;
     }
 
+    /**
+     * Mengambil URL suatu modul dengan tambahan parameter
+     * @param mixed $module string Rute modul
+     * @param mixed $parameter array Parameter tambahan untuk URL
+     * @return string
+     */
     public function getLinkParameter($module, $parameter)
     {
         // Menentukan pemisah
@@ -116,6 +144,11 @@ class Linker extends Base
         }
     }
 
+    /**
+     * Mengelola parameter tambahan URL yang berupa string
+     * @param mixed $parameter string Parameter tambahan untuk URL dengan tipe string
+     * @return string
+     */
     public function renderParameterString($parameter)
     {
         if(preg_match_all('/(.+?)=(.*?)(?:&|$)/i', $parameter, $matches)){

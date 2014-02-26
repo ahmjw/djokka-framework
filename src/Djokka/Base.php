@@ -3,10 +3,10 @@
 /**
  * @author Ahmad Jawahir <rawndummy@gmail.com>
  * @link http://www.djokka.com
- * @license http://www.djokka.com?r=index/license
+ * @license http://creativecommons.org/licenses/by-nc-sa/4.0/deed.en_US
  * @copyright Copyright &copy; 2013 Djokka Media
- * @package \
- * @version 1.0.0
+ * @since 1.0.3
+ * @version 1.0.3
  */
 
 namespace Djokka;
@@ -23,27 +23,29 @@ use Djokka\Helpers\Session;
 use Djokka\Helpers\User;
 
 /**
- * Kelas Djokka adalah kelas inti framework. Dimuat pertama kali oleh
- * index.php pada root web. Kelas ini mengendalikan keseluruhan sistem.
- * @author Ahmad Jawahir <rawndummy@gmail.com>
+ * Kelas utama yang digunakan untuk menyediakan fungsi yang dibutuhkan secara global
  * @since 1.0.0
  */
 class Base
 {
     /**
-     * @var Menampung instance dari kelas induk kontroller
+     * Instance dari kelas ini
      * @since 1.0.0
      * @access private
      */
     private static $core;
 
+    /**
+     * Daftar error yang ditemukan
+     * @deprecated
+     */
     private static $errors = array();
 
     /**
-     * Memuat pustaka yang terdapat di dalam framework
+     * Memuat pustaka yang terdapat di dalam framework secara invoke
      * @since 1.0.0
-     * @param $subclass adalah nama kelas pustaka framework
-     * @return objek instance kelas pustaka framework
+     * @param mixed $subclass adalah nama kelas pustaka framework
+     * @return object Objek instance kelas pustaka framework
      */
     public function __invoke($subclass)
     {
@@ -54,6 +56,12 @@ class Base
         return call_user_func(array($class_map[$subclass], 'get'));
     }
 
+    /**
+     * Memuat pustaka yang terdapat di dalam framework
+     * @since 1.0.0
+     * @param mixed $subclass adalah nama kelas pustaka framework
+     * @return object Objek instance kelas pustaka framework
+     */
     public function lib($subclass)
     {
         $class_map = Config::get()->getClassMap();
@@ -66,7 +74,7 @@ class Base
     /**
      * Mengambil instance kelas induk kontroller
      * @since 1.0.0
-     * @return objek instance kelas induk kontroller
+     * @return object
      */
     public static function getCore()
     {
@@ -94,6 +102,11 @@ class Base
         return htmlentities(addslashes($str));
     }
 
+    /**
+     * Mengambil lokasi folder konfigurasi
+     * @since 1.0.0
+     * @return string lokasi folder
+     */
     public function configDir()
     {
         return $this->realPath($this->config('dir').DS.$this->config('app_path').$this->config('config_path').DS);
@@ -194,6 +207,11 @@ class Base
         }
     }
 
+    /**
+     * Memuat/impor berkas kelas
+     * @since 1.0.1
+     * @return string lokasi folder
+     */
     public function using($class, &$var = null) {
         $path = $this->componentDir().$class.'.php';
         if(!file_exists($path)) {
@@ -210,7 +228,7 @@ class Base
     }
 
     /**
-     * Mengecek otorisasi suatu pengakses web
+     * Mengecek otorisasi suatu user web
      * @since 1.0.0
      * @param $type adalah tipe user yang telah ditentukan untuk penyaringan
      * @return boolean -> user telah terotorisasi atau belum
@@ -238,16 +256,27 @@ class Base
         return $data != null ? $data : $default; 
     }
 
+    /**
+     * Mengubah suatu string menjadi format path yang benar
+     * @since 1.0.0
+     * @return string
+     */
     public function realPath($path) {
         return preg_replace("/([\/\\\]+)/i", DS, $path);
     }
 
+    /**
+     * Mengambil format waktu
+     * @since 1.0.0
+     * @deprecated
+     * @return string lokasi folder
+     */
     public function dateFormat($format, $date_str) {
         return date($format, strtotime($date_str));
     }
 
     /**
-     * Sub fungsi kelas
+     * Membaca, menambah atau mengubah nilai konfigurasi
      */
     public function config() {
         switch (func_num_args()) {
@@ -265,6 +294,9 @@ class Base
         }
     }
 
+    /**
+     * Membaca, menambah atau mengubah nilai sesi
+     */
     public function session() {
         switch (func_num_args()) {
             case 0:
@@ -277,6 +309,9 @@ class Base
         }
     }
 
+    /**
+     * Membaca, menambah atau mengubah user yang sedang login
+     */
     public function user() {
         switch (func_num_args()) {
             case 0:
@@ -286,10 +321,19 @@ class Base
         }
     }
 
+    /**
+     * Memuat model
+     * @param mixed $name string Nama model yang akan dimuat
+     * @param optional $is_new boolean Model dimuat sebagai data baru atau data lama
+     * @return object
+     */
     public function model($name, $is_new = false) {
         return Model::get()->load($name, $is_new);
     }
 
+    /**
+     * Menginisialisai pager (pembagi halaman) dan memberikan nilai limit pada model
+     */
     public function pager() {
         switch (func_num_args()) {
             case 0:
@@ -299,6 +343,10 @@ class Base
         }
     }
 
+    /**
+     * Mengambil alamat URL untuk halaman yang sedang diakses
+     * @return string
+     */
     public function getUrl()
     {
         return Route::get()->getUrl();

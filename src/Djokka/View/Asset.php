@@ -3,9 +3,8 @@
 /**
  * @author Ahmad Jawahir <rawndummy@gmail.com>
  * @link http://www.djokka.com
- * @license http://www.djokka.com?r=index/license
+ * @license http://creativecommons.org/licenses/by-nc-sa/4.0/deed.en_US
  * @copyright Copyright &copy; 2013 Djokka Media
- * @package \Djokka\
  * @version 1.0.0
  */
 
@@ -18,24 +17,52 @@ use Djokka\Controller;
 /**
  * Kelas Djokka\Asset adalah kelas pustaka framework. Dipergunakan untuk mengatur
  * aset yang digunakan pada web
- * @author Ahmad Jawahir <rawndummy@gmail.com>
  * @since 1.0.0
  */
 class Asset extends Base
 {
-
+    /**
+     * Daftar berkas Javascript yang akan diletakkan pada kepala HTML
+     */
     private $header_script_files = array();
+
+    /**
+     * Daftar berkas CSS yang akan diletakkan pada kepala HTML
+     */
     private $header_stylesheet_files = array();
+    
+    /**
+     * Daftar kode Javascript yang akan diletakkan pada kepala HTML
+     */
     private $header_stylesheet = array();
+    
+    /**
+     * Daftar kode Javascript yang akan diletakkan pada kepala HTML
+     */
     private $header_scripts = array();
+    
+    /**
+     * Daftar berkas Javascript yang akan diletakkan pada kaki HTML
+     */
     private $footer_script_files = array();
+    
+    /**
+     * Daftar kode Javascript yang akan diletakkan pada kepala HTML
+     */
     private $footer_scripts = array();
+    
+    /**
+     * Daftar widget yang akan diletakkan pada badan HTML
+     */
     private $widgets = array();
+    
+    /**
+     * Daftar teks yang akan diletakkan pada badan HTML
+     */
     private $dom_append = array();
 
     /**
-     * @var Menampung instance dari kelas
-     * @access private
+     * Menampung instance dari kelas
      * @since 1.0.0
      */
     private static $instance;
@@ -54,6 +81,9 @@ class Asset extends Base
         return self::$instance;
     }
 
+    /**
+     * Mengosongkan semua data aset
+     */
     public function clear() {
         foreach ($this as $key => $value) {
             $this->{$key} = array();
@@ -91,8 +121,8 @@ class Asset extends Base
     /**
      * Menambahkan/menempelkan konten ke dalam suatu HTML menggunakan objek DOM
      * @since 1.0.0
-     * @param $element adalah ID elemen HTML
-     * @param $content adalah konten yang akan ditambahkan
+     * @param mixed $element adalah ID elemen HTML
+     * @param mixed $content adalah konten yang akan ditambahkan
      */
     public function append($element, $content)
     {
@@ -103,6 +133,12 @@ class Asset extends Base
         }
     }
 
+    /**
+     * Menambahkan/menempelkan konten dari suatu plugin/widget ke dalam suatu HTML menggunakan objek DOM
+     * @since 1.0.0
+     * @param mixed $element adalah ID elemen HTML
+     * @param mixed $element array Daftar nama widget/plugin
+     */
     public function setWidget($element, $items) {
         if(is_array($items)) {
             if(isset($this->widgets[$element])) {

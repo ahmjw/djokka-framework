@@ -3,7 +3,7 @@
 /**
  * @author Ahmad Jawahir <rawndummy@gmail.com>
  * @link http://www.djokka.com
- * @license http://www.djokka.com?r=index/license
+ * @license http://creativecommons.org/licenses/by-nc-sa/4.0/deed.en_US
  * @copyright Copyright &copy; 2013 Djokka Media
  * @package \Djokka\
  * @version 1.0.1
@@ -23,13 +23,12 @@ use Djokka\Controller\Plugin;
 /**
  * Kelas Djokka\Controller adalah kelas pustaka framework. Dipergunakan untuk mengatur
  * konfigurasi yang digunakan pada web
- * @author Ahmad Jawahir <rawndummy@gmail.com>
  * @since 1.0.0
  */
 class Controller extends Base
 {
     /**
-     * @var Menampung instance dari kelas
+     * Menampung instance dari kelas
      * @access private
      * @since 1.0.1
      */
@@ -49,11 +48,22 @@ class Controller extends Base
         return self::$instance;
     }
 
+    /**
+     * Memanggil bagian view yang akan dijadikan konten
+     * @param mixed $name string Nama view yang akan dipanggil
+     * @param optional $params array data yang akan diekstrak ke view tersebut
+     */
     public function view($name, $params = array())
     {
         View::getInstance()->mergeView($name, $params);
     }
 
+    /**
+     * Memanggil bagian view
+     * @param mixed $name string Nama view yang akan dipanggil
+     * @param optional $params array data yang akan diekstrak ke view tersebut
+     * @deprecated
+     */
     public function getView($name, $params = array())
     {
         return View::getInstance()->getView($this, $name, $params);
@@ -129,14 +139,29 @@ class Controller extends Base
         }
     }
 
+    /**
+     * Memasukkan kode Javascript ke badan HTML
+     * @param mixed $code string Kode Javascript yang akan dimasukkan
+     * @since 1.0.0
+     */
     public function js($code) {
         Asset::get()->js($code);
     }
 
+    /**
+     * Memasukkan kode CSS ke badan HTML
+     * @param mixed $code string Kode CSS yang akan dimasukkan
+     * @since 1.0.0
+     */
     public function css($code) {
         Asset::get()->css($code);
     }
 
+    /**
+     * Memasukkan link untuk berkas Javascript atau CSS
+     * @param mixed $url string Lokasi berkas yang akan dimasukkan
+     * @since 1.0.0
+     */
     public function asset($url) {
         Asset::get()->add($url);
     }
@@ -197,6 +222,11 @@ class Controller extends Base
         return $this->import('plugin.'.$name);
     }
 
+    /**
+     * Mengecek status suatu modul, apakah termasuk plugin atau modul biasa
+     * @param rute modul yang akan dicek
+     * @return boolean
+     */
     public function isPlugin($route) 
     {
         if(preg_match('/^plugin\.([a-zA-Z0-9_\/\-]+)/i', $route, $match)) {

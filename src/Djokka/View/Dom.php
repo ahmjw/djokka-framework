@@ -3,9 +3,8 @@
 /**
  * @author Ahmad Jawahir <rawndummy@gmail.com>
  * @link http://www.djokka.com
- * @license http://www.djokka.com?r=index/license
+ * @license http://creativecommons.org/licenses/by-nc-sa/4.0/deed.en_US
  * @copyright Copyright &copy; 2013 Djokka Media
- * @package \Djokka\
  * @version 1.0.0
  */
 
@@ -14,22 +13,19 @@ namespace Djokka\View;
 /**
  * Kelas Djokka\Dom adalah kelas pustaka framework. Dipergunakan untuk keperluan akses
  * objek DOM pada web
- * @author Ahmad Jawahir <rawndummy@gmail.com>
  * @since 1.0.0
  */
 class Dom extends \DomDocument
 {
 
     /**
-     * @var Menampung instance dari kelas
-     * @access private
+     * Menampung instance dari kelas
      * @since 1.0.0
      */
     private static $instance;
 
     /**
-     * @var Menampung objek DOM pembantu
-     * @access private
+     * Menampung objek DOM pembantu
      * @since 1.0.0
      */
     private $helper;
