@@ -98,9 +98,15 @@ class Boot extends Base
      */
     public static function handleException(\Exception $e)
     {
-        //if (ob_get_level() > 0) {
-            ob_end_clean();
-        //}
+        if(Config::get()->config('error_redirect') === true && $e->getCode() == 403) {
+            $page = Config::get()->config('module').'/'.Config::get()->config('action');
+            if($page != $redirect = Config::get()->config('module_forbidden')) {
+                Controller::get()->redirect('/' . $redirect);
+            } else {
+                $this->exceptionOutput($exception);
+            }
+        }
+        ob_end_clean();
         $path = SYSTEM_DIR . 'resources' . DIRECTORY_SEPARATOR . 'errors' . DIRECTORY_SEPARATOR . 'view.php';
         echo View::getInstance()->outputBuffering($path, array(
             'e' => $e
