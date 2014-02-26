@@ -22,28 +22,8 @@ use Djokka\Helpers\String;
 /**
  * Kelas pustaka yang bertugas untuk memproses dan mengendalikan model yang terdapat di dalam suatu modul
  */
-class Model extends Base
+abstract class Model extends Base
 {
-    /**
-     * @deprecated
-     */
-    const FIND = 1;
-
-    /**
-     * @deprecated
-     */
-    const FIND_ALL = 2;
-
-    /**
-     * @deprecated
-     */
-    const SCALAR = 3;
-
-    /**
-     * Instance dari kelas ini
-     */
-    private static $instance;
-
     /**
      * Data penting yang dibutuhkan oleh model
      */
@@ -54,50 +34,6 @@ class Model extends Base
         'externals'=>array(),
         'updates'=>array()
     );
-
-    /**
-     * Mengambil instance secara Singleton Pattern
-     * @since 1.0.0
-     * @param $class adalah nama kelas (opsional)
-     * @return objek instance kelas
-     */
-    public static function get($class = __CLASS__)
-    {
-        if(self::$instance == null) {
-            self::$instance = new $class;
-        }
-        return self::$instance;
-    }
-
-    /**
-     * Mengambil instance suatu model dari peta model
-     * @param mixed $class Nama kelas model
-     * @param mixed $module Nama modul tempat meletakkan model tersebut
-     * @param optional $is_new apakah model akan dimuat sebagai data baru atau data lama
-     * @return object
-     */
-    private static function getObject($class, $module, $is_new = true)
-    {
-        $schema = SchemaCollection::get();
-        if(!$schema->existsModel($class)) {
-            $object = new $class;
-            $object->____dataset['module'] = $module;
-            $schema->models($module, $object);
-            
-            if(!$schema->existsModule($module) && $object->table() != null) {
-                $data = new \stdClass();
-                $data->TableStructure = TableCollection::get()->table($object->table());
-                $data->Labels = $object->labels();
-                $schema->module($module, $data);
-            }
-        } else {
-            $object = $schema->models($module);
-        }
-        if($is_new === false) {
-            $object->setIsNew(false);
-        }
-        return $object;
-    }
 
     /**
      * Konstruktor kelas
@@ -722,32 +658,6 @@ class Model extends Base
         $collection->setModel($this);
         $collection->setDb($db);
         return $collection;
-    }
-
-    /**
-     * Memuat berkas model dari mengambil objek model
-     * @param mixed $name string Nama model yang akan dimuat
-     * @param optional $is_new boolean status apakah model dimuat sebagai data baru atau data lama
-     * @since 1.0.0
-     * @return object
-     */
-    public function load($name, $is_new = false) {
-        if(preg_match('/^\/([a-zA-Z][a-zA-Z0-9]+)$/i', $name, $match)) {
-            $path = $this->modelDir()."$match[1].php";
-            $class = 'Djokka\\Models\\'.$match[1];
-        } else {
-            $path = $this->moduleDir().$this->config('module').DS."models".DS."$name.php";
-            $class = 'Djokka\\Models\\'.$name;
-        }
-        $path = $this->realPath($path);
-        if(!file_exists($path)) {
-            throw new \Exception("Model file not found in path $path", 404);
-        }
-        include_once($path);
-        if(!class_exists($class)) {
-            throw new \Exception("Class $class is not defined in file $path", 500);
-        }
-        return $instance = $class::getObject($class, $name, $is_new);
     }
 
 
