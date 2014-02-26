@@ -1,6 +1,8 @@
 <?php
 
 /**
+ * Memproses modul yang menggunakan arsitektur modular
+ * @since 1.0.0
  * @author Ahmad Jawahir <rawndummy@gmail.com>
  * @link http://www.djokka.com
  * @license http://creativecommons.org/licenses/by-nc-sa/4.0/deed.en_US
@@ -19,14 +21,26 @@ use Djokka\Helpers\String;
 use Djokka\Helpers\User;
 
 /**
- * Kelas Djokka\Controller adalah kelas pustaka framework. Dipergunakan untuk mengatur
- * konfigurasi yang digunakan pada web
- * @since 1.0.0
+ * Kelas pendamping yang membantu kelas Djokka\Controller untuk memproses moduk yang menggunakan arsitektur modular
  */
 class Modular extends Core
 {
+    /**
+     * Informasi pengolah rute
+     * @deprecated
+     */
     private $router;
+
+    /**
+     * Informasi lokasi direktori modul
+     * @deprecated
+     */
     private $dir;
+
+    /**
+     * Informasi parameter yang dibutuhkan oleh modul
+     * @deprecated
+     */
     private $params;
 
     /**
@@ -51,8 +65,8 @@ class Modular extends Core
 
     /**
      * Mengambil konten view pada modul yang menggunakan arsitektur modular
-     * @param mixed $info array Informasi modul
-     * @param optional $param array Parameter yang akan dikirimkan untuk fungsi aksi
+     * @param array $info Informasi modul
+     * @param array $params Parameter yang akan dikirimkan untuk fungsi aksi
      * @return string
      */
     public function getViewContent($info, $params) {

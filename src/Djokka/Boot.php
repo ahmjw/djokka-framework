@@ -1,6 +1,8 @@
 <?php
 
 /**
+ * Melakukan boot/pemuatan sistem
+ * @since 1.0.0
  * @author Ahmad Jawahir <rawndummy@gmail.com>
  * @link http://www.djokka.com
  * @license http://creativecommons.org/licenses/by-nc-sa/4.0/deed.en_US
@@ -21,8 +23,7 @@ define('SYSTEM_DIR', __DIR__ . DS . '..' . DS . '..' . DS);
 include_once 'Base.php';
 
 /**
- * Kelas yang digunakan untuk melakukan boot/pemuatan sistem
- * @since 1.0.0
+ * Kelas pustaka yang digunakan untuk melakukan booting
  */
 class Boot extends Base
 {
@@ -139,6 +140,7 @@ class Boot extends Base
 
     /**
      * Bootloader, menjalankan sistem web
+     * @param string $route Rute modul yang langsung ingin dieksekusi
      * @since 1.0.0
      */
     public function run($route = null)
@@ -183,6 +185,7 @@ class Boot extends Base
 
     /**
      * Mengubah suatu string menjadi format path yang benar
+     * @param string $path Lokasi direktori/berkas yang akan dibenarkan
      * @since 1.0.0
      * @return string
      */
@@ -250,6 +253,8 @@ class Boot extends Base
 
     /**
      * Mengubah suatu string menjadi format path yang benar
+     * @param int $code Kode error
+     * @param string $message Pesan error yang akan ditampilkan
      * @since 1.0.0
      * @deprecated
      * @return string
@@ -262,7 +267,7 @@ class Boot extends Base
     /**
      * Menampilkan hasil error, termasuk ke header dokumen web
      * @since 1.0.0
-     * @param $exception adalah objek eksepsi dari sistem
+     * @param Exception $exception adalah objek eksepsi dari sistem
      * @deprecated
      */
     private function exceptionOutput($exception)
@@ -291,7 +296,7 @@ class Boot extends Base
     /**
      * Menangani semua error yang dilemparkan
      * @since 1.0.0
-     * @param $exception adalah objek eksepsi dari sistem
+     * @param Exception $exception adalah objek eksepsi dari sistem
      * @deprecated
      */
     public function exceptionHandler($exception)
@@ -329,6 +334,12 @@ class Boot extends Base
     }
 
     /**
+     * Mendaftarkan error yang ditemukan
+     * @param int $level Level error
+     * @param string $message Pesan error
+     * @param string $file Lokasi file
+     * @param int $line Nomor baris file
+     * @param array $context Konteks error
      * @deprecated
      */
     public function errorHandler($level, $message, $file, $line, $context)

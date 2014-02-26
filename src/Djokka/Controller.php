@@ -1,6 +1,8 @@
 <?php
 
 /**
+ * Mengontrol proses pada modul
+ * @since 1.0.0
  * @author Ahmad Jawahir <rawndummy@gmail.com>
  * @link http://www.djokka.com
  * @license http://creativecommons.org/licenses/by-nc-sa/4.0/deed.en_US
@@ -21,9 +23,7 @@ use Djokka\Controller\Modular;
 use Djokka\Controller\Plugin;
 
 /**
- * Kelas Djokka\Controller adalah kelas pustaka framework. Dipergunakan untuk mengatur
- * konfigurasi yang digunakan pada web
- * @since 1.0.0
+ * Kelas pustaka yang bertugas mengontrol atau mengendalikan proses di dalam modul
  */
 class Controller extends Base
 {
@@ -212,10 +212,10 @@ class Controller extends Base
     }
 
     /**
-     * Mengambil lokasi URL basis/root web
+     * Memanggil plugin
      * @since 1.0.1
-     * @param $url adalah tambahan ke belakang alamat URL
-     * @return string lokasi URL
+     * @param string $name Nama plugin yang akan dipanggil
+     * @return string Konten plugin
      */
     public function plugin($name) 
     {
@@ -224,7 +224,7 @@ class Controller extends Base
 
     /**
      * Mengecek status suatu modul, apakah termasuk plugin atau modul biasa
-     * @param rute modul yang akan dicek
+     * @param string $route Rute modul yang akan dicek
      * @return boolean
      */
     public function isPlugin($route) 
@@ -239,8 +239,8 @@ class Controller extends Base
     /**
      * Memanggil atau mengeksekusi suatu aksi/modul
      * @since 1.0.0
-     * @param $router adalah alamat aksi/modul yang akan dieksekusi
-     * @param $params adalah parameter tambahan yang dimasukkan ke dalam aksi/modul
+     * @param string $route adalah alamat aksi/modul yang akan dieksekusi
+     * @param array $params adalah parameter tambahan yang dimasukkan ke dalam aksi/modul
      * @return string berupa hasil pembacaan bagian view
      */
     public function import($route, $params = array())
@@ -259,9 +259,10 @@ class Controller extends Base
     }
 
     /**
-     * Membaca konten layout header
+     * Membaca konten layout
+     * @param string $layout Nama layout yang akan dibaca
      * @since 1.0.0
-     * @return konten layout header
+     * @return string konten layout
      */
     public function getLayout($layout)
     {

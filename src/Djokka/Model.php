@@ -1,6 +1,8 @@
 <?php
 
 /**
+ * Memproses model yang terdapat di dalam modul
+ * @since 1.0.0
  * @author Ahmad Jawahir <rawndummy@gmail.com>
  * @link http://www.djokka.com
  * @license http://creativecommons.org/licenses/by-nc-sa/4.0/deed.en_US
@@ -18,9 +20,7 @@ use Djokka\Model\Validation;
 use Djokka\Helpers\String;
 
 /**
- * Kelas Djokka\Model adalah kelas pustaka framework. Dipergunakan untuk mengendalikan,
- * mengelola, dan mengakses data model
- * @since 1.0.0
+ * Kelas pustaka yang bertugas untuk memproses dan mengendalikan model yang terdapat di dalam suatu modul
  */
 class Model extends Base
 {
@@ -99,10 +99,18 @@ class Model extends Base
         return $object;
     }
 
+    /**
+     * Konstruktor kelas
+     */
     public function __construct() {
         $this->preload();
     }
 
+    /**
+     * Melakukan pemanggilan fungsi ketika dilakukan pembacaan property
+     * @param string $property Nama property/field
+     * @return mixed
+     */
     public function __get($property) {
         if(in_array('_'.$property, get_class_methods($this))) {
             return call_user_func(array($this, '_'.$property));
@@ -397,6 +405,7 @@ class Model extends Base
     /**
      * Melakukan validasi terhadap model. Hasil validasi akan memberikan informasi error
      * ke dalam properti model dan memberikan status model valid atau tidak
+     * @param mixed $property Properti/field yang akan diabaikan dalam validasi
      * @since 1.0.1
      * @return status validasi, bernilai TRUE jika model valid, bernilai FALSE jika
      * model tidak valid
@@ -422,7 +431,7 @@ class Model extends Base
     /**
      * Melakukan operasi penyimpanan model (otomatis menentukan ditambah atau diubah)
      * @since 1.0.0
-     * @param $params adalah parameter tambahan untuk mengatur proses penyimpanan model
+     * @param $availables adalah Daftar field yang akan disimpan datanya
      * @return objek resource hasil operasi penyimpanan model
      */
     public function save($availables = null)
@@ -672,6 +681,7 @@ class Model extends Base
 
     /**
      * Mengambil lebih dari satu record/baris dari suatu tabel menggunakan model
+     * @param array $params Parameter tambahan untuk mengatur data yang dihasilkan
      * @since 1.0.0
      * @return array
      */
@@ -756,6 +766,8 @@ class Model extends Base
 
     /**
      * Memanggil view melalui model
+     * @param string $name Nama view
+     * @param array $params Data yang akan diekstrak ke view
      * @deprecated
      * @return string
      */

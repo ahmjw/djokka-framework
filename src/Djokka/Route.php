@@ -1,6 +1,8 @@
 <?php
 
 /**
+ * Mengalamatkan atau mengalokasikan rute untuk modul berdasarkan alamat URL yang sedang diakses
+ * @since 1.0.0
  * @author Ahmad Jawahir <rawndummy@gmail.com>
  * @link http://www.djokka.com
  * @license http://creativecommons.org/licenses/by-nc-sa/4.0/deed.en_US
@@ -14,10 +16,8 @@ use Djokka\Base;
 use Djokka\Helpers\String;
 
 /**
- * Kelas Djokka\Route adalah kelas pustaka framework. Dipergunakan untuk mengakses
- * informasi suatu rute yang digunakan oleh web
- * @author Ahmad Jawahir <rawndummy@gmail.com>
- * @since 1.0.0
+ * Kelas pustaka yang bertugas untuk mengalamatkan dan mengalokasikan rute untuk modul berdasarkan URL
+ * yang sedang diakses dan mengatur segala hal yang berhubungan dengan alamat URL
  */
 class Route extends Base
 {
@@ -156,7 +156,8 @@ class Route extends Base
     /**
      * Mengambil informasi rute berdasarkan router/pembuat alur
      * @since 1.0.0
-     * @param $router adalah alur terformat yang akan dimasukkan
+     * @param string $router Alur terformat yang akan dimasukkan
+     * @param bool $is_plugin Menandakan modul tersebut adalah plugin atau bukan
      * @return informasi rute dalam bentuk array
      */
     public function getModuleInfo($router, $is_plugin = false)

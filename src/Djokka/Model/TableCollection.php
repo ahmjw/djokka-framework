@@ -1,6 +1,8 @@
 <?php
 
 /**
+ * Membentuk koleksi tabel guna optimasi sistem
+ * @since 1.0.2
  * @author Ahmad Jawahir <rawndummy@gmail.com>
  * @link http://www.djokka.com
  * @license http://creativecommons.org/licenses/by-nc-sa/4.0/deed.en_US
@@ -11,8 +13,7 @@
 namespace Djokka\Model;
 
 /**
- * Kelas ini digunakan untuk membentuk koleksi skema/struktur tabel untuk keperluan optimasi sistem
- * @since 1.0.2
+ * Kelas pendampingyang membantu kelas Djokka\Model untuk optimasi
  */
 class TableCollection
 {
@@ -59,6 +60,7 @@ class TableCollection
 
 	/**
      * Mengecek apakah tabel telah dimuat atau belum
+     * @param string $name Nama tabel
      * @return boolean
      */
 	public function exists($name) {

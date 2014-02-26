@@ -1,6 +1,8 @@
 <?php
 
 /**
+ * Mengelola data session pada web
+ * @since 1.0.0
  * @author Ahmad Jawahir <rawndummy@gmail.com>
  * @link http://www.djokka.com
  * @license http://creativecommons.org/licenses/by-nc-sa/4.0/deed.en_US
@@ -11,9 +13,7 @@
 namespace Djokka\Helpers;
 
 /**
- * Kelas Djokka\Session adalah kelas pustaka framework. Dipergunakan untuk mengakses,
- * mengelola, dan memanipulasi data sesi pada web
- * @since 1.0.0
+ * Kelas pembantu yang bertugas untuk mempermudah pengolahan data session pada web
  */
 class Session
 {

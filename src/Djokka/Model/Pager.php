@@ -1,6 +1,8 @@
 <?php
 
 /**
+ * Membantu melakukan pagination atau pembagian halaman
+ * @since 1.0.0
  * @author Ahmad Jawahir <rawndummy@gmail.com>
  * @link http://www.djokka.com
  * @license http://creativecommons.org/licenses/by-nc-sa/4.0/deed.en_US
@@ -14,9 +16,7 @@ use Djokka\Base;
 use Djokka\Db;
 
 /**
- * Kelas Djokka\Config adalah kelas pustaka framework. Dipergunakan untuk mengatur
- * konfigurasi yang digunakan pada web
- * @since 1.0.0
+ * Kelas pendamping yang membantu kelas Djokka\Model untuk membagi halaman
  */
 class Pager extends Base
 {
@@ -77,9 +77,8 @@ class Pager extends Base
     /**
      * Membentuk informasi paginasi suatu record-record model
      * @since 1.0.0
-     * @param $limit adalah nilai batasan maksimum jumlah record per halaman
-     * @param $page adalah rute masukan untuk membaca halaman mana yang sedang dibuka
-     * @return informasi paginasi record-record
+     * @param array $args Parameter yang dibutuhkan untuk pembagian halaman
+     * @return string Informasi paginasi record-record
      */
     public function init($args = array())
     {

@@ -1,6 +1,8 @@
 <?php
 
 /**
+ * Mengelola berkas yang terdapat di dalam web
+ * @since 1.0.0
  * @author Ahmad Jawahir <rawndummy@gmail.com>
  * @link http://www.djokka.com
  * @license http://creativecommons.org/licenses/by-nc-sa/4.0/deed.en_US
@@ -14,9 +16,7 @@ use Djokka\Base;
 use Djokka\Helpers\String;
 
 /**
- * Kelas Djokka\File adalah kelas pustaka framework. Dipergunakan untuk keperluan akses
- * atau manipulasi file pada folder web
- * @since 1.0.0
+ * Kelas pembantu yang bertugas mengelola berkas yang terdapat di dalam web
  */
 class File extends Base
 {

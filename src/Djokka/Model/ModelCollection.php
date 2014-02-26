@@ -1,6 +1,8 @@
 <?php
 
 /**
+ * Membentuk koleksi model guna optimasi sistem
+ * @since 1.0.2
  * @author Ahmad Jawahir <rawndummy@gmail.com>
  * @link http://www.djokka.com
  * @license http://creativecommons.org/licenses/by-nc-sa/4.0/deed.en_US
@@ -11,8 +13,7 @@
 namespace Djokka\Model;
 
 /**
- * Kelas ini digunakan untuk membentuk koleksi model
- * @since 1.0.2
+ * Kelas pendampingyang membantu kelas Djokka\Model untuk optimasi
  */
 class ModelCollection
 {
@@ -50,19 +51,20 @@ class ModelCollection
     /**
      * Mengambil instance secara Singleton Pattern
      * @since 1.0.2
-     * @param $class adalah nama kelas (opsional)
      * @return objek instance kelas
      */
-    public static function get($class = __CLASS__)
+    public static function get()
     {
         if(self::$instance == null) {
-            self::$instance = new $class;
+            self::$instance = new static();
         }
         return self::$instance;
     }
 
     /**
      * Memasukkan koleksi model ke dalam suatu properti
+     * @param string $property Nama properti/field
+     * @return mixed
      */
 	public function __get($property)
 	{

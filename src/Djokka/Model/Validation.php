@@ -1,6 +1,8 @@
 <?php
 
 /**
+ * Melakukan validasi data model
+ * @since 1.0.0
  * @author Ahmad Jawahir <rawndummy@gmail.com>
  * @link http://www.djokka.com
  * @license http://creativecommons.org/licenses/by-nc-sa/4.0/deed.en_US
@@ -13,9 +15,7 @@ namespace Djokka\Model;
 use Djokka\Base;
 
 /**
- * Kelas Djokka\Validation adalah kelas pustaka framework. Dipergunakan untuk melakukan
- * validasi terhadap model
- * @since 1.0.0
+ * Kelas pendamping yang membantu kelas Djokka\Model untuk melakukan validasi terhadap data model
  */
 class Validation extends Base
 {

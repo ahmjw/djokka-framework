@@ -1,6 +1,8 @@
 <?php
 
 /**
+ * Menyediakan akses database
+ * @since 1.0.0
  * @author Ahmad Jawahir <rawndummy@gmail.com>
  * @link http://www.djokka.com
  * @license http://www.djokka.com?r=index/license
@@ -14,9 +16,7 @@ namespace Djokka;
 use Djokka\Base;
 
 /**
- * Kelas Djokka\Db adalah kelas pustaka framework. Dipergunakan untuk keperluan akses
- * database
- * @since 1.0.0
+ * Kelas pustaka yang bertugas menyediakan akses database
  */
 class Db extends Base
 {
@@ -91,6 +91,10 @@ class Db extends Base
         return self::$instance;
     }
 
+    /**
+     * Menginisialisasi data
+     * @return object {@link Djokka\Db}
+     */
     public function call() {
         if(func_num_args() == 1) {
             $this->From = func_get_arg(0);
@@ -119,6 +123,7 @@ class Db extends Base
 
     /**
      * Membentuk perintah SQL UPDATE
+     * @param array $data Data yang menjadi masukan untuk mengubah data
      * @return object
      */
     public function update($data) {
@@ -164,6 +169,7 @@ class Db extends Base
 
     /**
      * Mengamankan dari SQL injection menggunakan penyimbolan parameter
+     * @param array $params Parameter yang akan digunakan untuk mengganti simbol
      * @return string
      */
     public function replaceWith($params = array())
@@ -268,6 +274,7 @@ class Db extends Base
 
     /**
      * Membentuk perintah SQL SELECT
+     * @param string $str Nama field yang akan disaring
      * @return object
      */
     public function select($str = '*') {
@@ -280,6 +287,7 @@ class Db extends Base
 
     /**
      * Membentuk perintah SQL FROM
+     * @param string $str Nama tabel yang akan disaring
      * @return object
      */
     public function from($str) {
@@ -290,6 +298,7 @@ class Db extends Base
 
     /**
      * Membentuk perintah SQL GROUP BY
+     * @param string $str Nama field yang menjadi grup
      * @return object
      */
     public function group($str) {
@@ -300,6 +309,7 @@ class Db extends Base
 
     /**
      * Membentuk perintah SQL ORDER BY
+     * @param string $str Nama field yang akan diurutkan
      * @return object
      */
     public function order($str) {
@@ -310,6 +320,7 @@ class Db extends Base
 
     /**
      * Membentuk perintah SQL LIMIT
+     * @param string $str Teks pembatas untuk membatasi data
      * @return object
      */
     public function limit($str) {
@@ -334,6 +345,7 @@ class Db extends Base
     }
 
     /**
+     * Mengosongkan properti (salah)
      * @deprecated
      */
     public function getProperty()
@@ -406,6 +418,7 @@ class Db extends Base
 
     /**
      * Mengambil nilai field pada perintah SQL yang menyaring satu field
+     * @param string $sql Perintah SQL
      * @return string|int|float
      */
     public function getData($sql) {
@@ -428,7 +441,8 @@ class Db extends Base
     /**
      * Mengambil lebih dari satu record dalam bentuk array
      * @since 1.0.0
-     * @param $sql adalah query SQL yang akan dieksekusi
+     * @param string $sql Perintah SQL yang akan dieksekusi
+     * @param bool $use_array Menentukan data diambil sebagai array atau asosiasi saja
      * @return array record
      */
     public function getArrays($sql = null, $use_array = false)

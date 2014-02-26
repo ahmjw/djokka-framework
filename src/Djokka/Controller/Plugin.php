@@ -1,6 +1,9 @@
 <?php
 
 /**
+ * Mengakses dan memproses plugin yang tersedia di dalam web
+ * @author Ahmad Jawahir <rawndummy@gmail.com>
+ * @since 1.0.1
  * @author Ahmad Jawahir <rawndummy@gmail.com>
  * @link http://www.djokka.com
  * @license http://creativecommons.org/licenses/by-nc-sa/4.0/deed.en_US
@@ -15,13 +18,13 @@ use Djokka\Controller as Core;
 use Djokka\View\Asset;
 
 /**
- * Kelas Djokka\Plugin adalah kelas pustaka framework. Dipergunakan untuk mengatur
- * konfigurasi yang digunakan pada web
- * @author Ahmad Jawahir <rawndummy@gmail.com>
- * @since 1.0.1
+ * Kelas pendamping yang membantu kelas Djokka\Controller untuk mengakses dan memproses plugin
  */
 class Plugin extends Core
 {
+    /**
+     * Alamat URL plugin
+     */
     public $url;
 
     /**

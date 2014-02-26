@@ -1,6 +1,8 @@
 <?php
 
 /**
+ * Membentuk elemen HTML
+ * @since 1.0.0
  * @author Ahmad Jawahir <rawndummy@gmail.com>
  * @link http://www.djokka.com
  * @license http://creativecommons.org/licenses/by-nc-sa/4.0/deed.en_US
@@ -13,9 +15,7 @@ namespace Djokka\Helpers;
 use Djokka\Base;
 
 /**
- * Kelas Djokka\Html adalah kelas pustaka framework. Dipergunakan untuk membantu
- * pembuatan elemen HTML
- * @since 1.0.0
+ * Kelas pembantu yang bertugas untuk mempermudah pembentukan elemen HTML
  */
 class Html extends Base
 {
@@ -43,8 +43,9 @@ class Html extends Base
     /**
      * Membuat tag pembuka untuk suatu elemen HTML
      * @since 1.0.0
-     * @param $tag adalah nama tag HTML
-     * @param $args adalah parameter tambahan sebagai atribut elemen HTML
+     * @param string $tag adalah nama tag HTML
+     * @param array $args adalah parameter tambahan sebagai atribut elemen HTML
+     * @param bool $has_closed Menandai suatu tag HTML memiliki penutup atau tidak
      * @return skrip HTML elemen
      */
     public function tag($tag, $args = array(), $has_closed = true)
@@ -58,10 +59,11 @@ class Html extends Base
     /**
      * Membuat elemen drop-down list
      * @since 1.0.0
-     * @param $name adalah atribut nama untuk drop-down list
-     * @param $value adalah atribut nilai yang terpilih untuk drop-down list
-     * @param $items adalah daftar pilihan di dalam suatu drop-down list
-     * @param $options adalah parameter tambahan sebagai atribut elemen HTML
+     * @param string $name adalah atribut nama untuk drop-down list
+     * @param string $value adalah atribut nilai yang terpilih untuk drop-down list
+     * @param array $items adalah daftar pilihan di dalam suatu drop-down list
+     * @param array $options adalah parameter tambahan sebagai atribut elemen HTML
+     * @param array $params adalah parameter untuk mengatur kinerja elemen
      * @return skrip HTML drop-down list
      */
     public function select($name, $value, $items, $options = array(), $params = array())

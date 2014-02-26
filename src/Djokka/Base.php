@@ -1,6 +1,8 @@
 <?php
 
 /**
+ * Menyediakan fungsi yang dibutuhkan secara global
+ * @since 1.0.0
  * @author Ahmad Jawahir <rawndummy@gmail.com>
  * @link http://www.djokka.com
  * @license http://creativecommons.org/licenses/by-nc-sa/4.0/deed.en_US
@@ -24,7 +26,6 @@ use Djokka\Helpers\User;
 
 /**
  * Kelas utama yang digunakan untuk menyediakan fungsi yang dibutuhkan secara global
- * @since 1.0.0
  */
 class Base
 {
@@ -210,7 +211,9 @@ class Base
     /**
      * Memuat/impor berkas kelas
      * @since 1.0.1
-     * @return string lokasi folder
+     * @param string $class Nama kelas
+     * @param mixed $var Variabel yang akan diisi
+     * @return string Lokasi folder
      */
     public function using($class, &$var = null) {
         $path = $this->componentDir().$class.'.php';
@@ -258,6 +261,7 @@ class Base
 
     /**
      * Mengubah suatu string menjadi format path yang benar
+     * @param string $path Lokasi direktori/berkas yang akan dibenarkan
      * @since 1.0.0
      * @return string
      */
@@ -267,6 +271,8 @@ class Base
 
     /**
      * Mengambil format waktu
+     * @param string $format Format tanggal yang akan digunakan
+     * @param string $date_str Teks tanggal yang akan diubah
      * @since 1.0.0
      * @deprecated
      * @return string lokasi folder

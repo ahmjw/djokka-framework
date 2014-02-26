@@ -1,6 +1,8 @@
 <?php
 
 /**
+ * Menyediakan manipulasi HTML menggunakan object DomDocument
+ * @since 1.0.0
  * @author Ahmad Jawahir <rawndummy@gmail.com>
  * @link http://www.djokka.com
  * @license http://creativecommons.org/licenses/by-nc-sa/4.0/deed.en_US
@@ -11,9 +13,7 @@
 namespace Djokka\View;
 
 /**
- * Kelas Djokka\Dom adalah kelas pustaka framework. Dipergunakan untuk keperluan akses
- * objek DOM pada web
- * @since 1.0.0
+ * Kelas pendamping yang membantu kelas Djokka\View untuk melakukan manipulasi HTML
  */
 class Dom extends \DomDocument
 {

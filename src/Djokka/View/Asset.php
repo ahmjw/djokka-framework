@@ -1,6 +1,8 @@
 <?php
 
 /**
+ * Mengelola aset web
+ * @since 1.0.0
  * @author Ahmad Jawahir <rawndummy@gmail.com>
  * @link http://www.djokka.com
  * @license http://creativecommons.org/licenses/by-nc-sa/4.0/deed.en_US
@@ -15,9 +17,7 @@ use Djokka\Helpers\String;
 use Djokka\Controller;
 
 /**
- * Kelas Djokka\Asset adalah kelas pustaka framework. Dipergunakan untuk mengatur
- * aset yang digunakan pada web
- * @since 1.0.0
+ * Kelas pendamping yang membantu kelas Djokka\View untuk mengelola aset web
  */
 class Asset extends Base
 {
@@ -136,8 +136,8 @@ class Asset extends Base
     /**
      * Menambahkan/menempelkan konten dari suatu plugin/widget ke dalam suatu HTML menggunakan objek DOM
      * @since 1.0.0
-     * @param mixed $element adalah ID elemen HTML
-     * @param mixed $element array Daftar nama widget/plugin
+     * @param string $element ID elemen HTML
+     * @param array $items Daftar nama widget/plugin
      */
     public function setWidget($element, $items) {
         if(is_array($items)) {

@@ -1,11 +1,11 @@
 <?php
 
 /**
+ * Kelas inti Djokka Framework
  * @author Ahmad Jawahir <rawndummy@gmail.com>
  * @link http://www.djokka.com
- * @license http://www.djokka.com?r=index/license
+ * @license http://creativecommons.org/licenses/by-nc-sa/4.0/deed.en_US
  * @copyright Copyright &copy; 2013 Djokka Media
- * @package \
  * @version 1.0.0
  */
 
@@ -34,27 +34,28 @@ error_reporting(E_ALL ^ E_NOTICE);
 return Djokka::get();
 
 /**
- * Kelas Djokka adalah kelas inti framework. Dimuat pertama kali oleh
- * index.php pada root web. Kelas ini mengendalikan keseluruhan sistem.
- * @author Ahmad Jawahir <rawndummy@gmail.com>
- * @since 1.0.0
+ * Kelas inti pada Djokka Framework. Kelas ini yang melakukan booting dan menyediakan fungsi global
  * @deprecated
  */
 class Djokka
 {
     /**
-     * @var Menampung instance dari kelas induk kontroller
+     * Menampung instance dari kelas induk kontroller
+     * @deprecated
      * @since 1.0.0
-     * @access private
      */
     private static $core;
 
+    /**
+     * Daftar error yang ditemukan
+     * @deprecated
+     */
     private static $errors = array();
 
     /**
-     * @var Menampung instance dari kelas
-     * @access private
+     * Menampung instance dari kelas
      * @since 1.0.0
+     * @deprecated
      */
     private static $instance;
 
@@ -63,6 +64,7 @@ class Djokka
      * @since 1.0.0
      * @param $class adalah nama kelas (opsional)
      * @return objek instance kelas
+     * @deprecated
      */
     public static function get($class = __CLASS__)
     {
@@ -77,6 +79,7 @@ class Djokka
      * @since 1.0.0
      * @param $subclass adalah nama kelas pustaka framework
      * @return objek instance kelas pustaka framework
+     * @deprecated
      */
     public function __invoke($subclass)
     {
@@ -87,6 +90,12 @@ class Djokka
         return call_user_func(array($class_map[$subclass], 'get'));
     }
 
+    /**
+     * Memuat kelas pustaka
+     * @param string $subclass Nama kelas pustaka
+     * @return object
+     * @deprecated
+     */
     public function lib($subclass)
     {
         $class_map = Config::get()->getClassMap();
@@ -100,6 +109,7 @@ class Djokka
      * Mengambil instance kelas induk kontroller
      * @since 1.0.0
      * @return objek instance kelas induk kontroller
+     * @deprecated
      */
     public static function getCore()
     {
@@ -110,6 +120,7 @@ class Djokka
      * Menentukan suatu kelas anak sebagai kelas induk kontroller
      * @since 1.0.0
      * @param $core adalah instance kelas anak
+     * @deprecated
      */
     public static function setCore($core)
     {
@@ -120,6 +131,7 @@ class Djokka
      * Menentukan konfigurasi awal sebelum web dijalankan
      * @since 1.0.0
      * @param $config adalah konfigurasi-konfigurasi dalam bentuk array
+     * @deprecated
      */
     public function init($config = null)
     {
@@ -141,7 +153,9 @@ class Djokka
 
     /**
      * Bootloader, menjalankan sistem web
+     * @param string $route Rute modul yang langsung dieksekusi
      * @since 1.0.0
+     * @deprecated
      */
     public function run($route = null)
     {
@@ -164,6 +178,7 @@ class Djokka
      * Memuat secara otomatis suatu kelas pustaka, kontroller, model, dan komponen
      * @since 1.0.0
      * @param $class adalah nama kelas yang sedang dimuat
+     * @deprecated
      */
     public function autoload($class)
     {
@@ -194,6 +209,7 @@ class Djokka
     /**
      * Mengaktifkan semua otomatisasi pada sistem
      * @since 1.0.0
+     * @deprecated
      */
     public function registerAutoload()
     {
@@ -208,7 +224,7 @@ class Djokka
      * Menampilkan semua eksepsi menjadi informasi error
      * @since 1.0.0
      * @param $exception adalah objek eksepsi dari sistem
-     * @access private
+     * @deprecated
      */
     private function exceptionRender($exception)
     {
@@ -242,6 +258,12 @@ class Djokka
         echo $html;
     }
 
+    /**
+     * Membuat error dengan melemparkan eksepsi
+     * @param int $code Kode error
+     * @param string $message Pesan error
+     * @deprecated
+     */
     public function exception($code, $message)
     {
         throw new \Exception($message, $code);
@@ -251,7 +273,7 @@ class Djokka
      * Menampilkan hasil error, termasuk ke header dokumen web
      * @since 1.0.0
      * @param $exception adalah objek eksepsi dari sistem
-     * @access private
+     * @deprecated
      */
     private function exceptionOutput($exception)
     {
@@ -280,7 +302,7 @@ class Djokka
      * Menangani semua error yang dilemparkan
      * @since 1.0.0
      * @param $exception adalah objek eksepsi dari sistem
-     * @access public
+     * @deprecated
      */
     public function exceptionHandler($exception)
     {
@@ -316,6 +338,15 @@ class Djokka
         }
     }
 
+    /**
+     * Mendaftarkan error yang ditemukan
+     * @param int $level Level error
+     * @param string $message Pesan error
+     * @param string $file Lokasi file
+     * @param int $line Nomor baris file
+     * @param array $context Konteks error
+     * @deprecated
+     */
     public function errorHandler($level, $message, $file, $line, $context)
     {
         self::$errors[] = array(
@@ -332,12 +363,17 @@ class Djokka
      * @since 1.0.0
      * @param $str adalah string yang akan diamankan
      * @return string hasil pengamanan
+     * @deprecated
      */
     public function securify($str)
     {
         return htmlentities(addslashes($str));
     }
 
+    /**
+     * Mengambil lokasi folder konfigurasi
+     * @deprecated
+     */
     public function configDir()
     {
         return $this->realPath($this->config('dir').DS.$this->config('app_path').$this->config('config_path').DS);
@@ -347,6 +383,7 @@ class Djokka
      * Mengambil lokasi folder komponen
      * @since 1.0.0
      * @return string lokasi folder
+     * @deprecated
      */
     public function componentDir()
     {
@@ -357,6 +394,7 @@ class Djokka
      * Mengambil lokasi folder tema
      * @since 1.0.0
      * @return string lokasi folder
+     * @deprecated
      */
     public function themeDir()
     {
@@ -368,6 +406,7 @@ class Djokka
      * @since 1.0.0
      * @param $url adalah alamat URL jika hendak menggunakan lokasi eksternal
      * @return string lokasi URL
+     * @deprecated
      */
     public function themeUrl($url = null)
     {
@@ -381,6 +420,7 @@ class Djokka
      * Mengambil lokasi folder aset
      * @since 1.0.0
      * @return string lokasi folder
+     * @deprecated
      */
     public function assetDir()
     {
@@ -392,6 +432,7 @@ class Djokka
      * @since 1.0.0
      * @param $url adalah alamat URL jika hendak menggunakan lokasi eksternal
      * @return string lokasi URL
+     * @deprecated
      */
     public function assetUrl($url = null)
     {
@@ -405,6 +446,7 @@ class Djokka
      * Mengambil lokasi folder modul
      * @since 1.0.0
      * @return string lokasi folder
+     * @deprecated
      */
     public function moduleDir()
     {
@@ -416,6 +458,7 @@ class Djokka
      * Mengambil lokasi folder plugin
      * @since 1.0.1
      * @return string lokasi folder
+     * @deprecated
      */
     public function pluginDir()
     {
@@ -428,6 +471,7 @@ class Djokka
      * @since 1.0.0
      * @param $url adalah alamat URL lain target pengalihan halaman
      * @param $params adalah parameter tambahan untuk alamat URL
+     * @deprecated
      */
     public function redirect($url = null, $params = array())
     {
@@ -438,6 +482,12 @@ class Djokka
         }
     }
 
+    /**
+     * Memuat berkas kelas pustaka
+     * @param string $class Nama kelas
+     * @param mixed $var Variabel
+     * @deprecated
+     */
     public function using($class, &$var = null) {
         $path = $this->componentDir().$class.'.php';
         if(!file_exists($path)) {
@@ -458,6 +508,7 @@ class Djokka
      * @since 1.0.0
      * @param $type adalah tipe user yang telah ditentukan untuk penyaringan
      * @return boolean -> user telah terotorisasi atau belum
+     * @deprecated
      */
     public function authorized($type = null)
     {
@@ -476,24 +527,36 @@ class Djokka
      * @param $data adalah data yang akan dicek kekosongannya
      * @param $default adalah nilai default ketika data kosong
      * @return data atau nilai default
+     * @deprecated
      */
     public function defval($data, $default)
     {
         return $data != null ? $data : $default; 
     }
 
+    /**
+     * Mengubah suatu string menjadi format path yang benar
+     * @param string $path Lokasi direktori/berkas yang akan dibenarkan
+     * @deprecated
+     */
     public function realPath($path) {
         return preg_replace("/([\/\\\]+)/i", DS, $path);
     }
 
+    /**
+     * Memformat waktu ke bentuk format lain
+     * @param string $format Format baru
+     * @param string $date_str Teks waktu
+     * @deprecated
+     */
     public function dateFormat($format, $date_str) {
         return date($format, strtotime($date_str));
     }
 
     /**
-     * Sub fungsi kelas
+     * Mengakses konfigurasi
+     * @deprecated
      */
-
     public function config() {
         switch (func_num_args()) {
             case 0:
@@ -510,6 +573,10 @@ class Djokka
         }
     }
 
+    /**
+     * Mengakses session
+     * @deprecated
+     */
     public function session() {
         switch (func_num_args()) {
             case 0:
@@ -522,6 +589,10 @@ class Djokka
         }
     }
 
+    /**
+     * Mengakses data user
+     * @deprecated
+     */
     public function user() {
         switch (func_num_args()) {
             case 0:
@@ -531,10 +602,20 @@ class Djokka
         }
     }
 
+    /**
+     * Memuat model
+     * @param string $name Nama model
+     * @param bool $is_new Menandakan model dimuat sebagai data baru atau data lama
+     * @deprecated
+     */
     public function model($name, $is_new = false) {
         return Model::get()->load($name, $is_new);
     }
 
+    /**
+     * Membuat paging
+     * @deprecated
+     */
     public function pager() {
         switch (func_num_args()) {
             case 0:
@@ -544,6 +625,10 @@ class Djokka
         }
     }
 
+    /**
+     * Mengambil URL dari modul yang sedang diakses
+     * @deprecated
+     */
     public function getUrl()
     {
         return Route::get()->getUrl();
@@ -552,9 +637,8 @@ class Djokka
     /**
      * Membentuk alamat URL berdasarkan lokasi modul
      * @since 1.0.0
-     * @param $module adalah lokasi modul
-     * @param $params adalah parameter tambahan untuk dimasukkan ke URL
-     * @return string lokasi URL
+     * @return mixed
+     * @deprecated
      */
     public function link()
     {

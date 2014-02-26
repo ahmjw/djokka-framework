@@ -1,6 +1,8 @@
 <?php
 
 /**
+ * Membentuk alamat URL berdasarkan rute modul
+ * @since 1.0.0
  * @author Ahmad Jawahir <rawndummy@gmail.com>
  * @link http://www.djokka.com
  * @license http://creativecommons.org/licenses/by-nc-sa/4.0/deed.en_US
@@ -14,9 +16,7 @@ use Djokka\Base;
 use Djokka\Route;
 
 /**
- * Kelas Djokka\Controller adalah kelas pustaka framework. Dipergunakan untuk mengatur
- * konfigurasi yang digunakan pada web
- * @since 1.0.0
+ * Kelas pendamping yang membantu kelas Djokka\Controller untuk membentuk alamat URL berdasarkan rute modul
  */
 class Linker extends Base
 {
@@ -72,8 +72,8 @@ class Linker extends Base
 
     /**
      * Membentuk URL dengan melakukan penambatan metode GET dengan tambahan parameter
-     * @param mixed $module string Rute module
-     * @param mixed $module array Parameter tambahan untuk URL
+     * @param string $module Rute module
+     * @param array $params Parameter tambahan untuk URL
      * @return string
      */
     public function appendLink($module, $params)

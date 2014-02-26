@@ -1,6 +1,8 @@
 <?php
 
 /**
+ * Memproses modul yang menggunakan arsitektur HMVC
+ * @since 1.0.0
  * @author Ahmad Jawahir <rawndummy@gmail.com>
  * @link http://www.djokka.com
  * @license http://creativecommons.org/licenses/by-nc-sa/4.0/deed.en_US
@@ -19,9 +21,7 @@ use Djokka\Helpers\String;
 use Djokka\Helpers\User;
 
 /**
- * Kelas Djokka\Controller adalah kelas pustaka framework. Dipergunakan untuk mengatur
- * konfigurasi yang digunakan pada web
- * @since 1.0.0
+ * Kelas pendamping yang membantu kelas Djokka\Controller untuk memproses modul yang menggunakan arsitektur HMVC
  */
 class Hmvc extends Core
 {
@@ -47,8 +47,8 @@ class Hmvc extends Core
 
     /**
      * Mengambil konten view pada modul yang menggunakan arsitektur HMVC
-     * @param mixed $info array Informasi modul
-     * @param optional $param array Parameter yang akan dikirimkan ke fungsi aksi
+     * @param mixed $info Informasi modul
+     * @param array $params Parameter yang akan dikirimkan ke fungsi aksi
      * @return string
      */
     public function getViewContent($info, $params = array()) {

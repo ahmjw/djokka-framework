@@ -1,6 +1,8 @@
 <?php
 
 /**
+ * Mengolah citra atau data gambar
+ * @since 1.0.0
  * @author Ahmad Jawahir <rawndummy@gmail.com>
  * @link http://www.djokka.com
  * @license http://creativecommons.org/licenses/by-nc-sa/4.0/deed.en_US
@@ -11,9 +13,7 @@
 namespace Djokka\Helpers;
 
 /**
- * Kelas Djokka\Image adalah kelas pustaka framework. Dipergunakan untuk membantu
- * akses atau manipulasi citra/gambar
- * @since 1.0.0
+ * Kelas pembantu yang bertugas mempermudah pengolahan citra atau data gambar
  */
 class Image
 {

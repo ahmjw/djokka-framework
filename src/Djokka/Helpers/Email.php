@@ -1,6 +1,8 @@
 <?php
 
 /**
+ * Mengirim e-mail menggunakan IMAP
+ * @since 1.0.0
  * @author Ahmad Jawahir <rawndummy@gmail.com>
  * @link http://www.djokka.com
  * @license http://creativecommons.org/licenses/by-nc-sa/4.0/deed.en_US
@@ -11,9 +13,7 @@
 namespace Djokka\Helpers;
 
 /**
- * Kelas Djokka\Mail adalah kelas pustaka framework. Dipergunakan untuk membantu
- * dalam pengiriman pesan e-mail menggunakan protokol IMAP
- * @since 1.0.0
+ * Kelas pembantu yang bertugas mempermudah pengiriman e-mail
  */
 class Email
 {

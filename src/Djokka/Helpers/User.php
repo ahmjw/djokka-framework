@@ -1,6 +1,8 @@
 <?php
 
 /**
+ * Mengolah data user pada web
+ * @since 1.0.0
  * @author Ahmad Jawahir <rawndummy@gmail.com>
  * @link http://www.djokka.com
  * @license http://creativecommons.org/licenses/by-nc-sa/4.0/deed.en_US
@@ -13,9 +15,7 @@ namespace Djokka\Helpers;
 use Djokka\Base;
 
 /**
- * Kelas Djokka\User adalah kelas pustaka framework. Dipergunakan untuk mengakses dan
- * mengelola data user web
- * @since 1.0.0
+ * Kelas pembantu yang bertugas mempermudah pengolahan data user pada wev
  */
 class User extends Base
 {
@@ -96,7 +96,7 @@ class User extends Base
 
     /**
      * Mengambil data user
-     * @return object|arrray|single-type
+     * @return mixed
      */
     public function getUser() 
     {
@@ -106,7 +106,7 @@ class User extends Base
     /**
      * Mengambil data user berdasarkan jenis/tipe
      * @param mixed $type string Jenis/type user yang akan diambil
-     * @return object|array|single-type
+     * @return mixed
      */
     public function getUserByType($type) 
     {

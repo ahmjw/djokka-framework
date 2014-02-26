@@ -1,6 +1,7 @@
 <?php
 
 /**
+ * Memproses bagian view
  * @author Ahmad Jawahir <rawndummy@gmail.com>
  * @link http://www.djokka.com
  * @license http://creativecommons.org/licenses/by-nc-sa/4.0/deed.en_US
@@ -13,6 +14,9 @@ namespace Djokka;
 use Djokka\Base;
 use Djokka\View\Asset;
 
+/**
+ * Kelas pustaka yang bertugas untuk memproses dan mengendalikan bagian view yang terdapat di dalam suatu modul
+ */
 class View extends Base
 {
     /**
@@ -212,8 +216,8 @@ class View extends Base
     /**
      * Memanggil suatu view
      * @since 1.0.0
-     * @param $view adalah lokasi view
-     * @param $params adalah parameter tambahan untuk dimasukkan ke view
+     * @param string $name Lokasi view
+     * @param array $params Parameter tambahan untuk dimasukkan ke view
      */
     public function mergeView($name, $params = array())
     {
@@ -225,9 +229,9 @@ class View extends Base
 
     /**
      * Mengambil konten view
-     * @param mixed $instance object Instance modul yang akan memproses
-     * @param mixed $view string Nama view yang akan diproses
-     * @param optional $param array Parameter yang akan diekstrak ke bagian view
+     * @param object $instance Instance modul yang akan memproses
+     * @param string $view Nama view yang akan diproses
+     * @param array $params Parameter yang akan diekstrak ke bagian view
      * @return string
      */
     public function getView($instance, $view, $params = array()) {

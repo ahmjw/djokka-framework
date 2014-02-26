@@ -1,6 +1,8 @@
 <?php
 
 /**
+ * Mengelola konfigurasi web
+ * @since 1.0.0
  * @author Ahmad Jawahir <rawndummy@gmail.com>
  * @link http://www.djokka.com
  * @license http://creativecommons.org/licenses/by-nc-sa/4.0/deed.en_US
@@ -13,9 +15,7 @@ namespace Djokka\Helpers;
 use Djokka\Base;
 
 /**
- * Kelas Djokka\Config adalah kelas pustaka framework. Dipergunakan untuk mengatur
- * konfigurasi yang digunakan pada web
- * @since 1.0.0
+ * Kelas pembantu yang bertugas mengelola konfigurasi web
  */
 class Config extends Base
 {

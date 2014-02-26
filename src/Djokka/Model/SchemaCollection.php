@@ -1,6 +1,8 @@
 <?php
 
 /**
+ * Membentuk koleksi model guna optimasi sistem
+ * @since 1.0.2
  * @author Ahmad Jawahir <rawndummy@gmail.com>
  * @link http://www.djokka.com
  * @license http://creativecommons.org/licenses/by-nc-sa/4.0/deed.en_US
@@ -11,8 +13,7 @@
 namespace Djokka\Model;
 
 /**
- * Kelas ini digunakan untuk membentuk koleksi skema/struktur tabel beserta aksesor modul untuk keperluan optimasi sistem
- * @since 1.0.2
+ * Kelas pendampingyang membantu kelas Djokka\Model untuk optimasi
  */
 class SchemaCollection 
 {
