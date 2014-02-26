@@ -23,6 +23,7 @@ use Djokka\View\Asset;
 use Djokka\Helpers\Config;
 use Djokka\Helpers\Session;
 use Djokka\Helpers\User;
+use Djokka\Model\SchemaCollection;
 
 /**
  * Kelas utama yang digunakan untuk menyediakan fungsi yang dibutuhkan secara global
@@ -220,7 +221,8 @@ class Base
      * @param mixed $var Variabel yang akan diisi
      * @return string Lokasi folder
      */
-    public function using($class, &$var = null) {
+    public function using($class, &$var = null) 
+    {
         $path = $this->componentDir().$class.'.php';
         if(!file_exists($path)) {
             throw new \Exception("Failed to importing object file. File not found in path $path", 404);
@@ -277,7 +279,8 @@ class Base
     /**
      * Membaca, menambah atau mengubah nilai konfigurasi
      */
-    public function config() {
+    public function config() 
+    {
         switch (func_num_args()) {
             case 0:
                 return Config::get()->getConfig();
@@ -296,7 +299,8 @@ class Base
     /**
      * Membaca, menambah atau mengubah nilai sesi
      */
-    public function session() {
+    public function session() 
+    {
         switch (func_num_args()) {
             case 0:
                 return Session::get()->getSession();
@@ -311,7 +315,8 @@ class Base
     /**
      * Membaca, menambah atau mengubah user yang sedang login
      */
-    public function user() {
+    public function user() 
+    {
         switch (func_num_args()) {
             case 0:
                 return User::get()->getUser();
@@ -326,14 +331,39 @@ class Base
      * @param optional $is_new boolean Model dimuat sebagai data baru atau data lama
      * @return object
      */
-    public function model($name, $is_new = false) {
-        return Model::get()->load($name, $is_new);
+    public function model($name, $is_new = false)
+    {
+        if(preg_match('/^\/([a-zA-Z][a-zA-Z0-9]+)$/i', $name, $match)) {
+            $path = $this->modelDir()."$match[1].php";
+            $class = 'Djokka\\Models\\'.$match[1];
+        } else {
+            $path = $this->moduleDir().$this->config('module').DS."models".DS."$name.php";
+            $class = 'Djokka\\Models\\'.$name;
+        }
+        $path = $this->realPath($path);
+        if(!file_exists($path)) {
+            throw new \Exception("Model file not found in path $path", 404);
+        }
+        include_once($path);
+        if(!class_exists($class)) {
+            throw new \Exception("Class $class is not defined in file $path", 500);
+        }
+        $schema = SchemaCollection::get();
+        if(!$schema->existsModel($class)) {
+            $object = new $class;
+            $object->dataset('module', $name);
+            $schema->models($name, $object);
+        } else {
+            $object = $schema->models($name);
+        }
+        return $object;
     }
 
     /**
      * Menginisialisai pager (pembagi halaman) dan memberikan nilai limit pada model
      */
-    public function pager() {
+    public function pager() 
+    {
         switch (func_num_args()) {
             case 0:
                 return Pager::get()->result();
