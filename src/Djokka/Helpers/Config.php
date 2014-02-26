@@ -30,6 +30,7 @@ class Config extends Base
         'module_path'=>'protected/modules', // Lokasi folder module
         'plugin_path'=>'assets/plugins', // Lokasi folder plugin
         'component_path'=>'protected/components', // Lokasi folder komponen
+        'model_path'=>'protected/models', // Lokasi folder model
         'config_path'=>'protected/config', // Lokasi folder konfigurasi
         'app_path'=>null, // Lokasi folder project/aplikasi web
 
