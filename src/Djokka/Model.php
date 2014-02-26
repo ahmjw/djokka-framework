@@ -733,7 +733,7 @@ class Model extends Base
      */
     public function load($name, $is_new = false) {
         if(preg_match('/^\/([a-zA-Z][a-zA-Z0-9]+)$/i', $name, $match)) {
-            $path = $this->moduleDir()."models".DS."$match[1].php";
+            $path = $this->modelDir()."$match[1].php";
             $class = 'Djokka\\Models\\'.$match[1];
         } else {
             $path = $this->moduleDir().$this->config('module').DS."models".DS."$name.php";
