@@ -37,12 +37,6 @@ class Base
     private static $core;
 
     /**
-     * Daftar error yang ditemukan
-     * @deprecated
-     */
-    private static $errors = array();
-
-    /**
      * Memuat pustaka yang terdapat di dalam framework secara invoke
      * @since 1.0.0
      * @param mixed $subclass adalah nama kelas pustaka framework
@@ -278,18 +272,6 @@ class Base
      */
     public function realPath($path) {
         return preg_replace("/([\/\\\]+)/i", DS, $path);
-    }
-
-    /**
-     * Mengambil format waktu
-     * @param string $format Format tanggal yang akan digunakan
-     * @param string $date_str Teks tanggal yang akan diubah
-     * @since 1.0.0
-     * @deprecated
-     * @return string lokasi folder
-     */
-    public function dateFormat($format, $date_str) {
-        return date($format, strtotime($date_str));
     }
 
     /**
