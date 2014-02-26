@@ -6,6 +6,7 @@
 body{
 	font-family: Helvetica, Arial, Times;
 	color: #666;
+	background: #333;
 	margin-top: 20px;
 	margin-bottom: 20px;
 	font-size: 12px;
