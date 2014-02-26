@@ -156,19 +156,14 @@ class View extends Base
             $params = $this->views[$this->index]['params'];
             $theme_path = $this->themeDir().$this->config('theme').'/';
             $path = $this->realPath("{$theme_path}views/$info[module]/{$route}.php");
-            if(!$info['is_partial']) {
-                if(!file_exists($path)) {
-                    $path = $this->realPath("$info[dir]$info[module]/views/{$route}.php");
-                    if(!file_exists($path)) {
-                        throw new \Exception("View file not found in path $path", 404);
-                    }
-                }
-            } else {
-                $path = $this->realPath("$info[dir]/$info[home_class]/views/$info[partial_class]/{$route}.php");
+
+            if(!file_exists($path)) {
+                $path = $this->realPath("$info[dir]$info[module]/views/{$route}.php");
                 if(!file_exists($path)) {
                     throw new \Exception("View file not found in path $path", 404);
                 }
             }
+            
             // Menentukan kelas induk kontroller
             $this->active = false;
             if($this->index == 0 && !$info['is_plugin']) {

@@ -165,6 +165,7 @@ class Route extends Base
         $dir = !$is_plugin ? $this->moduleDir() : $this->pluginDir();
         $module = 'index';
         $action = 'index';
+        $path = '';
         $class = null;
         $home_class = null;
         $partial_class = null;
@@ -188,42 +189,27 @@ class Route extends Base
                     // Trace route
                     $i = 0;
                     $trace_proc = null;
+                    $prev_module = '';
+
                     foreach ($routes as $route) {
                         if(!$route) continue;
                         if($i == 0) $module = $route;
-                        if(is_numeric(strrpos($route, '-'))) {
-                            $part = explode('-', $route);
-                            $path = $this->realPath($dir.$trace_proc.$part[0].DS.'controllers'.DS.ucfirst($part[1])).'.php';
-                            if(is_file($path) && file_exists($path)) {
-                                $i++;
-                                if(is_numeric(strrpos($module, '-'))) {
-                                    $route = $part[0].DS.'controllers'.DS.$part[1];
-                                    $home_class = $part[0];
-                                    $partial_class = $part[1];
-                                    $class = ucfirst($part[1]);
-                                    $module = $part[0].'-'.$part[1];
-                                } else {
-                                    $route = $part[0].DS.'controllers'.DS.$part[1];
-                                    $home_class = $module.DS.$part[0];
-                                    $partial_class = $part[1];
-                                    $class = ucfirst($part[1]);
-                                    $module .= '/'.$part[0].'-'.$part[1];
-                                }
-                                
-                                $action = $routes[$i];
-                                $is_partial = true;
-                                break;
-                            }
+                        if($i > 0) {
+                            $trace_proc .= 'modules/' . $route . '/';
                         } else {
-                            $trace_proc .= $route.'/';
-                            $path = $this->realPath($dir.$trace_proc);
-                            if(!file_exists($path)) {
-                                $action = $i > 0 ? $route : $routes[1];
-                                break;
-                            }
-                            if($i > 0) {
-                                $module .= '/'.$route;
-                            }
+                            $trace_proc .= $route . '/';
+                        }
+                        $path = $this->realPath($dir.$trace_proc);
+                        if(!file_exists($path)) {
+                            $action = $i > 0 ? $route : $routes[1];
+                            $path = $this->realPath($dir.$prev_module);
+                            break;
+                        }
+                        if($i > 0) {
+                            $module .= '/'.$route;
+                            $prev_module .= 'modules/' . $route . '/';
+                        } else {
+                            $prev_module .= $route . '/';
                         }
                         $i++;
                     }
@@ -233,15 +219,14 @@ class Route extends Base
             }
         } else {
             $module = !empty($router) ? $router: $this->config('main_module');
+            $path = $dir . $module . '/';
         }
-        if(!$is_partial) {
-            $class = $has_sub && is_numeric(strrpos($module, '/')) ? 
-                ucfirst(String::get()->lastPart('/', $module)) : ucfirst($module);
-            $path = $this->realPath($dir.$module.DS.'controllers'.DS.$class.'.php');
-            $architecture = $router != $this->config('module_error') && file_exists($path) ? 'hmvc' : 'modular';
-        } else {
-            $architecture = 'hmvc';
-        }
+
+        $class = $has_sub && is_numeric(strrpos($module, '/')) ? 
+            ucfirst(String::get()->lastPart('/', $module)) : ucfirst($module);
+        $path = $this->realPath($path.DS.$class.'.php');
+        $architecture = $router != $this->config('module_error') && file_exists($path) ? 'hmvc' : 'modular';
+
         if($architecture == 'hmvc') {
             return array(
                 'architecture'=>$architecture,
@@ -249,13 +234,10 @@ class Route extends Base
                 'action'=>$action,
                 'route'=>$module.'/'.$action,
                 'function'=>'action'.ucfirst($action),
-                'home_class'=>$home_class,
-                'partial_class'=>$partial_class,
                 'class'=>'Djokka\\'.(!$is_plugin ? 'Controllers' : 'Plugins').'\\'.$class,
                 'params'=>$params,
                 'dir'=>$dir,
                 'path'=>$path,
-                'is_partial'=>$is_partial,
                 'is_plugin'=>$is_plugin
             );
         } else {
