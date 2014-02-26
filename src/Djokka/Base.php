@@ -172,7 +172,7 @@ class Base
     }
 
     /**
-     * Mengambil lokasi folder modul
+     * Mengambil lokasi folder model
      * @since 1.0.0
      * @return string lokasi folder
      */
@@ -180,6 +180,17 @@ class Base
     {
         $dir = $this->defval($this->config('ref_dir'), $this->config('dir'));
         return $this->realPath($dir.DS.$this->config('app_path').$this->config('module_path').DS);
+    }
+
+    /**
+     * Mengambil lokasi folder modul
+     * @since 1.0.0
+     * @return string lokasi folder
+     */
+    public function modelDir()
+    {
+        $dir = $this->defval($this->config('ref_dir'), $this->config('dir'));
+        return $this->realPath($dir.DS.$this->config('model_path').DS);
     }
 
     /**
