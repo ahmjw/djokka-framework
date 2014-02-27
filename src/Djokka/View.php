@@ -129,8 +129,8 @@ class View extends Base
             $this->content = utf8_decode($instance->render($path, $view['vars']));
             parent::setCore($instance);
         } else {
-            $instance->render($path, $params);
-            return $instance->render($path, $params);
+            $instance->render($path, $view['vars']);
+            return $instance->render($path, $view['vars']);
         }
     }
 
