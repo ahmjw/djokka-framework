@@ -25,30 +25,10 @@ class View extends Base
     private $content;
 
     /**
-     * Nilai indeks view pada pemanggilan HMVC
-     */
-    private $index = -1;
-
-    /**
-     * Daftar view yang telah terpanggil
-     */
-    private $views = array();
-
-    /**
-     * Menandai pengolah view telah aktif atau belum
-     */
-    private $active = false;
-
-    /**
-     * Menandai sistem mengaktifkan pengolah tema atau tidak
-     */
-    private $use_theme = true;
-
-    /**
      * Menampung instance dari kelas
      * @since 1.0.1
      */
-    private static $instance;
+    private static $_instance;
 
     /**
      * Mengambil instance secara Singleton Pattern
@@ -56,28 +36,12 @@ class View extends Base
      * @param $class adalah nama kelas (opsional)
      * @return objek instance kelas
      */
-    public static function getInstance($class = __CLASS__)
+    public static function getInstance()
     {
-        if(self::$instance == null) {
-            self::$instance = new $class;
+        if(self::$_instance == null) {
+            self::$_instance = new static();
         }
-        return self::$instance;
-    }
-
-    /**
-     * Run output buffering to render the view
-     * @param mixed $viewName string Name of the view
-     * @param mixed $vars Array data to extract to the view
-     * @return string Output buffering result from the view file
-     */
-    public function outputBuffering($viewName, array $vars = null)
-    {
-        ob_start();
-        if (!empty($vars)) {
-            extract($vars);
-        }
-        include $viewName;
-        return ob_get_clean();
+        return self::$_instance;
     }
 
     /**
@@ -150,31 +114,23 @@ class View extends Base
      * @return string
      */
     public function renderContent($info, $instance) {
-        // Melakukan pembacaan view
-        if($this->active && !empty($this->views)) {
-            $route = $this->views[$this->index]['view'];
-            $params = $this->views[$this->index]['params'];
-            $theme_path = $this->themeDir().$this->config('theme').'/';
-            $path = $this->realPath("{$theme_path}views/$info[module]/{$route}.php");
+        $view = $instance->getView();
+        $theme = $this->themeDir() . $this->config('theme') . '/';
+        $path = $this->realPath($theme . 'views/' . $info['module'] . '/'. $view['name'] . '.php');
 
+        if(!file_exists($path)) {
+            $path = $this->realPath($info['module_dir'] . '/views/' . $view['name'] . '.php');
             if(!file_exists($path)) {
-                $path = $this->realPath("$info[dir]$info[module]/views/{$route}.php");
-                if(!file_exists($path)) {
-                    throw new \Exception("View file not found in path $path", 404);
-                }
+                throw new \Exception("View file not found in path $path", 404);
             }
-            
-            // Menentukan kelas induk kontroller
-            $this->active = false;
-            if($this->index == 0 && !$info['is_plugin']) {
-                $this->content = utf8_decode($instance->render($path, $params));
-                parent::setCore($instance);
-            } else {
-                $instance->render($path, $params);
-                return $instance->render($path, $params);
-            }
+        }
+
+        if(!$info['is_plugin']) {
+            $this->content = utf8_decode($instance->render($path, $view['vars']));
+            parent::setCore($instance);
         } else {
-            $this->use_theme = false;
+            $instance->render($path, $params);
+            return $instance->render($path, $params);
         }
     }
 
@@ -191,35 +147,20 @@ class View extends Base
             echo json_encode($content);
             return;*/
         }
-        if($this->use_theme) {
-            $theme_path = $this->realPath($this->themeDir().$this->config('theme').DS.$this->config('layout').'.php');
-            if(!file_exists($theme_path)) {
-                throw new \Exception("Layout file not found in path {$theme_path}", 404);
-            }
-            if(parent::getCore() != null) {
-                $theme_content = parent::getCore()->render($theme_path);
-            } else {
-                $theme_content = Controller::get()->render($theme_path);
-            }
-            $content = Asset::get()->render($theme_content);
+
+        $theme_path = $this->realPath($this->themeDir().$this->config('theme').DS.$this->config('layout').'.php');
+        if(!file_exists($theme_path)) {
+            throw new \Exception("Layout file not found in path {$theme_path}", 404);
         }
+        if(Controller::getCore() != null) {
+            $theme_content = Controller::getCore()->render($theme_path);
+        } else {
+            $theme_content = Controller::get()->render($theme_path);
+        }
+        $content = Asset::getInstance()->render($theme_content);
         //$content = preg_replace('/[\r\n\t]/i', '', $content);
         //$content = preg_replace('/\s{1,}/i', ' ', $content);
-        return $content;
-    }
-
-    /**
-     * Memanggil suatu view
-     * @since 1.0.0
-     * @param string $name Lokasi view
-     * @param array $params Parameter tambahan untuk dimasukkan ke view
-     */
-    public function mergeView($name, $params = array())
-    {
-        $view = array('view'=>$name, 'params'=>$params);
-        $this->views = array_merge($this->views, array($view));
-        $this->index++;
-        $this->active = true;
+        print $content;
     }
 
     /**
