@@ -52,13 +52,12 @@ class Route extends Base
     /**
      * Mengambil instance secara Singleton Pattern
      * @since 1.0.0
-     * @param $class adalah nama kelas (opsional)
      * @return objek instance kelas
      */
-    public static function get($class = __CLASS__)
+    public static function getInstance()
     {
         if(self::$instance == null) {
-            self::$instance = new $class;
+            self::$instance = new static();
         }
         return self::$instance;
     }
@@ -160,7 +159,7 @@ class Route extends Base
      * @param bool $is_plugin Menandakan modul tersebut adalah plugin atau bukan
      * @return informasi rute dalam bentuk array
      */
-    public function getModuleInfo($router, $is_plugin = false)
+    public function getModuleInfo($router, $is_plugin = false, $is_widget = false)
     {
         $dir = !$is_plugin ? $this->moduleDir() : $this->pluginDir();
         $module = 'index';
@@ -223,34 +222,22 @@ class Route extends Base
         }
 
         $class = $has_sub && is_numeric(strrpos($module, '/')) ? 
-            ucfirst(String::get()->lastPart('/', $module)) : ucfirst($module);
+            ucfirst(String::getInstance()->lastPart('/', $module)) : ucfirst($module);
+        $module_dir = $path;
         $path = $this->realPath($path.DS.$class.'.php');
-        $architecture = $router != $this->config('module_error') && file_exists($path) ? 'hmvc' : 'modular';
 
-        if($architecture == 'hmvc') {
-            return array(
-                'architecture'=>$architecture,
-                'module'=>$module,
-                'action'=>$action,
-                'route'=>$module.'/'.$action,
-                'function'=>'action'.ucfirst($action),
-                'class'=>'Djokka\\'.(!$is_plugin ? 'Controllers' : 'Plugins').'\\'.$class,
-                'params'=>$params,
-                'dir'=>$dir,
-                'path'=>$path,
-                'is_plugin'=>$is_plugin
-            );
-        } else {
-            return array(
-                'architecture'=>$architecture,
-                'module'=>$module,
-                'action'=>$action,
-                'route'=>$module.'/'.$action,
-                'dir'=>$dir,
-                'path'=>$dir.$router.'.php',
-                'is_plugin'=>$is_plugin
-            );
-        }
+        return array(
+            'module'=>$module,
+            'action'=>$action,
+            'route'=>$module.'/'.$action,
+            'function'=>$is_widget ? 'widget'.ucfirst($action) : 'action'.ucfirst($action),
+            'class'=>'Djokka\\'.(!$is_plugin ? 'Controllers' : 'Plugins').'\\'.$class,
+            'params'=>$params,
+            'dir'=>$dir,
+            'path'=>$path,
+            'module_dir'=>$module_dir,
+            'is_plugin'=>$is_plugin
+        );
     }
 
     /**
