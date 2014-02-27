@@ -29,20 +29,19 @@ class Hmvc extends Core
      * Menampung instance dari kelas
      * @since 1.0.1
      */
-    private static $instance;
+    private static $_instance;
 
     /**
      * Mengambil instance secara Singleton Pattern
      * @since 1.0.1
-     * @param $class adalah nama kelas (opsional)
      * @return objek instance kelas
      */
-    public static function get($class = __CLASS__)
+    public static function getInstance()
     {
-        if(self::$instance == null) {
-            self::$instance = new $class;
+        if(self::$_instance == null) {
+            self::$_instance = new static();
         }
-        return self::$instance;
+        return self::$_instance;
     }
 
     /**
@@ -53,6 +52,9 @@ class Hmvc extends Core
      */
     public function getViewContent($info, $params = array()) {
         // Mengumpulkan informasi aksi
+        if (!file_exists($info['path'])) {
+            throw new \Exception("Class of module is not found: $info[path]", 404);
+        }
         include_once($info['path']);
         if(!class_exists($info['class'])) {
             throw new \Exception("Class $class is not declared in file $path", 500);
@@ -69,7 +71,7 @@ class Hmvc extends Core
                     return '('.$group.')';
                 }, $route[0]);
                 $pattern = '/'.str_replace('/', '\/', $pattern).'/i';
-                if(preg_match($pattern, Route::get()->getUri(), $match)) {
+                if(preg_match($pattern, Route::getInstance()->getUri(), $match)) {
                     $values = array_slice($match, 1);
                     $params = array();
                     foreach ($values as $i => $value) {
@@ -101,7 +103,7 @@ class Hmvc extends Core
             $instance, $info['function']), $info['params']
         );
 
-        if($this->config('json') === false) {
+        if($this->config('json') === false && $instance->isUseView()) {
             return View::getInstance()->renderContent($info, $instance);
         } else {
             return $return;
