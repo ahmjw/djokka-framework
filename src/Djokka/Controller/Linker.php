@@ -24,7 +24,7 @@ class Linker extends Base
      * Menampung instance dari kelas
      * @since 1.0.1
      */
-    private static $instance;
+    private static $_instance;
 
     /**
      * Mengambil instance secara Singleton Pattern
@@ -32,12 +32,12 @@ class Linker extends Base
      * @param $class adalah nama kelas (opsional)
      * @return objek instance kelas
      */
-    public static function get($class = __CLASS__)
+    public static function getInstance()
     {
-        if(self::$instance == null) {
-            self::$instance = new $class;
+        if(self::$_instance == null) {
+            self::$_instance = new static();
         }
-        return self::$instance;
+        return self::$_instance;
     }
 
     /**
@@ -56,16 +56,16 @@ class Linker extends Base
      */
     public function appendGet($module)
     {
-        $params = Route::get()->urlParam('get', $module);
+        $params = Route::getInstance()->urlParam('get', $module);
         $params = substr($params, 1, strlen($params));
         if(!isset($module[0])) {
-            return Route::get()->getBaseUrl().'/'.Route::get()->getUri().'?'.$params;
+            return Route::getInstance()->getBaseUrl().'/'.Route::getInstance()->getUri().'?'.$params;
         } else {
             if(!is_numeric(strpos($module[0], '/'))) {
-                return Route::get()->getBaseUrl().'/'.
+                return Route::getInstance()->getBaseUrl().'/'.
                     $this->config('module').'/'.$module[0].'?'.$params;
             } else {
-                return Route::get()->getBaseUrl().$module[0].'?'.$params;
+                return Route::getInstance()->getBaseUrl().$module[0].'?'.$params;
             }
         }
     }
@@ -78,7 +78,7 @@ class Linker extends Base
      */
     public function appendLink($module, $params)
     {
-        return $this->getLink($module).'?'.Route::get()->urlParam('get', $params);
+        return $this->getLink($module).'?'.Route::getInstance()->urlParam('get', $params);
     }
 
     /**
@@ -88,7 +88,7 @@ class Linker extends Base
      */
     public function renderParameter($params)
     {
-        return Route::get()->urlParam($this->config('route_format'), $params);
+        return Route::getInstance()->urlParam($this->config('route_format'), $params);
     }
 
     /**
@@ -102,7 +102,7 @@ class Linker extends Base
         $sprtr = $this->getSeparator();
         // Menentukan lokasi URL
         $url = null;
-        $base = Route::get()->getBaseUrl();
+        $base = Route::getInstance()->getBaseUrl();
         if(!is_numeric(strpos($module, '/'))) {
             $url = $base.$sprtr.$this->config('module').$sprtr.$module;
         } else if($module[0] == '-') {
@@ -134,12 +134,12 @@ class Linker extends Base
             $params = $this->renderParameter($parameter);
         }
         if(!is_numeric(strpos($module, '/'))) {
-            return Route::get()->getBaseUrl().$sprtr.$this->config('module').'/'.$module.$params;
+            return Route::getInstance()->getBaseUrl().$sprtr.$this->config('module').'/'.$module.$params;
         } else {
             if($module[0] != '/') {
-                return Route::get()->getBaseUrl().$sprtr.$this->config('module').'/'.$module.$params;
+                return Route::getInstance()->getBaseUrl().$sprtr.$this->config('module').'/'.$module.$params;
             } else {
-                return Route::get()->getBaseUrl().$sprtr.substr($module, 1, strlen($module)).$params;
+                return Route::getInstance()->getBaseUrl().$sprtr.substr($module, 1, strlen($module)).$params;
             }
         }
     }

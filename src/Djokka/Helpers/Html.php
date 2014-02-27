@@ -24,20 +24,19 @@ class Html extends Base
      * Menampung instance dari kelas
      * @since 1.0.0
      */
-    private static $instance;
+    private static $_instance;
 
     /**
      * Mengambil instance secara Singleton Pattern
      * @since 1.0.0
-     * @param $class adalah nama kelas (opsional)
      * @return objek instance kelas
      */
-    public static function get($class = __CLASS__)
+    public static function getInstance()
     {
-        if(self::$instance == null) {
-            self::$instance = new $class;
+        if(self::$_instance == null) {
+            self::$_instance = new static();
         }
-        return self::$instance;
+        return self::$_instance;
     }
 
     /**
@@ -95,6 +94,7 @@ class Html extends Base
     public function radio($name, $value, $items, $options = array())
     {
         $options['name'] = $name;
+        $rendered = '';
         if($items) {
             foreach ($items as $values => $display) {
                 $values = !is_numeric($values) ? $values : $display;

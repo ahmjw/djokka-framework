@@ -88,7 +88,7 @@ class Config extends Base
      * Menampung instance dari kelas
      * @since 1.0.0
      */
-    private static $instance;
+    private static $_instance;
 
     /**
      * Mengambil instance secara Singleton Pattern
@@ -96,22 +96,23 @@ class Config extends Base
      * @param $class adalah nama kelas (opsional)
      * @return objek instance kelas
      */
-    public static function get($class = __CLASS__)
+    public static function getInstance()
     {
-        if(self::$instance == null) {
-            self::$instance = new $class;
+        if(self::$_instance == null) {
+            self::$_instance = new static();
         }
-        return self::$instance;
+        return self::$_instance;
     }
 
     /**
      * Konstruktor kelas
      */
-    public function __construct() {
+    public function __construct() 
+    {
         if(isset($_SERVER['SCRIPT_NAME']) && isset($_SERVER['DOCUMENT_ROOT'])) {
-            $dir = String::get()->unlastPart('/', $_SERVER['SCRIPT_NAME']);
+            $dir = String::getInstance()->unlastPart('/', $_SERVER['SCRIPT_NAME']);
             if($dir == '') {
-                $dir = String::get()->unlastPart('\\', $_SERVER['SCRIPT_NAME']);
+                $dir = String::getInstance()->unlastPart('\\', $_SERVER['SCRIPT_NAME']);
             }
             $this->data['dir'] = $this->realPath($_SERVER['DOCUMENT_ROOT'].$dir.DS);
         }
@@ -120,7 +121,8 @@ class Config extends Base
     /**
      * Membaca nilai konfigurasi yang diletakkan di dalam berkas konfigurasi dan memasukkannya ke dalam sistem
      */
-    public function render() {
+    public function render() 
+    {
         $dir = $this->configDir();
         $path = $dir.'main.php';
         if(file_exists($path)) {
@@ -159,7 +161,8 @@ class Config extends Base
      * Mengambil data peta kelas
      * @return array
      */
-    public function getClassMap() {
+    public function getClassMap() 
+    {
         return $this->class_map;
     }
 

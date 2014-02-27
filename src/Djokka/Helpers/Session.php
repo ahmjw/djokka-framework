@@ -22,21 +22,20 @@ class Session
      * Menampung instance dari kelas
      * @since 1.0.0
      */
-    private static $instance;
+    private static $_instance;
 
     /**
      * Mengambil instance secara Singleton Pattern
      * @since 1.0.0
-     * @param $class adalah nama kelas (opsional)
      * @return objek instance kelas
      */
-    public static function get($class = __CLASS__)
+    public static function getInstance()
     {
-        if(self::$instance == null) {
+        if(self::$_instance == null) {
             session_start();
-            self::$instance = new $class;
+            self::$_instance = new static();
         }
-        return self::$instance;
+        return self::$_instance;
     }
 
     /**

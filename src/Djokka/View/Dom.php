@@ -22,7 +22,7 @@ class Dom extends \DomDocument
      * Menampung instance dari kelas
      * @since 1.0.0
      */
-    private static $instance;
+    private static $_instance;
 
     /**
      * Menampung objek DOM pembantu
@@ -36,13 +36,13 @@ class Dom extends \DomDocument
      * @param $class adalah nama kelas (opsional)
      * @return objek instance kelas
      */
-    public static function get($class = __CLASS__)
+    public static function getInstance()
     {
-        if(self::$instance == null) {
-            self::$instance = new $class;
-            self::$instance->helper = new \DomDocument(1.0, 'UTF-8');
+        if(self::$_instance == null) {
+            self::$_instance = new static();
+            self::$_instance->helper = new \DomDocument(1.0, 'UTF-8');
         }
-        return self::$instance;
+        return self::$_instance;
     }
 
     /**

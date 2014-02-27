@@ -65,20 +65,19 @@ class Asset extends Base
      * Menampung instance dari kelas
      * @since 1.0.0
      */
-    private static $instance;
+    private static $_instance;
 
     /**
      * Mengambil instance secara Singleton Pattern
      * @since 1.0.0
-     * @param $class adalah nama kelas (opsional)
      * @return objek instance kelas
      */
-    public static function get($class = __CLASS__)
+    public static function getInstance()
     {
-        if(self::$instance == null) {
-            self::$instance = new $class;
+        if(self::$_instance == null) {
+            self::$_instance = new static();
         }
-        return self::$instance;
+        return self::$_instance;
     }
 
     /**
@@ -204,10 +203,10 @@ class Asset extends Base
         
         // Membuat objek DOM
         libxml_use_internal_errors(true);
-        Dom::get()->loadHTML($content);
+        Dom::getInstance()->loadHTML($content);
         libxml_clear_errors();
-        $header = Dom::get()->getElementsByTagName('head')->item(0);
-        $body = Dom::get()->getElementsByTagName('body')->item(0);
+        $header = Dom::getInstance()->getElementsByTagName('head')->item(0);
+        $body = Dom::getInstance()->getElementsByTagName('body')->item(0);
 
         // Render header's assets
         // For JS files
@@ -271,12 +270,12 @@ class Asset extends Base
         foreach ($this->widgets as $elements => $items) {
             foreach ($items as $module => $params) {
                 if(is_numeric($module)){
-                    Dom::get()->append($elements, 
-                        Controller::get()->import('plugin.'.$params)
+                    Dom::getInstance()->append($elements, 
+                        Controller::getInstance()->import($params, null, true)
                     );
                 } else {
-                    Dom::get()->append($elements, 
-                        Controller::get()->import('plugin.'.$module, $params)
+                    Dom::getInstance()->append($elements, 
+                        Controller::getInstance()->import($module, $params, true)
                     );
                 }
             }
@@ -285,11 +284,11 @@ class Asset extends Base
         // For DOM append
         foreach ($this->dom_append as $element => $items) {
             foreach ($items as $item) {
-                Dom::get()->append($element, $item);
+                Dom::getInstance()->append($element, $item);
             }
         }
 
-        return Dom::get()->saveHTML();
+        return Dom::getInstance()->saveHTML();
     }
 
 }

@@ -22,20 +22,19 @@ class TableCollection
      * Menampung instance dari kelas
      * @since 1.0.2
      */
-    private static $instance;
+    private static $_instance;
 
     /**
      * Mengambil instance secara Singleton Pattern
      * @since 1.0.2
-     * @param $class adalah nama kelas (opsional)
      * @return objek instance kelas
      */
-    public static function get($class = __CLASS__)
+    public static function getInstance()
     {
-        if(self::$instance == null) {
-            self::$instance = new $class;
+        if(self::$_instance == null) {
+            self::$_instance = new static();
         }
-        return self::$instance;
+        return self::$_instance;
     }
 
     /**
@@ -44,7 +43,10 @@ class TableCollection
 	public function table() {
 		switch (func_num_args()) {
 			case 1:
-				return $this->{func_get_arg(0)};
+                if (isset($this->{func_get_arg(0)})) {
+				    return $this->{func_get_arg(0)};
+                }
+                break;
 			case 2:
 				if(!is_array(func_get_arg(1))) {
 					return $this->{func_get_arg(0)}[func_get_arg(1)];
