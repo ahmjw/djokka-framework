@@ -35,12 +35,12 @@ class ModelCollection
     /**
      * Jumlah baris yang dihasilkan dari hasil eksekusi perintah SQL
      */
-	public $RowCount;
+	public $rowCount;
 
     /**
      * Jumlah kolom yang dihasilkan dari hasil eksekusi perintah SQL
      */
-	public $FieldCount;
+	public $fieldCount;
 
     /**
      * Menampung instance dari kelas
@@ -68,18 +68,20 @@ class ModelCollection
      */
 	public function __get($property)
 	{
-		if($property == 'Rows') {
-			$this->Rows = array();
+		if($property == 'rows') {
+			$this->rows = array();
             while ($row = $this->resource->fetch_assoc()) {
                 $record = clone $this->model;
                 foreach ($row as $key => $value) {
                     $record->{$key} = stripslashes($value);
                 }
-                $this->Rows[] = $record;
+                $this->rows[] = $record;
             }
             $this->resource->free_result();
 		}
-		return $this->{$property};
+        if (isset($this->{$property})) {
+          return $this->{$property};
+        }
 	}
 
     /**
@@ -103,8 +105,8 @@ class ModelCollection
 			}
 		}
 		$this->resource = $db->execute();
-		$this->RowCount = $this->resource->num_rows;
-		$this->FieldCount = $this->resource->field_count;
+		$this->rowCount = $this->resource->num_rows;
+		$this->fieldCount = $this->resource->field_count;
 	}
 
     /**
