@@ -28,45 +28,59 @@ use Djokka\Controller\Plugin;
 class Controller extends Base
 {
     /**
+     * Nama view
+     * @since 1.0.3
+     */
+    private $_view;
+
+    /**
      * Menampung instance dari kelas
-     * @access private
      * @since 1.0.1
      */
-    private static $instance;
+    private static $_instance;
 
     /**
      * Mengambil instance secara Singleton Pattern
      * @since 1.0.1
-     * @param $class adalah nama kelas (opsional)
      * @return objek instance kelas
      */
-    public static function get($class = __CLASS__)
+    public static function getInstance()
     {
-        if(self::$instance == null) {
-            self::$instance = new $class;
+        if(self::$_instance == null) {
+            self::$_instance = new static();
         }
-        return self::$instance;
+        return self::$_instance;
     }
 
     /**
      * Memanggil bagian view yang akan dijadikan konten
-     * @param mixed $name string Nama view yang akan dipanggil
-     * @param optional $params array data yang akan diekstrak ke view tersebut
+     * @param string $name Nama view yang akan dipanggil
+     * @param array $vars Data yang akan diekstrak ke view tersebut
      */
-    public function view($name, $params = array())
+    public function view($name, array $vars = array())
     {
-        View::getInstance()->mergeView($name, $params);
+        $this->_view = array(
+            'name' => $name,
+            'vars' => $vars
+        );
     }
 
     /**
-     * Memanggil bagian view
-     * @param mixed $name string Nama view yang akan dipanggil
-     * @param optional $params array data yang akan diekstrak ke view tersebut
+     * Mengecek apakah modul menggunakan view atau tidak
+     * @return boolean
+     */
+    public function isUseView()
+    {
+        return !empty($this->_view);
+    }
+
+    /**
+     * Memanggil data view
      * @deprecated
      */
-    public function getView($name, $params = array())
+    public function getView()
     {
-        return View::getInstance()->getView($this, $name, $params);
+        return $this->_view;
     }
 
     /**
@@ -91,6 +105,22 @@ class Controller extends Base
     }
 
     /**
+     * Run output buffering to render the view
+     * @param mixed $viewName string Name of the view
+     * @param mixed $vars Array data to extract to the view
+     * @return string Output buffering result from the view file
+     */
+    public function outputBuffering($viewName, array $vars = null)
+    {
+        ob_start();
+        if (!empty($vars)) {
+            extract($vars);
+        }
+        include $viewName;
+        return ob_get_clean();
+    }
+
+    /**
      * Mengambil atau menentukan konten web
      * @since 1.0.0
      * @param - Jika tanpa parameter, maka dia memberikan konten web
@@ -110,11 +140,13 @@ class Controller extends Base
      */
     public function uri($i = null)
     {
-        $uris = Route::get()->uris;
+        $uris = Route::getInstance()->uris;
         if($i === null) {
             return $uris;
         } else {
-            return $uris[$i];
+            if (isset($uris[$i])) {
+                return $uris[$i];
+            }
         }
     }
 
@@ -126,7 +158,7 @@ class Controller extends Base
      */
     public function param($var = null)
     {
-        $params = Route::get()->url_params;
+        $params = Route::getInstance()->url_params;
         if($var !== null) {
             if($this->config('route_format') == 'path') {
                 if(count($params) > 0)
@@ -145,7 +177,7 @@ class Controller extends Base
      * @since 1.0.0
      */
     public function js($code) {
-        Asset::get()->js($code);
+        Asset::getInstance()->js($code);
     }
 
     /**
@@ -154,7 +186,7 @@ class Controller extends Base
      * @since 1.0.0
      */
     public function css($code) {
-        Asset::get()->css($code);
+        Asset::getInstance()->css($code);
     }
 
     /**
@@ -163,7 +195,7 @@ class Controller extends Base
      * @since 1.0.0
      */
     public function asset($url) {
-        Asset::get()->add($url);
+        Asset::getInstance()->add($url);
     }
 
     /**
@@ -208,7 +240,7 @@ class Controller extends Base
      */
     public function baseUrl($url = null)
     {
-        return Route::get()->base_url.'/'.$url;
+        return Route::getInstance()->base_url.'/'.$url;
     }
 
     /**
@@ -243,19 +275,15 @@ class Controller extends Base
      * @param array $params adalah parameter tambahan yang dimasukkan ke dalam aksi/modul
      * @return string berupa hasil pembacaan bagian view
      */
-    public function import($route, $params = array())
+    public function import($route, $params = array(), $is_widget = false)
     {
         $is_plugin = false;
         if($plugin = $this->isPlugin($route)) {
             $route = $plugin;
             $is_plugin = true;
         }
-        $info = $route == $this->config('route') ? $this->config('module_info') : Route::get()->getModuleInfo($route, $is_plugin);
-        if($info['architecture'] == 'hmvc') {
-            return Hmvc::get()->getViewContent($info, $params);
-        } else {
-            return Modular::get()->getViewContent($info, $params);
-        }
+        $info = $route == $this->config('route') ? $this->config('module_info') : Route::getInstance()->getModuleInfo($route, $is_plugin, $is_widget);
+        return Hmvc::getInstance()->getViewContent($info, $params);
     }
 
     /**
@@ -281,7 +309,7 @@ class Controller extends Base
      */
     public function widget($element, $items)
     {
-        Asset::get()->setWidget($element, $items);
+        Asset::getInstance()->setWidget($element, $items);
     }
 
 }
