@@ -102,7 +102,7 @@ abstract class Model extends Base
      */
     public function setRules($field, $rules, $params = array())
     {
-        Validation::get()->setRules($field, $rules, $params);
+        Validation::getInstance()->setRules($field, $rules, $params);
     }
 
     /**
@@ -113,11 +113,8 @@ abstract class Model extends Base
      */
     public function label($property = null)
     {
-        if($this->schema() != null) {
-            return isset($this->schema()->Labels[$property]) ? $this->schema()->Labels[$property] : ucfirst($property);
-        } else {
-            return ucfirst($property);
-        }
+        $labels = $this->labels();
+        return !empty($labels) && isset($labels[$property]) ? $labels[$property] : ucfirst($property);
     }
 
     /**
@@ -133,7 +130,7 @@ abstract class Model extends Base
     {
         if(!empty($data)) {
             foreach ($data as $key => $value) {
-                if(!$this->isNew() && !in_array($key, $this->____dataset['updates'])) {
+                if(!in_array($key, $this->____dataset['updates'])) {
                     $this->____dataset['updates'][] = $key;
                 }
                 $this->{$key} = $value;
@@ -184,14 +181,14 @@ abstract class Model extends Base
     {
         switch (func_num_args()) {
             case 0:
-                return Validation::get()->errors;
+                return Validation::getInstance()->errors;
             case 1:
-                if (isset(Validation::get()->errors[func_get_arg(0)])) {
-                    return Validation::get()->errors[func_get_arg(0)];
+                if (isset(Validation::getInstance()->errors[func_get_arg(0)])) {
+                    return Validation::getInstance()->errors[func_get_arg(0)];
                 }
                 break;
             case 2:
-                Validation::get()->errors[func_get_arg(0)] = func_get_arg(1);
+                Validation::getInstance()->errors[func_get_arg(0)] = func_get_arg(1);
                 break;
         }
     }
@@ -205,8 +202,8 @@ abstract class Model extends Base
      */
     public function validate()
     {
-        $validated = Validation::get()->validate($this);
-        Validation::get()->clearRules();
+        $validated = Validation::getInstance()->validate($this);
+        Validation::getInstance()->clearRules();
         return $validated;
     }
 
@@ -222,17 +219,17 @@ abstract class Model extends Base
     {
         if($property !== null) {
             if(!is_array($property)) {
-                Validation::get()->unvalidates = array_merge(
-                    Validation::get()->unvalidates,
+                Validation::getInstance()->unvalidates = array_merge(
+                    Validation::getInstance()->unvalidates,
                     array($property)
                 );
             } else {
-                Validation::get()->unvalidates = array_merge(
-                    Validation::get()->unvalidates, $property
+                Validation::getInstance()->unvalidates = array_merge(
+                    Validation::getInstance()->unvalidates, $property
                 );
             }
         } else {
-            Validation::get()->unvalidate = true;
+            Validation::getInstance()->unvalidate = true;
         }
     }
 }

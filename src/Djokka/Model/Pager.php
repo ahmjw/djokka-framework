@@ -67,7 +67,7 @@ class Pager extends Base
         } else {
             $sql = "SELECT $field FROM $table";
         }
-        $resource = Db::get()->query($sql);
+        $resource = Db::getInstance()->query($sql);
         $total = $resource->num_rows;
         $num_page = ceil($total / $pager['limit']);
         return array($pager['page'], $num_page, $total);

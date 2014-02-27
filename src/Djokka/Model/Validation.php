@@ -48,13 +48,12 @@ class Validation extends Base
     /**
      * Mengambil instance secara Singleton Pattern
      * @since 1.0.0
-     * @param $class adalah nama kelas (opsional)
      * @return objek instance kelas
      */
-    public static function get($class = __CLASS__)
+    public static function getInstance()
     {
         if(self::$instance == null) {
-            self::$instance = new $class;
+            self::$instance = new static();
         }
         return self::$instance;
     }
