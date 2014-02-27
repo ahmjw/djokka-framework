@@ -25,102 +25,6 @@ use Djokka\Helpers\String;
 abstract class ActiveRecord extends Base
 {
     /**
-     * Instance dari kelas ini
-     */
-    private static $_instance;
-
-    /**
-     * Data penting yang dibutuhkan oleh model
-     */
-    public $____dataset = array(
-        'is_new'=>true,
-        'module'=>null,
-        'params'=>array(),
-        'externals'=>array(),
-        'updates'=>array()
-    );
-
-    /**
-     * Mengambil instance secara Singleton Pattern
-     * @since 1.0.0
-     * @param $class adalah nama kelas (opsional)
-     * @return objek instance kelas
-     */
-    public static function get()
-    {
-        if(self::$_instance == null) {
-            self::$_instance = new static();
-        }
-        return self::$_instance;
-    }
-
-    /**
-     * Mengambil instance suatu model dari peta model
-     * @param mixed $class Nama kelas model
-     * @param mixed $module Nama modul tempat meletakkan model tersebut
-     * @param optional $is_new apakah model akan dimuat sebagai data baru atau data lama
-     * @return object
-     */
-    public function makeObject($class, $module, $is_new = true)
-    {
-        $schema = SchemaCollection::get();
-        if(!$schema->existsModel($class)) {
-            $object = new $class;
-            $object->____dataset['module'] = $module;
-            $schema->models($module, $object);
-            
-            if(!$schema->existsModule($module) && $object->table() != null) {
-                $data = new \stdClass();
-                $data->TableStructure = TableCollection::get()->table($object->table());
-                $data->Labels = $object->labels();
-                $schema->module($module, $data);
-            }
-        } else {
-            $object = $schema->models($module);
-        }
-        if($is_new === false) {
-            $object->setIsNew(false);
-        }
-        return $object;
-    }
-
-    /**
-     * Konstruktor kelas
-     */
-    public function __construct() {
-        $this->preload();
-    }
-
-    /**
-     * Melakukan pemanggilan fungsi ketika dilakukan pembacaan property
-     * @param string $property Nama property/field
-     * @return mixed
-     */
-    public function __get($property) {
-        if(in_array('_'.$property, get_class_methods($this))) {
-            return call_user_func(array($this, '_'.$property));
-        }
-        return $this->{$property};
-    }
-
-    /**
-     * Memasukkan data ke dalam peta tabel ketika terjadi inisialisasi
-     * @param mixed $property string Nama properti
-     * @param mixed $value Nilai dari properti
-     */
-    public function __set($property, $value) {
-        if(in_array('table', get_class_methods($this))) {
-            /*$fields = SchemaCollection::get()->tables[$this->table()]['fields'];
-            if($fields != null) {
-                if(!in_array($property, $fields)) {
-                    $this->____dataset['externals'][] = $property;
-                }
-            }*/
-        }
-        $this->{$property} = $value;
-    }
-
-    /**
      * Fungsi yang digunakan untuk menetapkan nama tabel yang diwakili oleh model
      * @return string
      */
@@ -139,39 +43,53 @@ abstract class ActiveRecord extends Base
     abstract function rules();
 
     /**
+     * Data penting yang dibutuhkan oleh model
+     */
+    public $____dataset = array(
+        'is_new'=>false,
+        'module'=>null,
+        'params'=>array(),
+        'externals'=>array(),
+        'updates'=>array()
+    );
+
+    /**
+     * Konstruktor kelas
+     */
+    public function __construct() {
+        $this->preload();
+    }
+
+    /**
      * Memasukkan data model ke dalam pemetaan
      */
     private function preload()
     {
-        if($this->labels() != null) {
-            $this->schema('labels', $this->labels());
-        }
-        if($this->table() != null) {
-            if(!TableCollection::get()->exists($this->table()))
-            {
-                if($desc = $this->db()->desc()) {
-                    $pkey = null;
-                    $temp = array();
-                    foreach ($desc as $schema) {
-                        $field = null;
-                        $info = array();
-                        foreach ($schema as $key => $value) {
-                            if($key == 'Field') {
-                                $field = $value;
-                            } else {
-                                $info[$key] = $value;
-                                if($key == 'Key' && $value == 'PRI') {
-                                    $pkey = $field;
-                                }
+        $this->schema('labels', $this->labels());
+        if (!TableCollection::getInstance()->exists($this->table()))
+        {
+            if($desc = $this->db()->desc()) {
+                $pkey = null;
+                $temp = array();
+                foreach ($desc as $schema) {
+                    $field = null;
+                    $info = array();
+                    foreach ($schema as $key => $value) {
+                        if($key == 'Field') {
+                            $field = $value;
+                        } else {
+                            $info[$key] = $value;
+                            if($key == 'Key' && $value == 'PRI') {
+                                $pkey = $field;
                             }
                         }
-                        $fields[] = $field;
-                        $temp['describe'][$field] = $info;
                     }
-                    $temp['fields'] = $fields;
-                    $temp['primary_key'] = $pkey;
-                    TableCollection::get()->table($this->table(), $temp);
+                    $fields[] = $field;
+                    $temp['describe'][$field] = $info;
                 }
+                $temp['fields'] = $fields;
+                $temp['primary_key'] = $pkey;
+                $this->schema($temp);
             }
         }
     }
@@ -208,13 +126,21 @@ abstract class ActiveRecord extends Base
      * @param optional $use_module boolean menentukan apakah pencarian menggunakan module
      * @return array
      */
-    public function schema($use_module = false)
+    public function schema()
     {
-        if($use_module === true) {
-            SchemaCollection::get()->setCurrentModule($this->____dataset['module']);
-            return SchemaCollection::get();
-        } else {
-            return SchemaCollection::get()->module($this->____dataset['module']);
+        $data = TableCollection::getInstance()->table($this->table());
+        switch (func_num_args()) {
+            case 0:
+                return $data;
+            case 1:
+                if (!is_array(func_get_arg(0)) && isset($data[func_get_arg(0)])) {
+                    return $data[func_get_arg(0)];
+                } else {
+                    TableCollection::getInstance()->table($this->table(), func_get_arg(0));
+                }
+                break;
+            default:
+                break;
         }
     }
 
@@ -226,7 +152,7 @@ abstract class ActiveRecord extends Base
      */
     public function setRules($field, $rules, $params = array())
     {
-        Validation::get()->setRules($field, $rules, $params);
+        Validation::getInstance()->setRules($field, $rules, $params);
     }
 
     /**
@@ -236,7 +162,7 @@ abstract class ActiveRecord extends Base
      */
     public function isNew()
     {
-        return $this->____dataset['is_new'];
+        return (bool)$this->____dataset['is_new'];
     }
 
     /**
@@ -262,8 +188,7 @@ abstract class ActiveRecord extends Base
      */
     public function getPrimaryKey()
     {
-        return 'id';
-        //return $this->defval($this->schema()->TableStructure['primary_key'], $this->dataset('primary_key'));
+        return $this->defval($this->schema('primary_key'), $this->dataset('primary_key'));
     }
 
     /**
@@ -354,14 +279,14 @@ abstract class ActiveRecord extends Base
     {
         switch (func_num_args()) {
             case 0:
-                return Validation::get()->errors;
+                return Validation::getInstance()->errors;
             case 1:
-                if (isset(Validation::get()->errors[func_get_arg(0)])) {
-                    return Validation::get()->errors[func_get_arg(0)];
+                if (isset(Validation::getInstance()->errors[func_get_arg(0)])) {
+                    return Validation::getInstance()->errors[func_get_arg(0)];
                 }
                 break;
             case 2:
-                Validation::get()->errors[func_get_arg(0)] = func_get_arg(1);
+                Validation::getInstance()->errors[func_get_arg(0)] = func_get_arg(1);
                 break;
         }
     }
@@ -375,8 +300,8 @@ abstract class ActiveRecord extends Base
      */
     public function validate()
     {
-        $validated = Validation::get()->validate($this);
-        Validation::get()->clearRules();
+        $validated = Validation::getInstance()->validate($this);
+        Validation::getInstance()->clearRules();
         return $validated;
     }
 
@@ -392,17 +317,17 @@ abstract class ActiveRecord extends Base
     {
         if($property !== null) {
             if(!is_array($property)) {
-                Validation::get()->unvalidates = array_merge(
-                    Validation::get()->unvalidates,
+                Validation::getInstance()->unvalidates = array_merge(
+                    Validation::getInstance()->unvalidates,
                     array($property)
                 );
             } else {
-                Validation::get()->unvalidates = array_merge(
-                    Validation::get()->unvalidates, $property
+                Validation::getInstance()->unvalidates = array_merge(
+                    Validation::getInstance()->unvalidates, $property
                 );
             }
         } else {
-            Validation::get()->unvalidate = true;
+            Validation::getInstance()->unvalidate = true;
         }
     }
 
@@ -429,14 +354,14 @@ abstract class ActiveRecord extends Base
             throw new \Exception("This operation just active in new instance", 500);
         }
         if(!$this->validate()) {
-            return;
+            return false;
         }
         $into = $values = null;
         if($availables === null) {
             $availables = array();
-            $schema = $this->schema()->TableStructure;
-            foreach ($schema['fields'] as $field) {
-                if($schema['describe'][$field]['Extra'] != 'auto_increment' && isset($this->{$field})) {
+            $data = TableCollection::getInstance()->table($this->table());
+            foreach ($data['fields'] as $field) {
+                if($data['describe'][$field]['Extra'] != 'auto_increment' && isset($this->{$field})) {
                     $availables[] = $field;
                 }
             }
@@ -445,7 +370,7 @@ abstract class ActiveRecord extends Base
         $count = count($availables) - 1;
         foreach ($availables as $field) {
             $into .= $field;
-            $values .=  "'".Db::get()->getConnection()->real_escape_string($this->{$field})."'";
+            $values .=  "'".Db::getInstance()->getConnection()->real_escape_string($this->{$field})."'";
             if($i < $count) {
                 $into .= ', ';
                 $values .= ', ';
@@ -453,9 +378,10 @@ abstract class ActiveRecord extends Base
             $i++;
         }
         if($resource = $this->db()->insert($into, $values)->execute()) {
-            $this->{$this->getPrimaryKey()} = Db::get()->getConnection()->insert_id;
+            $this->{$this->getPrimaryKey()} = Db::getInstance()->getConnection()->insert_id;
             return $resource;
         }
+        return false;
     }
 
     /**
@@ -467,10 +393,11 @@ abstract class ActiveRecord extends Base
     public function update($availables = null)
     {
         if(!$this->validate()) {
-            return;
+            return false;
         }
         if($availables === null) {
-            $fields = $this->schema()->TableStructure['fields'];
+            $data = TableCollection::getInstance()->table($this->table());
+            $fields = $data['fields'];
             if($fields == null) {
                 throw new \Exception("No field in update list", 500);
             }
@@ -486,7 +413,7 @@ abstract class ActiveRecord extends Base
         $count = count($availables) - 1;
         $i = 0;
         foreach ($availables as $field) {
-            $set .= $field." = '".Db::get()->getConnection()->real_escape_string($this->{$field})."'";
+            $set .= $field." = '".Db::getInstance()->getConnection()->real_escape_string($this->{$field})."'";
             if($i < $count) {
                 $set .= ', ';
             }
@@ -495,6 +422,7 @@ abstract class ActiveRecord extends Base
         if($resource = $this->db()->update($set)->execute()) {
             return $resource;
         }
+        return false;
     }
 
     /**
@@ -520,7 +448,7 @@ abstract class ActiveRecord extends Base
             $model = $this->load(trim($matches[1]), false);
             return $model->table();
         }, $args[0]);
-        $sql = Db::get()->replaceWith($args);
+        $sql = Db::getInstance()->replaceWith($args);
         // Membaca record dari database
         $this->db()->Query = $sql;
         $resource = $this->db()->execute();
@@ -735,11 +663,11 @@ abstract class ActiveRecord extends Base
      * @return objek kelas {@link Djokka\Db}
      */
     public function db($from = null) {
-        Db::get()->From = $this->defval($from, $this->table());
+        Db::getInstance()->From = $this->defval($from, $this->table());
         if(isset($this->____dataset['params']['where'])) {
-            Db::get()->Where = $this->____dataset['params']['where'];
+            Db::getInstance()->Where = $this->____dataset['params']['where'];
         }
-        return Db::get();
+        return Db::getInstance();
     }
 
     /**
@@ -751,6 +679,6 @@ abstract class ActiveRecord extends Base
      */
     public function view($name, $params = array())
     {
-        return Controller::get()->getView($name, $params);
+        return Controller::getInstance()->getView($name, $params);
     }
 }
