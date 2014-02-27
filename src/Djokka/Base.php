@@ -45,11 +45,11 @@ class Base
      */
     public function __invoke($subclass)
     {
-        $class_map = Config::get()->getClassMap();
-        if(!isset($class_map[$subclass])) {
+        $class_map = Config::getInstance()->getClassMap();
+        if (!isset($class_map[$subclass])) {
             throw new \Exception('Class library with name '.$subclass.' not found', 500);
         }
-        return call_user_func(array($class_map[$subclass], 'get'));
+        return call_user_func(array($class_map[$subclass], 'getInstance'));
     }
 
     /**
@@ -60,8 +60,8 @@ class Base
      */
     public function lib($subclass)
     {
-        $class_map = Config::get()->getClassMap();
-        if(!isset($class_map[$subclass])) {
+        $class_map = Config::getInstance()->getClassMap();
+        if (!isset($class_map[$subclass])) {
             throw new \Exception('Class library with name '.$subclass.' not found', 500);
         }
         return call_user_func(array($class_map[$subclass], 'get'));
@@ -136,8 +136,8 @@ class Base
      */
     public function themeUrl($url = null)
     {
-        if(($theme_url = $this->config('theme_url')) == null) {
-            $theme_url = Route::get()->urlPath($this->themeDir());
+        if (($theme_url = $this->config('theme_url')) == null) {
+            $theme_url = Route::getInstance()->urlPath($this->themeDir());
         }
         return $theme_url.$this->theme().'/'.$url;
     }
@@ -160,8 +160,8 @@ class Base
      */
     public function assetUrl($url = null)
     {
-        if(($asset_url = $this->config('asset_url')) == null) {
-            $asset_url = Route::get()->urlPath($this->assetDir());
+        if (($asset_url = $this->config('asset_url')) == null) {
+            $asset_url = Route::getInstance()->urlPath($this->assetDir());
         }
         return $asset_url.$url;
     }
@@ -185,7 +185,7 @@ class Base
     public function modelDir()
     {
         $dir = $this->defval($this->config('ref_dir'), $this->config('dir'));
-        return $this->realPath($dir.DS.$this->config('model_path').DS);
+        return $this->realPath($dir.DS.$this->config('app_path').DS.$this->config('model_path').DS);
     }
 
     /**
@@ -207,7 +207,7 @@ class Base
      */
     public function redirect($url = null, $params = array())
     {
-        if($url == -1) {
+        if ($url == -1) {
             header('Location: '.$_SERVER['HTTP_REFERER']);
         } else {
             header('Location: '.$this->link($url, $params));
@@ -224,14 +224,14 @@ class Base
     public function using($class, &$var = null) 
     {
         $path = $this->componentDir().$class.'.php';
-        if(!file_exists($path)) {
+        if (!file_exists($path)) {
             throw new \Exception("Failed to importing object file. File not found in path $path", 404);
         }
         include_once($path);
-        if(preg_match('/[a-zA-Z0-9_]+\/([a-zA-Z0-9_]+$)/i', $class, $match)) {
+        if (preg_match('/[a-zA-Z0-9_]+\/([a-zA-Z0-9_]+$)/i', $class, $match)) {
             $class = $match[1];
         }
-        if(!class_exists($class)) {
+        if (!class_exists($class)) {
             throw new \Exception("Class $class is not defiend in file $path", 500);
         }
         $var = new $class;
@@ -245,10 +245,10 @@ class Base
      */
     public function authorized($type = null)
     {
-        if($type == null) {
-            return Session::get()->exists('user');
+        if ($type == null) {
+            return Session::getInstance()->exists('user');
         } else {
-            if($data = $this->user($type)) {
+            if ($data = $this->user($type)) {
                 return !empty($data);
             }
         }
@@ -283,15 +283,15 @@ class Base
     {
         switch (func_num_args()) {
             case 0:
-                return Config::get()->getConfig();
+                return Config::getInstance()->getConfig();
             case 1:
-                if(!is_array(func_get_arg(0))) {
-                    return Config::get()->getData(func_get_arg(0));
+                if (!is_array(func_get_arg(0))) {
+                    return Config::getInstance()->getData(func_get_arg(0));
                 } else {
-                    return Config::get()->merge(func_get_arg(0));
+                    return Config::getInstance()->merge(func_get_arg(0));
                 }
             case 2:
-                Config::get()->setData(func_get_arg(0), func_get_arg(1));
+                Config::getInstance()->setData(func_get_arg(0), func_get_arg(1));
                 break;
         }
     }
@@ -303,11 +303,11 @@ class Base
     {
         switch (func_num_args()) {
             case 0:
-                return Session::get()->getSession();
+                return Session::getInstance()->getSession();
             case 1:
-                return Session::get()->getData(func_get_arg(0));
+                return Session::getInstance()->getData(func_get_arg(0));
             case 2:
-                Session::get()->setData(func_get_arg(0), func_get_arg(1));
+                Session::getInstance()->setData(func_get_arg(0), func_get_arg(1));
                 break;
         }
     }
@@ -319,9 +319,9 @@ class Base
     {
         switch (func_num_args()) {
             case 0:
-                return User::get()->getUser();
+                return User::getInstance()->getUser();
             case 1:
-                return User::get()->getUserByType(func_get_arg(0));
+                return User::getInstance()->getUserByType(func_get_arg(0));
         }
     }
 
@@ -333,7 +333,7 @@ class Base
      */
     public function model($name, $is_new = false)
     {
-        if(preg_match('/^\/([a-zA-Z][a-zA-Z0-9]+)$/i', $name, $match)) {
+        if (preg_match('/^\/([a-zA-Z][a-zA-Z0-9]+)$/i', $name, $match)) {
             $path = $this->modelDir()."$match[1].php";
             $class = 'Djokka\\Models\\'.$match[1];
         } else {
@@ -341,20 +341,22 @@ class Base
             $class = 'Djokka\\Models\\'.$name;
         }
         $path = $this->realPath($path);
-        if(!file_exists($path)) {
+        if (!file_exists($path)) {
             throw new \Exception("Model file not found in path $path", 404);
         }
         include_once($path);
-        if(!class_exists($class)) {
+        if (!class_exists($class)) {
             throw new \Exception("Class $class is not defined in file $path", 500);
         }
-        $schema = SchemaCollection::get();
-        if(!$schema->existsModel($class)) {
-            $object = new $class;
-            $object->dataset('module', $name);
-            $schema->models($name, $object);
-        } else {
-            $object = $schema->models($name);
+        $object = new $class;
+        $object->dataset('module', $name);
+        if ((bool)$is_new && $object instanceof ActiveRecord) {
+            $object->setNew();
+            foreach ($object->schema('fields') as $field) {
+                if (!isset($object->{$field})) {
+                    $object->{$field} = null;
+                }
+            }
         }
         return $object;
     }
@@ -366,9 +368,9 @@ class Base
     {
         switch (func_num_args()) {
             case 0:
-                return Pager::get()->result();
+                return Pager::getInstance()->result();
             case 1:
-                return Pager::get()->init(func_get_args());
+                return Pager::getInstance()->init(func_get_args());
         }
     }
 
@@ -378,7 +380,7 @@ class Base
      */
     public function getUrl()
     {
-        return Route::get()->getUrl();
+        return Route::getInstance()->getUrl();
     }
 
     /**
@@ -394,12 +396,12 @@ class Base
             case 0:
                 return $this->getUrl();
             case 1:
-                return Linker::get()->getLink(func_get_arg(0));
+                return Linker::getInstance()->getLink(func_get_arg(0));
             case 2:
-                if(is_array(func_get_arg(0))) {
-                    return Linker::get()->appendGet(func_get_arg(0));
+                if (is_array(func_get_arg(0))) {
+                    return Linker::getInstance()->appendGet(func_get_arg(0));
                 } else {
-                    return Linker::get()->getLinkParameter(func_get_arg(0), func_get_arg(1));
+                    return Linker::getInstance()->getLinkParameter(func_get_arg(0), func_get_arg(1));
                 }
         }
     }
