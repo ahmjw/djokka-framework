@@ -1,2 +1,5 @@
 - Fix Error in DOMDocument
 http://stackoverflow.com/questions/6090667/php-domdocument-errors-warnings-on-html5-tags
+
+- Make directory copy
+http://www.sitepoint.com/forums/showthread.php?679161-Copy-entire-directories-with-PHP
