@@ -218,7 +218,7 @@ class Route extends Base
             }
         } else {
             $module = !empty($router) ? $router: $this->config('main_module');
-            $path = $dir . $module . '/';
+            $path = $dir . $module . DS;
         }
 
         $class = $has_sub && is_numeric(strrpos($module, '/')) ? 
