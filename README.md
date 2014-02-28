@@ -6,6 +6,7 @@ Djokka Framework is PHP Framework using HMVC (Hierarchical Model-View-Controller
 HMVC Structure
 ==============
 
+```
 +--modules
 |  |
 |  +--blog (Module)
@@ -50,6 +51,7 @@ HMVC Structure
    +--Blog.php
    +--Gallery.php
    +--Agenda.php
+```
 
 This is an example hierarchical module. There is 2 module in root, blog and member. A module is has controller and can has views and models.
 If you don't like to place your model inside module, you can place it to 'models' as global model. Every module can access the global model.
@@ -59,6 +61,6 @@ but must be has a controller. The controller of module is same with the module n
 
 ========
 
-Djokka Framework is started develop on February 17th 2013
+Djokka Framework is started develop at February 17th 2013
 
-By Ahmad Jawahir <rawndummy@gmail.com>
+By [Ahmad Jawahir] : http://twitter.com/ahmjw <rawndummy@gmail.com>
