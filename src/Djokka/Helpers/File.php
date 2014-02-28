@@ -24,7 +24,7 @@ class File extends Base
      * Menampung instance dari kelas
      * @since 1.0.0
      */
-    private static $instance;
+    private static $_instance;
 
     /**
      * Mengambil instance secara Singleton Pattern
@@ -32,25 +32,25 @@ class File extends Base
      * @param $class adalah nama kelas (opsional)
      * @return objek instance kelas
      */
-    public static function get($class = __CLASS__)
+    public static function getInstance()
     {
-        if(self::$instance == null) {
-            self::$instance = new $class;
+        if(self::$_instance == null) {
+            self::$_instance = new static();
         }
-        return self::$instance;
+        return self::$_instance;
     }
 
     /**
      * Membuat file baru atau menulis suatu konten ke dalam suatu file
      * @since 1.0.0
-     * @param $path adalah lokasi file di dalam folder web
-     * @param $content adalah teks yang akan dimasukkan ke dalam file tersebut
-     * @param $params adalah parameter tambahan yang akan ditambahkan untuk penulisan
+     * @param string $path Lokasi file di dalam folder web
+     * @param string $content Teks yang akan dimasukkan ke dalam file tersebut
+     * @param array $params Parameter tambahan yang akan ditambahkan untuk penulisan
      * file
      */
     public function write($path, $content, $params = array())
     {
-        $dir = String::get()->unlastPart(DS, $path);
+        $dir = String::getInstance()->unlastPart(DS, $path);
         $mode = isset($params['mode']) && !empty($params['mode']) ? $params['mode'] : 'w';
         if(!file_exists($dir))
             throw new \Exception("Directory not found in path $dir", 404);
@@ -62,13 +62,41 @@ class File extends Base
     }
 
     /**
+     * Menyalin/copy isi dalam direktori ke direktori lainnya
+     * @param string $src Direktori asal
+     * @param string $dst Direktori tujuan
+     * @since 1.0.3
+     * @return void
+     */
+    public function copyDir($src, $dst)
+    {
+        $dir = opendir($src);
+        if (!file_exists($dst)) {
+            mkdir($dst);
+        }
+        while(false !== ( $file = readdir($dir)) ) { 
+            if (( $file != '.' ) && ( $file != '..' )) { 
+                $src_path = $this->realPath($src . '/' . $file);
+                $dst_path = $this->realPath($dst . '/' . $file);
+
+                if ( is_dir($src_path) ) { 
+                    $this->copyDir($src_path, $dst_path);
+                } else { 
+                    copy($src_path, $dst_path);
+                } 
+            } 
+        } 
+        closedir($dir); 
+    }  
+
+    /**
      * Membuat folder baru di dalam folder web
      * @since 1.0.0
      * @param $path adalah lokasi folder yang hendak dibuat
      */
     public function makeDir($path)
     {
-        $real_path = String::get()->realPath($path);
+        $real_path = String::getInstance()->realPath($path);
         $dir = $this->defval($this->config('ref_dir'), $this->config('dir'));
         $real_path = str_replace($dir, null, $real_path);
         foreach (explode(DS, $real_path) as $path) {
@@ -93,7 +121,7 @@ class File extends Base
     public function download($path, $name, $mime = 'application/octet-stream')
     {
         $info = pathinfo($path);
-        $name = String::get()->slugify($name).'.'.$info['extension'];
+        $name = String::getInstance()->slugify($name).'.'.$info['extension'];
         header('Content-type: '.$mime);
         header('Content-Disposition: attachment; filename="'.$name.'"');
         header('Content-Length: ' . filesize($path));
@@ -136,5 +164,4 @@ class File extends Base
         }
         return $files;
     }
-
 }
