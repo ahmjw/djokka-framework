@@ -613,7 +613,7 @@ class Db extends Base
                 $temp['schema'][$field] = $info;
             }
             $temp['fields'] = $fields;
-            $temp['primary'] = $pkey;
+            $temp['primary_key'] = $pkey;
             return $temp;
         }
     }
