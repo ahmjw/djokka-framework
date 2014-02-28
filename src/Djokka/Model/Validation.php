@@ -128,6 +128,8 @@ class Validation extends Base
             $action = $match[1];
             $params = explode(',', $match[2]);
         }
+        $action = trim($action);
+
         // If no validation
         if(!in_array($action, get_class_methods($this))) {
             if(in_array($action, get_class_methods($model))) {
@@ -258,13 +260,12 @@ class Validation extends Base
      * @param $model adalah objek model yang akan divalidasi
      * @param $field adalah field/properti model
      * @param $params adalah parameter yang dimasukkan dalam aturan validasi
-     * @access private
      * @return status validasi
      */
     private function regex($model, $field, $params = array())
     {
         preg_match($params[0], $model->{$field}, $match);
-        if($model->{$field} != $match[0]) {
+        if (empty($match) || $model->{$field} != $match[0]) {
             $message = isset($params['message']) ?
                 str_replace('{attr}', $model->label($field), $params['message']) :
                 $model->label($field).' is not match with pattern';
