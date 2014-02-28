@@ -42,9 +42,7 @@ class Config extends Base
 
         // Controller configurarion
         'main_module'=>'index', // Nama modul utama
-        'modular_parent'=>null, // Nama kelas induk untuk modul arsitektur modular
         'module'=>null, // Nama modul yang sedang diakses
-        'architecture'=>null, // Arsitektur yang akan digunakan
 
         // Router configuration
         'get_router'=>'r', // Nama key untuk format rute GET
