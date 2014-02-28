@@ -1,0 +1,64 @@
+body{
+  margin-top: 20px;
+  background: #ace;
+}
+#main-container{
+  padding: 20px;
+  margin-top: 30px;
+  margin-bottom: 40px;
+  min-height: 600px;
+  border-radius: 0px 0px 5px 5px;
+}
+#headline-container{
+  margin-bottom: -30px;
+  padding-top: 30px;
+}
+#headline{
+  margin-left: -15px;
+  margin-right: -15px;
+}
+#header-wrapper{
+}
+#menu-wrapper{
+  margin: 0px -25px 0px -25px;
+}
+#footer-container{
+  padding-top: 40px;
+  padding-bottom: 20px;
+}
+#main{
+  min-height: 400px;
+}
+.footer{
+  color: #fff;
+}
+.container {
+  max-width: 910px;
+}
+.bg-white{
+  background: #ffffff;
+}
+.media-content{
+  margin: 10px 0px;
+}
+.widget {
+  margin-bottom: 20px;
+}
+
+.footer ul.menu {
+  list-style: none;
+  margin: 0px;
+  padding: 0px;
+}
+.footer ul.menu a{
+  display: block;
+  border-bottom: 1px dotted #ccc;
+  text-decoration: none;
+  padding: 10px 4px;
+}
+.footer ul.menu a:hover {
+  color: #fff;
+}
+#copyright{
+  margin-top: 40px;
+}
