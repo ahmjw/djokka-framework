@@ -64,7 +64,7 @@ class Base
         if (!isset($class_map[$subclass])) {
             throw new \Exception('Class library with name '.$subclass.' not found', 500);
         }
-        return call_user_func(array($class_map[$subclass], 'get'));
+        return call_user_func(array($class_map[$subclass], 'getInstance'));
     }
 
     /**
@@ -96,6 +96,16 @@ class Base
     public function securify($str)
     {
         return htmlentities(addslashes($str));
+    }
+
+    /**
+     * Mengambil lokasi folder data
+     * @since 1.0.0
+     * @return string lokasi folder
+     */
+    public function dataDir()
+    {
+        return $this->realPath($this->config('dir').DS.$this->config('app_path').$this->config('data_path').DS);
     }
 
     /**
