@@ -1,8 +1,8 @@
 <?php
 
 /**
- * Menyediakan fungsi yang dibutuhkan secara global
- * @since 1.0.0
+ * File ini dapat memberikan jalan pintas bagi kelas lain untuk mengakses fungsi penting
+ * @since 1.0.3
  * @author Ahmad Jawahir <rawndummy@gmail.com>
  * @link http://www.djokka.com
  * @license http://creativecommons.org/licenses/by-nc-sa/4.0/deed.en_US
@@ -10,7 +10,6 @@
  * @since 1.0.3
  * @version 1.0.3
  */
-
 namespace Djokka;
 
 use Djokka\Route;
@@ -26,35 +25,13 @@ use Djokka\Helpers\User;
 use Djokka\Model\SchemaCollection;
 
 /**
- * Kelas utama yang digunakan untuk menyediakan fungsi yang dibutuhkan secara global
+ * Trait yang digunakan untuk menyediakan fungsi penting dengan jalan pintas
  */
-class Base
+trait TShortcut
 {
     /**
-     * Instance dari kelas ini
-     * @since 1.0.0
-     * @access private
-     */
-    private static $core;
-
-    /**
-     * Memuat pustaka yang terdapat di dalam framework secara invoke
-     * @since 1.0.0
-     * @param mixed $subclass adalah nama kelas pustaka framework
-     * @return object Objek instance kelas pustaka framework
-     */
-    public function __invoke($subclass)
-    {
-        $class_map = Config::getInstance()->getClassMap();
-        if (!isset($class_map[$subclass])) {
-            throw new \Exception('Class library with name '.$subclass.' not found', 500);
-        }
-        return call_user_func(array($class_map[$subclass], 'getInstance'));
-    }
-
-    /**
      * Memuat pustaka yang terdapat di dalam framework
-     * @since 1.0.0
+     * @since 1.0.3
      * @param mixed $subclass adalah nama kelas pustaka framework
      * @return object Objek instance kelas pustaka framework
      */
@@ -67,29 +44,9 @@ class Base
         return call_user_func(array($class_map[$subclass], 'getInstance'));
     }
 
-    /**
-     * Mengambil instance kelas induk kontroller
-     * @since 1.0.0
-     * @return object
-     */
-    public static function getCore()
-    {
-        return self::$core;
-    }
-
-    /**
-     * Menentukan suatu kelas anak sebagai kelas induk kontroller
-     * @since 1.0.0
-     * @param $core adalah instance kelas anak
-     */
-    public static function setCore($core)
-    {
-        self::$core = $core;
-    }
-
-    /**
+	/**
      * Mengamankan string dengan slashing dan HTML entitying
-     * @since 1.0.0
+     * @since 1.0.3
      * @param $str adalah string yang akan diamankan
      * @return string hasil pengamanan
      */
@@ -100,7 +57,7 @@ class Base
 
     /**
      * Mengambil lokasi folder data
-     * @since 1.0.0
+     * @since 1.0.3
      * @return string lokasi folder
      */
     public function dataDir()
@@ -110,7 +67,7 @@ class Base
 
     /**
      * Mengambil lokasi folder konfigurasi
-     * @since 1.0.0
+     * @since 1.0.3
      * @return string lokasi folder
      */
     public function configDir()
@@ -120,7 +77,7 @@ class Base
 
     /**
      * Mengambil lokasi folder komponen
-     * @since 1.0.0
+     * @since 1.0.3
      * @return string lokasi folder
      */
     public function componentDir()
@@ -130,7 +87,7 @@ class Base
 
     /**
      * Mengambil lokasi folder tema
-     * @since 1.0.0
+     * @since 1.0.3
      * @return string lokasi folder
      */
     public function themeDir()
@@ -140,7 +97,7 @@ class Base
 
     /**
      * Mengambil lokasi URL tema
-     * @since 1.0.0
+     * @since 1.0.3
      * @param $url adalah alamat URL jika hendak menggunakan lokasi eksternal
      * @return string lokasi URL
      */
@@ -154,7 +111,7 @@ class Base
 
     /**
      * Mengambil lokasi folder aset
-     * @since 1.0.0
+     * @since 1.0.3
      * @return string lokasi folder
      */
     public function assetDir()
@@ -164,7 +121,7 @@ class Base
 
     /**
      * Mengambil lokasi URL aset
-     * @since 1.0.0
+     * @since 1.0.3
      * @param $url adalah alamat URL jika hendak menggunakan lokasi eksternal
      * @return string lokasi URL
      */
@@ -178,7 +135,7 @@ class Base
 
     /**
      * Mengambil lokasi folder model
-     * @since 1.0.0
+     * @since 1.0.3
      * @return string lokasi folder
      */
     public function moduleDir()
@@ -189,7 +146,7 @@ class Base
 
     /**
      * Mengambil lokasi folder modul
-     * @since 1.0.0
+     * @since 1.0.3
      * @return string lokasi folder
      */
     public function modelDir()
@@ -211,7 +168,7 @@ class Base
 
     /**
      * Mengalihkan ke halaman lain
-     * @since 1.0.0
+     * @since 1.0.3
      * @param $url adalah alamat URL lain target pengalihan halaman
      * @param $params adalah parameter tambahan untuk alamat URL
      */
@@ -249,7 +206,7 @@ class Base
 
     /**
      * Mengecek otorisasi suatu user web
-     * @since 1.0.0
+     * @since 1.0.3
      * @param $type adalah tipe user yang telah ditentukan untuk penyaringan
      * @return boolean -> user telah terotorisasi atau belum
      */
@@ -266,7 +223,7 @@ class Base
 
     /**
      * Mengambil nilai default antara dua kemungkinan
-     * @since 1.0.0
+     * @since 1.0.3
      * @param $data adalah data yang akan dicek kekosongannya
      * @param $default adalah nilai default ketika data kosong
      * @return data atau nilai default
@@ -279,7 +236,7 @@ class Base
     /**
      * Mengubah suatu string menjadi format path yang benar
      * @param string $path Lokasi direktori/berkas yang akan dibenarkan
-     * @since 1.0.0
+     * @since 1.0.3
      * @return string
      */
     public function realPath($path) {
@@ -395,7 +352,7 @@ class Base
 
     /**
      * Membentuk alamat URL berdasarkan lokasi modul
-     * @since 1.0.0
+     * @since 1.0.3
      * @param $module adalah lokasi modul
      * @param $params adalah parameter tambahan untuk dimasukkan ke URL
      * @return string lokasi URL
@@ -415,5 +372,4 @@ class Base
                 }
         }
     }
-
 }
