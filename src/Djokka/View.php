@@ -139,8 +139,9 @@ class View extends Base
      * @param mixed $content string Konten web yang akan diproses ke tema
      * @return string
      */
-    public function renderTheme($content) 
+    public function renderOutput($route)
     {
+        $content = Controller::getInstance()->import($route);
         // Jika dalam mode JSON
         if($this->config('json') === true || HANDLE_ERROR === true) {
             /*header('Content-type: application/json');
@@ -155,7 +156,7 @@ class View extends Base
         if(Controller::getCore() != null) {
             $theme_content = Controller::getCore()->render($theme_path);
         } else {
-            $theme_content = Controller::get()->render($theme_path);
+            $theme_content = Controller::getInstance()->render($theme_path);
         }
         $content = Asset::getInstance()->render($theme_content);
         //$content = preg_replace('/[\r\n\t]/i', '', $content);
