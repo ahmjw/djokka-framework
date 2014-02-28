@@ -63,4 +63,4 @@ but must be has a controller. The controller of module is same with the module n
 
 Djokka Framework is started develop at February 17th 2013
 
-By [Ahmad Jawahir] : http://twitter.com/ahmjw <rawndummy@gmail.com>
+By [Ahmad Jawahir](http://twitter.com/ahmjw) <rawndummy@gmail.com>
