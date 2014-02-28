@@ -28,9 +28,10 @@ class Config extends Base
         'theme_path'=>'themes', // Lokasi folder tema
         'asset_path'=>'assets', // Lokasi folder aset
         'module_path'=>'protected/modules', // Lokasi folder module
-        'plugin_path'=>'assets/plugins', // Lokasi folder plugin
+        'plugin_path'=>'plugins', // Lokasi folder plugin
         'component_path'=>'protected/components', // Lokasi folder komponen
         'model_path'=>'protected/models', // Lokasi folder model
+        'data_path'=>'protected/data', // Lokasi folder model
         'config_path'=>'protected/config', // Lokasi folder konfigurasi
         'app_path'=>null, // Lokasi folder project/aplikasi web
 
@@ -121,14 +122,23 @@ class Config extends Base
     /**
      * Membaca nilai konfigurasi yang diletakkan di dalam berkas konfigurasi dan memasukkannya ke dalam sistem
      */
-    public function render() 
+    public function render($dir = null) 
     {
-        $dir = $this->configDir();
+        $is_auto = false;
+        if($dir === null) {
+            $is_auto = true;
+            $dir = $this->configDir();
+        }
+        $result = array();
         $path = $dir.'main.php';
         if(file_exists($path)) {
             $data = include($path);
             if(is_array($data)) {
-                $this->merge($data);
+                if($is_auto) {
+                    $this->merge($data);
+                } else {
+                    $result = array_merge($result, $data);
+                }
             }
         }
 
@@ -136,9 +146,15 @@ class Config extends Base
         if(file_exists($path)) {
             $data = include($path);
             if(is_array($data)) {
-                $this->merge(array(
-                    'db'=>$data
-                ));
+                if($is_auto) {
+                    $this->merge(array(
+                        'db'=>$data
+                    ));
+                } else {
+                    $result = array_merge($result, array(
+                        'db'=>$data
+                    ));
+                }
             }
         }
 
@@ -146,15 +162,18 @@ class Config extends Base
         if(file_exists($path)) {
             $data = include($path);
             if(is_array($data)) {
-                $this->merge(array(
-                    'routes'=>$data
-                ));
+                if($is_auto) {
+                    $this->merge(array(
+                        'routes'=>$data
+                    ));
+                } else {
+                    $result = array_merge($result, array(
+                        'routes'=>$data
+                    ));
+                }
             }
         }
-        $path = $dir.'.debug';
-        if(file_exists($path)) {
-            $this->merge(array('debug_json_mode'=>true));
-        }
+        return $result;
     }
 
     /**
