@@ -41,7 +41,7 @@ class Boot extends Base
      */
     public static function getInstance()
     {
-        if(self::$_instance == null) {
+        if (self::$_instance == null) {
             self::$_instance = new static();
         }
         return self::$_instance;
@@ -54,7 +54,7 @@ class Boot extends Base
     public function registerAutoload()
     {
         // Error and exception handling
-        if(HANDLE_ERROR === true) {
+        if (HANDLE_ERROR === true) {
             register_shutdown_function(array(__CLASS__, 'onShutdown'));
             set_error_handler(array(__CLASS__, 'handleError'), E_ALL ^ E_NOTICE);
             set_exception_handler(array(__CLASS__, 'handleException'));
@@ -74,7 +74,6 @@ class Boot extends Base
         if (($error = error_get_last()) !== null) {
             self::handleError($error["type"], $error["message"], $error["file"], $error["line"]);
         }
-        //var_dump($error);
     }
 
     /**
@@ -99,9 +98,9 @@ class Boot extends Base
      */
     public static function handleException(\Exception $e)
     {
-        if(Config::getInstance()->config('error_redirect') === true && $e->getCode() == 403) {
+        if (Config::getInstance()->config('error_redirect') === true && $e->getCode() == 403) {
             $page = Config::getInstance()->config('module').'/'.Config::getInstance()->config('action');
-            if($page != $redirect = Config::getInstance()->config('module_forbidden')) {
+            if ($page != $redirect = Config::getInstance()->config('module_forbidden')) {
                 Controller::getInstance()->redirect('/' . $redirect);
             } else {
                 $this->exceptionOutput($exception);
@@ -121,21 +120,21 @@ class Boot extends Base
     public function autoload($class)
     {
         $path = null;
-        if(preg_match('/^'.__NAMESPACE__.'(.*)$/i', $class, $match)) {
+        if (preg_match('/^'.__NAMESPACE__.'(.*)$/i', $class, $match)) {
             $path = $this->realPath(__DIR__.$this->realPath($match[1]).'.php');
-            if(!file_exists($path)) {
+            if (!file_exists($path)) {
                 throw new \Exception("Class file not found in path $path", 404);
             }
             include_once($path);
         } else {
-            if(preg_match('/^[a-zA-Z0-9_]+Model$/i', $class, $match)) {
+            if (preg_match('/^[a-zA-Z0-9_]+Model$/i', $class, $match)) {
                 $path = $this->moduleDir().'models'.DIRECTORY_SEPARATOR.$class.'.php';
-                if(!file_exists($path)) {
+                if (!file_exists($path)) {
                     throw new \Exception("Model file not found at path $path", 404);
                 }
             } else {
                 $path = $this->componentDir().$class.'.php';
-                if(!file_exists($path)) {
+                if (!file_exists($path)) {
                     throw new \Exception("Component file not found at path $path", 404);
                 }
             }
@@ -150,16 +149,25 @@ class Boot extends Base
      */
     public function run($route = null)
     {
-        if($route === null) {
+        if ($route === null) {
             Route::getInstance()->load();
             $route = $this->config('module').'/'.$this->config('action');
         }
-        $content = Controller::getInstance()->import($route);
-        
-        if(HANDLE_ERROR === true && !empty(self::$errors)) {
-        } else {
-            View::getInstance()->renderTheme($content);
+        View::getInstance()->renderOutput($route);
+    }
+
+    private function loadInternalApp()
+    {
+        if (isset($_GET['djokka']) && !empty($_GET['djokka'])) {
+            Config::getInstance()->merge(array(
+                'app_config' => $this->config(),
+                'dir' => SYSTEM_DIR.'resources'.DS.'apps'.DS.$_GET['djokka'],
+                'theme_path' => '../../themes',
+                'asset_path' => '../../assets',
+            ));
+            return true;
         }
+        return false;
     }
 
     /**
@@ -170,17 +178,19 @@ class Boot extends Base
     public function init($config = null)
     {
         $this->registerAutoload();
-        if($config !== null) {
-            if(is_array($config)) {
-                Config::getInstance()->merge($config);
+        if (!$this->loadInternalApp()) {
+            if ($config !== null) {
+                if (is_array($config)) {
+                    Config::getInstance()->merge($config);
+                } else {
+                    Config::getInstance()->merge(array(
+                        'dir'=>$config,
+                    ));
+                    Config::getInstance()->render();
+                }
             } else {
-                Config::getInstance()->merge(array(
-                    'dir'=>$config,
-                ));
                 Config::getInstance()->render();
             }
-        } else {
-            Config::getInstance()->render();
         }
         return $this;
     }
@@ -203,7 +213,7 @@ class Boot extends Base
             case 0:
                 return Config::getInstance()->getConfig();
             case 1:
-                if(!is_array(func_get_arg(0))) {
+                if (!is_array(func_get_arg(0))) {
                     return Config::getInstance()->getData(func_get_arg(0));
                 } else {
                     return Config::getInstance()->merge(func_get_arg(0));
