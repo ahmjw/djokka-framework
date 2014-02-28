@@ -158,6 +158,17 @@ abstract class Model extends Base
         return self::getObject(get_class($this), $this->____dataset['module'], (bool)$is_new);
     }
 
+    public function showError(array $params = array())
+    {
+        if ($this->hasError()) {
+            echo isset($params['open']) ? $params['open'] : '<ul>';
+            foreach ($this->error() as $message) {
+                echo '<li>' . $message . '</li>';
+            }
+            echo isset($params['close']) ? $params['close'] : '</ul>';
+        }
+    }
+
     /**
      * Mengecek suatu properti model memiliki error atau tidak
      * @since 1.0.0
