@@ -24,7 +24,7 @@ HMVC Structure
 |  |  |
 |  |  +--modules
 |  |     |
-|  |     +--comment
+|  |     +--comment (Sub-module)
 |  |        |
 |  |        +--Comment.php (Controller)
 |  |        |
@@ -56,7 +56,7 @@ HMVC Structure
 This is an example hierarchical module. There is 2 module in root, blog and member. A module is has controller and can has views and models.
 If you don't like to place your model inside module, you can place it to 'models' as global model. Every module can access the global model.
 
-Look into module 'blog', you'll see the submodule with name 'comment'. Yeah, that's the HMVC means. The module must not be has view or model,
+Look into module 'blog', you'll see the sub-module with name 'comment'. Yeah, that's the HMVC means. The module must not be has view or model,
 but must be has a controller. The controller of module is same with the module name with capitalized format.
 
 ========
