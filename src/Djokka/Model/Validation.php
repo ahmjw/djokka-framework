@@ -12,12 +12,10 @@
 
 namespace Djokka\Model;
 
-use Djokka\Base;
-
 /**
  * Kelas pendamping yang membantu kelas Djokka\Model untuk melakukan validasi terhadap data model
  */
-class Validation extends Base
+class Validation
 {
     /**
      * Daftar error yang dihasilkan

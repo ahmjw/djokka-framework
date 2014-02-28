@@ -12,13 +12,14 @@
 
 namespace Djokka\Helpers;
 
-use Djokka\Base;
+use Djokka\TShortcut;
 
 /**
  * Kelas pembantu yang bertugas mengelola konfigurasi web
  */
-class Config extends Base
+class Config
 {
+    use TShortcut;
     /**
      * Menampung data konfigurasi web
      * @since 1.0.0
@@ -113,7 +114,7 @@ class Config extends Base
             if($dir == '') {
                 $dir = String::getInstance()->unlastPart('\\', $_SERVER['SCRIPT_NAME']);
             }
-            $this->data['dir'] = $this->realPath($_SERVER['DOCUMENT_ROOT'].$dir.DS);
+            $this->data['dir'] = preg_replace("/([\/\\\]+)/i", DS, $_SERVER['DOCUMENT_ROOT'].$dir).DS;
         }
     }
 

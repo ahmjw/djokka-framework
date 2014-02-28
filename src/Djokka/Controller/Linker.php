@@ -12,14 +12,16 @@
 
 namespace Djokka\Controller;
 
-use Djokka\Base;
 use Djokka\Route;
+use Djokka\TShortcut;
 
 /**
  * Kelas pendamping yang membantu kelas Djokka\Controller untuk membentuk alamat URL berdasarkan rute modul
  */
-class Linker extends Base
+class Linker
 {
+    use TShortcut;
+
     /**
      * Menampung instance dari kelas
      * @since 1.0.1

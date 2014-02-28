@@ -13,13 +13,13 @@
 
 namespace Djokka;
 
-use Djokka\Base;
-
 /**
  * Kelas pustaka yang bertugas menyediakan akses database
  */
-class Db extends Base
+class Db
 {
+    use TShortcut;
+
     /**
      * Perintah SQL yang dihasilkan
      */

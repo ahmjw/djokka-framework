@@ -12,18 +12,19 @@
 
 namespace Djokka;
 
-use Djokka\Base;
 use Djokka\Model\SchemaCollection;
 use Djokka\Model\TableCollection;
 use Djokka\Model\ModelCollection;
 use Djokka\Model\Validation;
 use Djokka\Helpers\String;
+use Djokka\TShortcut;
 
 /**
  * Kelas pustaka yang bertugas untuk memproses dan mengendalikan model yang terdapat di dalam suatu modul
  */
-abstract class ActiveRecord extends Base
+abstract class ActiveRecord
 {
+    use TShortcut;
     /**
      * Fungsi yang digunakan untuk menetapkan nama tabel yang diwakili oleh model
      * @return string

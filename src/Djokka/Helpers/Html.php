@@ -12,12 +12,10 @@
 
 namespace Djokka\Helpers;
 
-use Djokka\Base;
-
 /**
  * Kelas pembantu yang bertugas untuk mempermudah pembentukan elemen HTML
  */
-class Html extends Base
+class Html
 {
 
     /**

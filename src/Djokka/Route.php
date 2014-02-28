@@ -12,15 +12,16 @@
 
 namespace Djokka;
 
-use Djokka\Base;
 use Djokka\Helpers\String;
 
 /**
  * Kelas pustaka yang bertugas untuk mengalamatkan dan mengalokasikan rute untuk modul berdasarkan URL
  * yang sedang diakses dan mengatur segala hal yang berhubungan dengan alamat URL
  */
-class Route extends Base
+class Route
 {
+    use TShortcut;
+
     /**
      * Menampung informasi modul yang sedang diakses
      * @since 1.0.0

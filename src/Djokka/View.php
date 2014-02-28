@@ -11,18 +11,19 @@
 
 namespace Djokka;
 
-use Djokka\Base;
 use Djokka\View\Asset;
 
 /**
  * Kelas pustaka yang bertugas untuk memproses dan mengendalikan bagian view yang terdapat di dalam suatu modul
  */
-class View extends Base
+class View
 {
+    use TShortcut;
+
     /**
      * Konten web
      */
-    private $content;
+    private $_content;
 
     /**
      * Menampung instance dari kelas
@@ -61,7 +62,7 @@ class View extends Base
      */
     public function getContent()
     {
-        return $this->content;
+        return $this->_content;
     }
 
     /**
@@ -69,7 +70,7 @@ class View extends Base
      * @param mixed $content string Konten web
      */
     public function setContent($content) {
-        $this->content = $content;
+        $this->_content = $content;
     }
 
     /**
@@ -126,8 +127,8 @@ class View extends Base
         }
 
         if(!$info['is_plugin']) {
-            $this->content = utf8_decode($instance->render($path, $view['vars']));
-            parent::setCore($instance);
+            $this->_content = utf8_decode($instance->render($path, $view['vars']));
+            Controller::setCore($instance);
         } else {
             $instance->render($path, $view['vars']);
             return $instance->render($path, $view['vars']);

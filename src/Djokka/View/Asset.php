@@ -12,14 +12,13 @@
 
 namespace Djokka\View;
 
-use Djokka\Base;
 use Djokka\Helpers\String;
 use Djokka\Controller;
 
 /**
  * Kelas pendamping yang membantu kelas Djokka\View untuk mengelola aset web
  */
-class Asset extends Base
+class Asset
 {
     /**
      * Daftar berkas Javascript yang akan diletakkan pada kepala HTML

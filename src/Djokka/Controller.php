@@ -13,7 +13,6 @@
 
 namespace Djokka;
 
-use Djokka\Base;
 use Djokka\Route;
 use Djokka\View\Asset;
 use Djokka\Helpers\String;
@@ -25,13 +24,22 @@ use Djokka\Controller\Plugin;
 /**
  * Kelas pustaka yang bertugas mengontrol atau mengendalikan proses di dalam modul
  */
-class Controller extends Base
+class Controller
 {
+    use TShortcut;
+
     /**
      * Nama view
      * @since 1.0.3
      */
     private $_view;
+
+    /**
+     * Instance dari kelas ini
+     * @since 1.0.3
+     * @access private
+     */
+    private static $_core;
 
     /**
      * Menampung instance dari kelas
@@ -50,6 +58,26 @@ class Controller extends Base
             self::$_instance = new static();
         }
         return self::$_instance;
+    }
+
+    /**
+     * Mengambil instance kelas induk kontroller
+     * @since 1.0.3
+     * @return object
+     */
+    public static function getCore()
+    {
+        return self::$_core;
+    }
+
+    /**
+     * Menentukan suatu kelas anak sebagai kelas induk kontroller
+     * @since 1.0.3
+     * @param $core adalah instance kelas anak
+     */
+    public static function setCore($core)
+    {
+        self::$_core = $core;
     }
 
     /**

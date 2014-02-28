@@ -12,7 +12,6 @@
 
 namespace Djokka;
 
-use Djokka\Base;
 use Djokka\Model\SchemaCollection;
 use Djokka\Model\TableCollection;
 use Djokka\Model\ModelCollection;
@@ -22,7 +21,7 @@ use Djokka\Helpers\String;
 /**
  * Kelas pustaka yang bertugas untuk memproses dan mengendalikan model yang terdapat di dalam suatu modul
  */
-abstract class Model extends Base
+abstract class Model
 {
     /**
      * Data penting yang dibutuhkan oleh model

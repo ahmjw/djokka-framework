@@ -20,13 +20,13 @@ define('DS', DIRECTORY_SEPARATOR);
 defined('HANDLE_ERROR') or define('HANDLE_ERROR', false);
 define('SYSTEM_DIR', __DIR__ . DS . '..' . DS . '..' . DS);
 
-include_once 'Base.php';
-
 /**
  * Kelas pustaka yang digunakan untuk melakukan booting
  */
-class Boot extends Base
+class Boot
 {
+    use TShortcut;
+
     /**
      * Instance dari kelas ini
      * @since 1.0.0
@@ -98,6 +98,7 @@ class Boot extends Base
      */
     public static function handleException(\Exception $e)
     {
+        print_r($e);
         if (Config::getInstance()->config('error_redirect') === true && $e->getCode() == 403) {
             $page = Config::getInstance()->config('module').'/'.Config::getInstance()->config('action');
             if ($page != $redirect = Config::getInstance()->config('module_forbidden')) {
@@ -193,34 +194,5 @@ class Boot extends Base
             }
         }
         return $this;
-    }
-
-    /**
-     * Mengubah suatu string menjadi format path yang benar
-     * @param string $path Lokasi direktori/berkas yang akan dibenarkan
-     * @since 1.0.0
-     * @return string
-     */
-    public function realPath($path) {
-        return preg_replace("/([\/\\\]+)/i", DS, $path);
-    }
-
-    /**
-     * Membaca, menambah atau mengubah nilai konfigurasi
-     */
-    public function config() {
-        switch (func_num_args()) {
-            case 0:
-                return Config::getInstance()->getConfig();
-            case 1:
-                if (!is_array(func_get_arg(0))) {
-                    return Config::getInstance()->getData(func_get_arg(0));
-                } else {
-                    return Config::getInstance()->merge(func_get_arg(0));
-                }
-            case 2:
-                Config::getInstance()->setData(func_get_arg(0), func_get_arg(1));
-                break;
-        }
     }
 }
