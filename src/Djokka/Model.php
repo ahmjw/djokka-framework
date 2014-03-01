@@ -23,48 +23,28 @@ use Djokka\Helpers\String;
  */
 abstract class Model
 {
+    use TShortcut;
+    
     /**
      * Data penting yang dibutuhkan oleh model
      */
-    protected $____dataset = array(
+    protected $_dataset = array(
         'is_new'=>true,
         'module'=>null,
         'params'=>array(),
-        'externals'=>array(),
-        'updates'=>array()
     );
-
-    /**
-     * Konstruktor kelas
-     */
-    public function __construct()
-    {
-        $this->preload();
-    }
-
-    /**
-     * Fungsi yang digunakan untuk menetapkan nama tabel yang diwakili oleh model
-     * @return string
-     */
-    public function table()
-    {
-    }
 
     /**
      * Fungsi yang digunakan untuk menetapkan label-label yang digunakan oleh model
      * @return array
      */
-    public function labels()
-    {
-    }
+    abstract function labels();
 
     /**
      * Fungsi yang digunakan untuk menetapkan aturan-aturan validasi yang digunakan oleh model
      * @return string
      */
-    public function rules()
-    {
-    }
+    abstract function rules();
 
     /**
      * Mengambil dan mengubah informasi yang terkandung di dalam suatu model
@@ -81,14 +61,14 @@ abstract class Model
     {
         switch (func_num_args()) {
             case 0:
-                return $this->____dataset;
+                return $this->_dataset;
             case 1:
-                if (isset($this->____dataset[func_get_arg(0)])) {
-                    return $this->____dataset[func_get_arg(0)];
+                if (isset($this->_dataset[func_get_arg(0)])) {
+                    return $this->_dataset[func_get_arg(0)];
                 }
                 break;
             case 2:
-                $this->____dataset[func_get_arg(0)] = func_get_arg(1);
+                $this->_dataset[func_get_arg(0)] = func_get_arg(1);
                 break;
         }
     }
@@ -129,9 +109,6 @@ abstract class Model
     {
         if(!empty($data)) {
             foreach ($data as $key => $value) {
-                if(!in_array($key, $this->____dataset['updates'])) {
-                    $this->____dataset['updates'][] = $key;
-                }
                 $this->{$key} = $value;
             }
         }
@@ -154,7 +131,7 @@ abstract class Model
      */
     public function origin($is_new = false)
     {
-        return self::getObject(get_class($this), $this->____dataset['module'], (bool)$is_new);
+        return self::getObject(get_class($this), $this->_dataset['module'], (bool)$is_new);
     }
 
     public function showError(array $params = array())
