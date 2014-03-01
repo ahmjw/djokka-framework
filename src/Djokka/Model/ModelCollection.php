@@ -12,26 +12,13 @@
 
 namespace Djokka\Model;
 
+use Djokka\Database\Connection;
+
 /**
  * Kelas pendampingyang membantu kelas Djokka\Model untuk optimasi
  */
 class ModelCollection
 {
-    /**
-     * Resource yang dihasilkan dari hasil eksekusi perintah SQL yang dilakukan database
-     */
-	private $resource;
-
-    /**
-     * Parameter yang dimasukkan untuk penyaringan hasil
-     */
-    private $parameters = array();
-
-    /**
-     * Model yang meminta koleksi
-     */
-	private $model;
-
     /**
      * Jumlah baris yang dihasilkan dari hasil eksekusi perintah SQL
      */
@@ -43,22 +30,31 @@ class ModelCollection
 	public $fieldCount;
 
     /**
-     * Menampung instance dari kelas
-     * @since 1.0.2
+     * Perintah SQL
      */
-    private static $instance;
+    private $_sql;
 
     /**
-     * Mengambil instance secara Singleton Pattern
-     * @since 1.0.2
-     * @return objek instance kelas
+     * Hasil eksekusi perintah SQL
      */
-    public static function get()
+    private $_result;
+
+    /**
+     * Model yang akan dikoleksi
+     */
+    private $_model;
+
+    /**
+     * Konstruktor kelas
+     */
+    public function __construct($sql, $model)
     {
-        if(self::$instance == null) {
-            self::$instance = new static();
-        }
-        return self::$instance;
+        $this->_sql = $sql;
+        $connection = Connection::getInstance();
+        $this->_result = $connection->query($sql);
+        $this->rowCount = $this->_result->num_rows;
+        $this->fieldCount = $this->_result->field_count;
+        $this->_model = $model;
     }
 
     /**
@@ -70,71 +66,22 @@ class ModelCollection
 	{
 		if($property == 'rows') {
 			$this->rows = array();
-            while ($row = $this->resource->fetch_assoc()) {
-                $record = clone $this->model;
+            while ($row = $this->_result->fetch_assoc()) {
+                $record = clone $this->_model;
                 foreach ($row as $key => $value) {
                     $record->{$key} = stripslashes($value);
                 }
                 $this->rows[] = $record;
             }
-            $this->resource->free_result();
+            $this->_result->free_result();
 		}
         if (isset($this->{$property})) {
           return $this->{$property};
         }
 	}
 
-    /**
-     * Menetapkan objek model yang melakukan permintaan koleksi
-     * @param mixed $model object Objek model
-     */
-	public function setModel($model)
-	{
-		$this->model = $model;
-	}
-
-    /**
-     * Memberikan data ke dalam koleksi model
-     * @param mixed $db object Objek dari kelas {@link Djokka\Db}
-     */
-	public function setDb($db)
-	{
-		foreach ($db as $key => $value) {
-			if(!isset($this->{$key})) {
-				$this->{$key} = $value;
-			}
-		}
-		$this->resource = $db->execute();
-		$this->rowCount = $this->resource->num_rows;
-		$this->fieldCount = $this->resource->field_count;
-	}
-
-    /**
-     * Mengambil objek model dari hasil parsing perintah SQL
-     * @return object
-     */
-    public function getModel()
+    public function getPager()
     {
-        $model = $this->model;
-        $data = $this->parameters['where'];
-        if(preg_match_all('/(?:^\s*\?\s+|\s+[^=]+\s*\?\s+|(\w+)\s*(?:=|!=|>|>=|<|<=|<>|(?:L|l)(?:I|i)(?:K|k)(?:E|e)|(?:N|n)(?:O|o)(?:T|t)\s+(?:L|l)(?:I|i)(?:K|k)(?:E|e))\s*?)/i', $data[0], $matches)) {
-            $params = array_slice($data, 1);
-            for ($i=0; $i < count($matches[0]); $i++) {
-                $property = trim($matches[1][$i]);
-                if(!empty($property)) {
-                    $model->{$property} = $params[$i];
-                }
-            }
-        }
-        return $model;
-    }
-
-    /**
-     * Menetapkan parameter yang akan menyaring hasil
-     * @param mixed $parameters array Parameter untuk penyaringan
-     */
-    public function setParameters($parameters)
-    {
-        $this->parameters = $parameters;
+        return $this->_model->getPager();
     }
 }
