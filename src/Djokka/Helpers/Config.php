@@ -26,62 +26,61 @@ class Config
      */
     private $data = array(
         // System path
-        'theme_path'=>'themes', // Lokasi folder tema
-        'asset_path'=>'assets', // Lokasi folder aset
-        'module_path'=>'protected/modules', // Lokasi folder module
-        'plugin_path'=>'plugins', // Lokasi folder plugin
-        'component_path'=>'protected/components', // Lokasi folder komponen
-        'model_path'=>'protected/models', // Lokasi folder model
-        'data_path'=>'protected/data', // Lokasi folder model
-        'config_path'=>'protected/config', // Lokasi folder konfigurasi
-        'app_path'=>null, // Lokasi folder project/aplikasi web
+        'theme_path'     => 'themes', // Lokasi folder tema
+        'asset_path'     => 'assets', // Lokasi folder aset
+        'module_path'    => 'protected/modules', // Lokasi folder module
+        'plugin_path'    => 'plugins', // Lokasi folder plugin
+        'component_path' => 'protected/components', // Lokasi folder komponen
+        'model_path'     => 'protected/models', // Lokasi folder model
+        'data_path'      => 'protected/data', // Lokasi folder model
+        'config_path'    => 'protected/config', // Lokasi folder konfigurasi
+        'app_path'       => null, // Lokasi folder project/aplikasi web
 
         // Error handler
-        'error_redirect'=>false, // Menandai apakah dilakukan pengalihan halaman saat terjadi error
-        'module_error'=>'index/error', // Nama modul tujuan pengalihan jika terjadi error
-        'module_forbidden'=>'index/signin', // Nama modul tujuan pengalihan saat terjadi error akses ditolak
+        'error_redirect'   => false, // Menandai apakah dilakukan pengalihan halaman saat terjadi error
+        'module_error'     => 'index/error', // Nama modul tujuan pengalihan jika terjadi error
+        'module_forbidden' => 'index/signin', // Nama modul tujuan pengalihan saat terjadi error akses ditolak
 
         // Controller configurarion
-        'main_module'=>'index', // Nama modul utama
-        'module'=>null, // Nama modul yang sedang diakses
+        'main_module' => 'index', // Nama modul utama
+        'module'      => null, // Nama modul yang sedang diakses
 
         // Router configuration
-        'get_router'=>'r', // Nama key untuk format rute GET
-        'route_format'=>'path', // Format rute yang akan digunakan
-        'route_max_depth'=>20, // Maksimum kedalaman hirarki modul
-        'route_params'=>array(), // Parameter yang tersedia untuk Route-Aliasing
-        'router_action'=>null, // Aksi yang menjadi target untuk Route-Aliasing
-        'ref_dir'=>null, // Lokasi folder untuk mengganti lokasi folder standar pada suatu kondisi tertentu
-        'router'=>null, // Pengolah rute untuk Route-Aliasing
-        'asset_url'=>null, // URL untuk aset
-        'theme_url'=>null, // URL untuk tema
+        'get_router'      => 'r', // Nama key untuk format rute GET
+        'route_format'    => 'path', // Format rute yang akan digunakan
+        'route_max_depth' => 20, // Maksimum kedalaman hirarki modul
+        'route_params'    => array(), // Parameter yang tersedia untuk Route-Aliasing
+        'router_action'   => null, // Aksi yang menjadi target untuk Route-Aliasing
+        'ref_dir'         => null, // Lokasi folder untuk mengganti lokasi folder standar pada suatu kondisi tertentu
+        'router'          => null, // Pengolah rute untuk Route-Aliasing
+        'asset_url'       => null, // URL untuk aset
+        'theme_url'       => null, // URL untuk tema
 
         // View configuration
-        'theme'=>'default', // Nama tema yang sedang digunakan web
-        'layout'=>'index', // Nama layout yang sedang digunakan web
-        'json'=>false, // Menandai apakah output web menggunakan format JSON atau tidak
-        'debug_json_mode'=>false, // Menandai apakah debug dilakukan menggunakan format JSON atau tidak
-        'pager'=>null, // Data sementar untuk pager/pembagi halaman
+        'theme'  => 'default', // Nama tema yang sedang digunakan web
+        'layout' => 'index', // Nama layout yang sedang digunakan web
+        'json'   => false, // Menandai apakah output web menggunakan format JSON atau tidak
+        'pager'  => null, // Data sementar untuk pager/pembagi halaman
 
-        'connection'=>0 // Indeks koneksi database yang akan digunakan pada fitur multi-database
+        'connection' => 0 // Indeks koneksi database yang akan digunakan pada fitur multi-database
     );
 
     /**
      * Peta kelas yang akan menjadi anggota pustaka yang dapat dipanggil
      */
     private $class_map = array(
-        'Session'=>'Djokka\\Helpers\\Session',
-        'User'=>'Djokka\\Helpers\\User',
-        'Config'=>'Djokka\\Helpers\\Config',
-        'Html'=>'Djokka\\Helpers\\Html',
-        'Email'=>'Djokka\\Helpers\\Email',
-        'Image'=>'Djokka\\Helpers\\Image',
-        'File'=>'Djokka\\Helpers\\File',
-        'String'=>'Djokka\\Helpers\\String',
-        'Db'=>'Djokka\\Db',
-        'Route'=>'Djokka\\Route',
-        'Asset'=>'Djokka\\View\\Asset',
-        'Model'=>'Djokka\\Model'
+        'Session' => 'Helpers\\Session',
+        'User'    => 'Helpers\\User',
+        'Config'  => 'Helpers\\Config',
+        'Html'    => 'Helpers\\Html',
+        'Email'   => 'Helpers\\Email',
+        'Image'   => 'Helpers\\Image',
+        'File'    => 'Helpers\\File',
+        'String'  => 'Helpers\\String',
+        'Db'      => 'Database\\Connection',
+        'Route'   => 'Route',
+        'Asset'   => 'View\\Asset',
+        'Model'   => 'Model'
     );
 
     /**
