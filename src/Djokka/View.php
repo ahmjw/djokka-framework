@@ -26,6 +26,11 @@ class View
     private $_content;
 
     /**
+     * Menandai view telah diaktifkan atau belum
+     */
+    private $_activated = false;
+
+    /**
      * Menampung instance dari kelas
      * @since 1.0.1
      */
@@ -92,15 +97,6 @@ class View
     }
 
     /**
-     * Mengecek apakah bagian pengolah diaktifkan atau tidak
-     * @return boolean
-     */
-    public function isActive()
-    {
-        return $this->active;
-    }
-
-    /**
      * Menetapkan status apakah pengolah tema digunakan atau tidak
      * @param mixed $condition boolean
      */
@@ -126,7 +122,8 @@ class View
             }
         }
 
-        if(!$info['is_plugin']) {
+        if(!$this->_activated && !$info['is_plugin']) {
+            $this->_activated = true;
             $this->_content = utf8_decode($instance->render($path, $view['vars']));
             Controller::setCore($instance);
         } else {
