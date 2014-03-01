@@ -38,10 +38,11 @@ trait TShortcut
     public function lib($subclass)
     {
         $class_map = Config::getInstance()->getClassMap();
+
         if (!isset($class_map[$subclass])) {
             throw new \Exception('Class library with name '.$subclass.' not found', 500);
         }
-        return call_user_func(array($class_map[$subclass], 'getInstance'));
+        return call_user_func(array(__NAMESPACE__ . '\\' . $class_map[$subclass], 'getInstance'));
     }
 
 	/**
@@ -140,8 +141,7 @@ trait TShortcut
      */
     public function moduleDir()
     {
-        $dir = $this->defval($this->config('ref_dir'), $this->config('dir'));
-        return $this->realPath($dir.DS.$this->config('app_path').$this->config('module_path').DS);
+        return $this->realPath($this->config('dir').DS.$this->config('app_path').$this->config('module_path').DS);
     }
 
     /**
@@ -151,8 +151,7 @@ trait TShortcut
      */
     public function modelDir()
     {
-        $dir = $this->defval($this->config('ref_dir'), $this->config('dir'));
-        return $this->realPath($dir.DS.$this->config('app_path').DS.$this->config('model_path').DS);
+        return $this->realPath($this->config('dir').DS.$this->config('app_path').DS.$this->config('model_path').DS);
     }
 
     /**
@@ -162,8 +161,7 @@ trait TShortcut
      */
     public function pluginDir()
     {
-        $dir = $this->defval($this->config('ref_dir'), $this->config('dir'));
-        return $this->realPath($dir.DS.$this->config('app_path').$this->config('plugin_path').DS);
+        return $this->realPath($this->config('dir').DS.$this->config('app_path').$this->config('plugin_path').DS);
     }
 
     /**
@@ -219,18 +217,6 @@ trait TShortcut
                 return !empty($data);
             }
         }
-    }
-
-    /**
-     * Mengambil nilai default antara dua kemungkinan
-     * @since 1.0.3
-     * @param $data adalah data yang akan dicek kekosongannya
-     * @param $default adalah nilai default ketika data kosong
-     * @return data atau nilai default
-     */
-    public function defval($data, $default)
-    {
-        return $data != null ? $data : $default; 
     }
 
     /**
@@ -326,19 +312,6 @@ trait TShortcut
             }
         }
         return $object;
-    }
-
-    /**
-     * Menginisialisai pager (pembagi halaman) dan memberikan nilai limit pada model
-     */
-    public function pager() 
-    {
-        switch (func_num_args()) {
-            case 0:
-                return Pager::getInstance()->result();
-            case 1:
-                return Pager::getInstance()->init(func_get_args());
-        }
     }
 
     /**
