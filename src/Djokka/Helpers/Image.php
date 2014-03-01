@@ -22,7 +22,7 @@ class Image
      * Menampung instance dari kelas
      * @since 1.0.0
      */
-    private static $instance;
+    private static $_instance;
 
     /**
      * Mengambil instance secara Singleton Pattern
@@ -31,10 +31,10 @@ class Image
      */
     public static function getInstance()
     {
-        if(self::$instance == null) {
-            self::$instance = new static();
+        if(self::$_instance == null) {
+            self::$_instance = new static();
         }
-        return self::$instance;
+        return self::$_instance;
     }
 
     /**

@@ -12,14 +12,16 @@
 
 namespace Djokka\Helpers;
 
-use Djokka\Base;
+use Djokka\TShortcut;
 use Djokka\Helpers\String;
 
 /**
  * Kelas pembantu yang bertugas mengelola berkas yang terdapat di dalam web
  */
-class File extends Base
+class File
 {
+    use TShortcut;
+
     /**
      * Menampung instance dari kelas
      * @since 1.0.0
@@ -97,7 +99,7 @@ class File extends Base
     public function makeDir($path)
     {
         $real_path = String::getInstance()->realPath($path);
-        $dir = $this->defval($this->config('ref_dir'), $this->config('dir'));
+        $dir = $this->config('dir');
         $real_path = str_replace($dir, null, $real_path);
         foreach (explode(DS, $real_path) as $path) {
             if(!empty($path)) {

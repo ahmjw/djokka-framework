@@ -16,6 +16,7 @@ namespace Djokka\Controller;
 use Djokka\Route;
 use Djokka\Controller as Core;
 use Djokka\View\Asset;
+use Djokka\Helpers\String;
 
 /**
  * Kelas pendamping yang membantu kelas Djokka\Controller untuk mengakses dan memproses plugin
@@ -51,7 +52,7 @@ class Plugin extends Core
      */
     public function __construct() {
         if(get_class($this) != __CLASS__) {
-            $class = $this('String')->lastPart('\\', get_class($this));
+            $class = String::getInstance()->lastPart('\\', get_class($this));
             $path = $this->pluginDir().lcfirst(preg_replace('/([a-zA-Z0-9_]+)Plugin$/i', '$1', $class)).DS;
             $this->url = Route::getInstance()->urlPath($path);
         }

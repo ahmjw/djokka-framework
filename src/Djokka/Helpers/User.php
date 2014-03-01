@@ -12,12 +12,10 @@
 
 namespace Djokka\Helpers;
 
-use Djokka\Base;
-
 /**
  * Kelas pembantu yang bertugas mempermudah pengolahan data user pada wev
  */
-class User extends Base
+class User
 {
 
     /**
@@ -80,7 +78,7 @@ class User extends Base
                         $data->{$key} = $value;
                     }
                 }
-                $this->session('user', array($type=>$data));
+                Session::getInstance()->setData('user', array($type=>$data));
         }
     }
     
@@ -99,7 +97,7 @@ class User extends Base
      */
     public function getUser() 
     {
-        return $this->session('user');
+        return Session::getInstance()->getData('user');
     }
 
     /**
@@ -109,7 +107,7 @@ class User extends Base
      */
     public function getUserByType($type) 
     {
-        $user = $this->session('user');
+        $user = Session::getInstance()->getData('user');
         if(is_array($user)) {
             return $user[$type];
         } else {

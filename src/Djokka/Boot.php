@@ -98,7 +98,6 @@ class Boot
      */
     public static function handleException(\Exception $e)
     {
-        print_r($e);
         if (Config::getInstance()->config('error_redirect') === true && $e->getCode() == 403) {
             $page = Config::getInstance()->config('module').'/'.Config::getInstance()->config('action');
             if ($page != $redirect = Config::getInstance()->config('module_forbidden')) {
