@@ -12,7 +12,6 @@
 
 namespace Djokka\Helpers;
 
-use Djokka\TShortcut;
 use Djokka\Helpers\String;
 
 /**
@@ -20,7 +19,7 @@ use Djokka\Helpers\String;
  */
 class File
 {
-    use TShortcut;
+    //use TShortcut;
 
     /**
      * Menampung instance dari kelas
@@ -40,6 +39,93 @@ class File
             self::$_instance = new static();
         }
         return self::$_instance;
+    }
+
+    /**
+     * Mengubah suatu string menjadi format path yang benar
+     * @param string $path Lokasi direktori/berkas yang akan dibenarkan
+     * @since 1.0.3
+     * @return string
+     */
+    public function realPath($path) {
+        return preg_replace("/([\/\\\]+)/i", DS, $path);
+    }
+
+    /**
+     * Mengambil lokasi folder data
+     * @since 1.0.3
+     * @return string lokasi folder
+     */
+    public function dataDir()
+    {
+        return $this->realPath(Config::getInstance()->getData('dir') . DS . Config::getInstance()->getData('app_path') .
+            Config::getInstance()->getData('data_path') . DS);
+    }
+
+    /**
+     * Mengambil lokasi folder konfigurasi
+     * @since 1.0.3
+     * @return string lokasi folder
+     */
+    public function configDir()
+    {
+        return $this->realPath(Config::getInstance()->getData('dir') . DS . Config::getInstance()->getData('app_path') .
+            Config::getInstance()->getData('config_path') . DS);
+    }
+
+    /**
+     * Mengambil lokasi folder komponen
+     * @since 1.0.3
+     * @return string lokasi folder
+     */
+    public function componentDir()
+    {
+        return $this->realPath(Config::getInstance()->getData('dir') . DS . Config::getInstance()->getData('app_path') .
+            Config::getInstance()->getData('component_path') . DS);
+    }
+
+    /**
+     * Mengambil lokasi folder tema
+     * @since 1.0.3
+     * @return string lokasi folder
+     */
+    public function themeDir()
+    {
+        return $this->realPath(Config::getInstance()->getData('dir') . DS . Config::getInstance()->getData('app_path') .
+            Config::getInstance()->getData('theme_path') . DS);
+    }
+
+    /**
+     * Mengambil lokasi folder model
+     * @since 1.0.3
+     * @return string lokasi folder
+     */
+    public function moduleDir()
+    {
+        return $this->realPath(Config::getInstance()->getData('dir') . DS . Config::getInstance()->getData('app_path') .
+            Config::getInstance()->getData('module_path') . DS);
+    }
+
+    /**
+     * Mengambil lokasi folder modul
+     * @since 1.0.3
+     * @return string lokasi folder
+     */
+    public function modelDir()
+    {
+        return $this->realPath(Config::getInstance()->getData('dir') . DS . Config::getInstance()->getData('app_path') .
+            DS.Config::getInstance()->getData('model_path') . DS);
+    }
+
+    /**
+     * Mengambil lokasi folder plugin
+     * @since 1.0.1
+     * @return string lokasi folder
+     */
+    public function pluginDir()
+    {
+        return $this->realPath(Config::getInstance()->getData('dir') . DS . Config::getInstance()->getData('app_path') .
+            Config::getInstance()->getData('plugin_path') . DS);
     }
 
     /**
@@ -85,7 +171,7 @@ class File
                     $this->copyDir($src_path, $dst_path);
                 } else { 
                     copy($src_path, $dst_path);
-                } 
+                }
             } 
         } 
         closedir($dir); 
@@ -99,7 +185,7 @@ class File
     public function makeDir($path)
     {
         $real_path = String::getInstance()->realPath($path);
-        $dir = $this->config('dir');
+        $dir = Config::getInstance()->getData('dir');
         $real_path = str_replace($dir, null, $real_path);
         foreach (explode(DS, $real_path) as $path) {
             if(!empty($path)) {
