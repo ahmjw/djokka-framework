@@ -12,14 +12,12 @@
 
 namespace Djokka\Helpers;
 
-use Djokka\TShortcut;
-
 /**
  * Kelas pembantu yang bertugas mengelola konfigurasi web
  */
 class Config
 {
-    use TShortcut;
+    //use TShortcut;
     /**
      * Menampung data konfigurasi web
      * @since 1.0.0
@@ -125,7 +123,7 @@ class Config
         $is_auto = false;
         if($dir === null) {
             $is_auto = true;
-            $dir = $this->configDir();
+            $dir = $this->data['dir'].DS.$this->data['app_path'].$this->data['config_path'].DS;
         }
         $result = array();
         $path = $dir.'main.php';
