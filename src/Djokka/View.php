@@ -12,14 +12,14 @@
 namespace Djokka;
 
 use Djokka\View\Asset;
+use Djokka\Helpers\Config;
+use Djokka\Helpers\File;
 
 /**
  * Kelas pustaka yang bertugas untuk memproses dan mengendalikan bagian view yang terdapat di dalam suatu modul
  */
 class View
 {
-    use TShortcut;
-
     /**
      * Konten web
      */
@@ -50,15 +50,9 @@ class View
         return self::$_instance;
     }
 
-    /**
-     * Mengambil lokasi direktori view
-     * @param mixed $viewName string Nama view
-     * @return string
-     */
-    private function getPath($viewName)
+    public function isActivated()
     {
-        return BASE_DIR . DIRECTORY_SEPARATOR . 'modules' . DIRECTORY_SEPARATOR . $this->_module .
-            DIRECTORY_SEPARATOR . 'views' . DIRECTORY_SEPARATOR . $viewName . '.php';
+        return $this->_activated;
     }
 
     /**
@@ -71,40 +65,6 @@ class View
     }
 
     /**
-     * Menentukan konten web
-     * @param mixed $content string Konten web
-     */
-    public function setContent($content) {
-        $this->_content = $content;
-    }
-
-    /**
-     * Mengambil daftar view yang telah terpanggil
-     * @return array
-     */
-    public function getViews()
-    {
-        return $this->views;
-    }
-
-    /**
-     * Mengambil indeks terakhir view yang terpanggil
-     * @return int
-     */
-    public function getIndex()
-    {
-        return $this->index;
-    }
-
-    /**
-     * Menetapkan status apakah pengolah tema digunakan atau tidak
-     * @param mixed $condition boolean
-     */
-    public function setUseTheme($condition) {
-        $this->use_theme = $condition;
-    }
-
-    /**
      * Memproses konten web berdasarkan informasi modul
      * @param mixed $info array Informasi terkait modul yang akan diproses
      * @param mixed $instance object Instance dari modul yang akan diproses
@@ -112,23 +72,22 @@ class View
      */
     public function renderContent($info, $instance) {
         $view = $instance->getView();
-        $theme = $this->themeDir() . $this->config('theme') . '/';
-        $path = $this->realPath($theme . 'views/' . $info['module'] . '/'. $view['name'] . '.php');
+        $theme = File::getInstance()->themeDir() . Config::getInstance()->getData('theme') . '/';
+        $path = File::getInstance()->realPath($theme . 'views/' . $info['module'] . '/'. $view['name'] . '.php');
 
         if(!file_exists($path)) {
-            $path = $this->realPath($info['module_dir'] . '/views/' . $view['name'] . '.php');
+            $path = File::getInstance()->realPath($info['module_dir'] . '/views/' . $view['name'] . '.php');
             if(!file_exists($path)) {
-                throw new \Exception("View file not found in path $path", 404);
+                throw new \Exception("View of module '$info[route]' is not found: $path", 404);
             }
         }
 
         if(!$this->_activated && !$info['is_plugin']) {
             $this->_activated = true;
-            $this->_content = utf8_decode($instance->render($path, $view['vars']));
+            $this->_content = utf8_decode($instance->outputBuffering($path, $view['vars']));
             Controller::setCore($instance);
         } else {
-            $instance->render($path, $view['vars']);
-            return $instance->render($path, $view['vars']);
+            return $instance->outputBuffering($path, $view['vars']);
         }
     }
 
@@ -141,20 +100,20 @@ class View
     {
         $content = Controller::getInstance()->import($route);
         // Jika dalam mode JSON
-        if($this->config('json') === true || HANDLE_ERROR === true) {
+        if(Config::getInstance()->getData('json') === true || HANDLE_ERROR === true) {
             /*header('Content-type: application/json');
             echo json_encode($content);
             return;*/
         }
 
-        $theme_path = $this->realPath($this->themeDir().$this->config('theme').DS.$this->config('layout').'.php');
+        $theme_path = File::getInstance()->realPath(File::getInstance()->themeDir().Config::getInstance()->getData('theme').DS.Config::getInstance()->getData('layout').'.php');
         if(!file_exists($theme_path)) {
             throw new \Exception("Layout file not found in path {$theme_path}", 404);
         }
         if(Controller::getCore() != null) {
-            $theme_content = Controller::getCore()->render($theme_path);
+            $theme_content = Controller::getCore()->outputBuffering($theme_path);
         } else {
-            $theme_content = Controller::getInstance()->render($theme_path);
+            $theme_content = Controller::getInstance()->outputBuffering($theme_path);
         }
         $content = Asset::getInstance()->render($theme_content);
         //$content = preg_replace('/[\r\n\t]/i', '', $content);
@@ -170,14 +129,14 @@ class View
      * @return string
      */
     public function getView($instance, $view, $params = array()) {
-        $path = $this->themeDir().$this->config('theme').DS.'views'.DS.$this->config('module').DS.$view.'.php';
+        $path = File::getInstance()->themeDir().Config::getInstance()->getData('theme').DS.'views'.DS.Config::getInstance()->getData('module').DS.$view.'.php';
         if(!file_exists($path)) {
-            $path = $this->moduleDir().$this->config('module').DS.'views'.DS.$view.'.php';
+            $path = $this->moduleDir().Config::getInstance()->getData('module').DS.'views'.DS.$view.'.php';
             if(!file_exists($path)) {
                 throw new \Exception("View file not found in path $path", 404);
             }
         }
-        return $instance->render($path, $params);
+        return $instance->outputBuffering($path, $params);
     }
 
 }
