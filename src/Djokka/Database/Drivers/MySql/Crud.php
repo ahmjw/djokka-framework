@@ -31,6 +31,7 @@ class Crud implements ICrud
         'order'  => null,
         'limit'  => null,
         'insert' => null,
+        'update' => null,
         'values' => null,
         'query'  => null
     );
@@ -150,6 +151,50 @@ class Crud implements ICrud
     }
 
     /**
+     * Membentuk perintah SQL UPDATE
+     * @param array $data Data yang menjadi masukan untuk mengubah data
+     * @return object
+     */
+    public function update($data)
+    {
+        $sql = 'UPDATE '.$this->_sql['from'].' SET ';
+        if(is_array($data)) {
+            $count = count($data)-1;
+            $i = 0;
+            foreach ($data as $key => $value) {
+                $sql .= "$key = '".addslashes($value)."'";
+                if($i < $count) {
+                    $sql .= ', ';
+                }
+                $i++;
+            }
+        } else {
+            $sql .= $data;
+        }
+        $this->_sql['query'] = $sql;
+        return $this;
+    }
+
+    /**
+     * Membentuk perintah SQL INSERT INTO
+     * @return object
+     */
+    public function insert() {
+        $sql = "INSERT INTO {$this->From} ";
+        switch (func_num_args()) {
+            case 0:
+                break;
+            case 1:
+                break;
+            case 2:
+                $sql .= '('.func_get_arg(0).') VALUES('.func_get_arg(1).')';
+                break;
+        }
+        $this->Query = $sql;
+        return $this;
+    }
+
+    /**
      * Mengambil jumlah data yang dihasilkan dari perintah SQL yang dijalankan
      * @return int
      */
@@ -204,7 +249,7 @@ class Crud implements ICrud
     public function execute() 
     {
         if($resource = $this->_connection->query($this->_sql['query'])) {
-            foreach ($this as $key => $value) {
+            foreach ($this->_sql as $key => $value) {
                 $this->_sql[$key] = null;
             }
             return $resource;
