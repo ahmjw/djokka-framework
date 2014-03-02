@@ -328,4 +328,15 @@ abstract class ActiveRecord extends Model
     {
         return $this->getDriver('Crud')->getPager($this);
     }
+
+    public function db($from = null)
+    {
+        $driver = $this->getDriver('Crud');
+        if($from === null) {
+            $driver->from($this->table());
+        } else {
+            $driver->from($from);
+        }
+        return $driver;
+    }
 }
