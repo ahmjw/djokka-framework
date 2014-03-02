@@ -62,7 +62,7 @@ class Hmvc extends Core
         $instance = new $info['class'];
 
         // Self router aliasing
-        if(method_exists($instance, 'routes') && ($routes = call_user_func(array($instance, 'routes')))) {
+        if(!$info['is_widget'] && method_exists($instance, 'routes') && ($routes = call_user_func(array($instance, 'routes')))) {
             foreach ($routes as $route) {
                 $keys = array();
                 $pattern = preg_replace_callback('/\(([a-zA-Z_](?:[a-zA-Z0-9_]+)?):(.*?)\)/i', function($matches) use(&$keys) {
