@@ -23,9 +23,9 @@ define('SYSTEM_DIR', __DIR__ . DS . '..' . DS . '..' . DS);
 /**
  * Kelas pustaka yang digunakan untuk melakukan booting
  */
-class Boot
+class Boot extends Shortcut
 {
-    use TShortcut;
+    //use TShortcut;
 
     /**
      * Instance dari kelas ini
@@ -106,6 +106,7 @@ class Boot
                 $this->exceptionOutput($exception);
             }
         }
+        
         ob_end_clean();
         $path = SYSTEM_DIR . 'resources' . DIRECTORY_SEPARATOR . 'errors' . DIRECTORY_SEPARATOR . 'view.php';
         include_once($path);
