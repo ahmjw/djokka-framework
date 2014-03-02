@@ -21,9 +21,9 @@ use Djokka\Helpers\String;
 /**
  * Kelas pustaka yang bertugas untuk memproses dan mengendalikan model yang terdapat di dalam suatu modul
  */
-abstract class Model
+abstract class Model extends Shortcut
 {
-    use TShortcut;
+    //use TShortcut;
     
     /**
      * Data penting yang dibutuhkan oleh model

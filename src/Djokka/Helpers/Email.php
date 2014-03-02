@@ -22,7 +22,7 @@ class Email
      * Menampung instance dari kelas
      * @since 1.0.0
      */
-    private static $instance;
+    private static $_instance;
 
     /**
      * Mengambil instance secara Singleton Pattern
@@ -32,10 +32,10 @@ class Email
      */
     public static function get($class = __CLASS__)
     {
-        if(self::$instance == null) {
-            self::$instance = new $class;
+        if(self::$_instance == null) {
+            self::$_instance = new $class;
         }
-        return self::$instance;
+        return self::$_instance;
     }
 
     /**

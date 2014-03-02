@@ -13,14 +13,13 @@
 namespace Djokka\Controller;
 
 use Djokka\Route;
-use Djokka\TShortcut;
+use Djokka\Helpers\Config;
 
 /**
  * Kelas pendamping yang membantu kelas Djokka\Controller untuk membentuk alamat URL berdasarkan rute modul
  */
 class Linker
 {
-    use TShortcut;
 
     /**
      * Menampung instance dari kelas
@@ -48,7 +47,7 @@ class Linker
      */
     public function getSeparator()
     {
-        return $this->config('route_format') == 'get' ? '?r=' : '/';
+        return Config::getInstance()->getData('route_format') == 'get' ? '?r=' : '/';
     }
 
     /**
@@ -65,7 +64,7 @@ class Linker
         } else {
             if(!is_numeric(strpos($module[0], '/'))) {
                 return Route::getInstance()->getBaseUrl().'/'.
-                    $this->config('module').'/'.$module[0].'?'.$params;
+                    Config::getInstance()->getData('module').'/'.$module[0].'?'.$params;
             } else {
                 return Route::getInstance()->getBaseUrl().$module[0].'?'.$params;
             }
@@ -90,7 +89,7 @@ class Linker
      */
     public function renderParameter($params)
     {
-        return Route::getInstance()->urlParam($this->config('route_format'), $params);
+        return Route::getInstance()->urlParam(Config::getInstance()->getData('route_format'), $params);
     }
 
     /**
@@ -106,12 +105,12 @@ class Linker
         $url = null;
         $base = Route::getInstance()->getBaseUrl();
         if(!is_numeric(strpos($module, '/'))) {
-            $url = $base.$sprtr.$this->config('module').$sprtr.$module;
+            $url = $base.$sprtr.Config::getInstance()->getData('module').$sprtr.$module;
         } else if($module[0] == '-') {
-            $url = $base.$sprtr.$this->config('module').'-'.substr($module, 1, strlen($module));
+            $url = $base.$sprtr.Config::getInstance()->getData('module').'-'.substr($module, 1, strlen($module));
         }else {
             if($module[0] != '/') {
-                $url = $base.$sprtr.$this->config('module').$sprtr.$module;
+                $url = $base.$sprtr.Config::getInstance()->getData('module').$sprtr.$module;
             } else {
                 $url = $base.$sprtr.substr($module, 1, strlen($module));
             }
@@ -136,10 +135,10 @@ class Linker
             $params = $this->renderParameter($parameter);
         }
         if(!is_numeric(strpos($module, '/'))) {
-            return Route::getInstance()->getBaseUrl().$sprtr.$this->config('module').'/'.$module.$params;
+            return Route::getInstance()->getBaseUrl().$sprtr.Config::getInstance()->getData('module').'/'.$module.$params;
         } else {
             if($module[0] != '/') {
-                return Route::getInstance()->getBaseUrl().$sprtr.$this->config('module').'/'.$module.$params;
+                return Route::getInstance()->getBaseUrl().$sprtr.Config::getInstance()->getData('module').'/'.$module.$params;
             } else {
                 return Route::getInstance()->getBaseUrl().$sprtr.substr($module, 1, strlen($module)).$params;
             }
