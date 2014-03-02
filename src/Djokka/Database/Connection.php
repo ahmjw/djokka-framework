@@ -13,19 +13,19 @@
 
 namespace Djokka\Database;
 
-use Djokka\TShortcut;
+use Djokka\Helpers\Config;
 
 /**
  * Kelas pustaka yang bertugas menyediakan akses database
  */
 class Connection
 {
-    use TShortcut;
+    //use TShortcut;
 
     /**
      * Koneksi database yang digunakan
      */
-    private $connection;
+    private $_connection;
 
     /**
      * @var Menampung instance dari kelas
@@ -63,53 +63,7 @@ class Connection
      * @return object
      */
     public function getConnection() {
-        return $this->connection;
-    }
-
-    /**
-     * Membentuk perintah SQL UPDATE
-     * @param array $data Data yang menjadi masukan untuk mengubah data
-     * @return object
-     */
-    public function update($data) {
-        $sql = "UPDATE {$this->From} SET ";
-        if(is_array($data)) {
-            $count = count($data)-1;
-            $i = 0;
-            foreach ($data as $key => $value) {
-                $sql .= "$key = '".addslashes($value)."'";
-                if($i < $count) {
-                    $sql .= ', ';
-                }
-                $i++;
-            }
-        } else {
-            $sql .= $data;
-        }
-        if(isset($this->Where)) {
-            $sql .= $this->where($this->Where)->Query;
-        }
-        $this->Query = $sql;
-        return $this;
-    }
-
-    /**
-     * Membentuk perintah SQL INSERT INTO
-     * @return object
-     */
-    public function insert() {
-        $sql = "INSERT INTO {$this->From} ";
-        switch (func_num_args()) {
-            case 0:
-                break;
-            case 1:
-                break;
-            case 2:
-                $sql .= '('.func_get_arg(0).') VALUES('.func_get_arg(1).')';
-                break;
-        }
-        $this->Query = $sql;
-        return $this;
+        return $this->_connection;
     }
 
     /**
@@ -122,7 +76,7 @@ class Connection
         $criteria = $params[0];
         $criterias = array_slice($params, 1);
         $i = 0;
-        $connection = $this->connection;
+        $connection = $this->_connection;
         return preg_replace_callback('/\?/i', function($matches) use($connection, $criterias, &$i) {
             $i++;
             return "'".$connection->real_escape_string($criterias[$i-1])."'";
@@ -135,16 +89,16 @@ class Connection
      */
     public function connect()
     {
-        $dbs = $this->config('db');
-        $config = $dbs[$this->config('connection')];
+        $dbs = Config::getInstance()->getData('db');
+        $config = $dbs[Config::getInstance()->getData('connection')];
         if($config == null) {
             throw new \Exception("No database configuration", 500);
         }
         switch ($config['driver']) {
             case 'MySql':
-                @$this->connection = new \Mysqli($config['hostname'], $config['username'], $config['password'], $config['database']);
-                if($this->connection->connect_error) {
-                    throw new \Exception($this->connection->connect_error, 500);
+                @$this->_connection = new \Mysqli($config['hostname'], $config['username'], $config['password'], $config['database']);
+                if($this->_connection->connect_error) {
+                    throw new \Exception($this->_connection->connect_error, 500);
                 }
                 break;
             case 'PostgreSql':
@@ -167,23 +121,23 @@ class Connection
         if(!is_string($sql) && !is_array($sql)) {
             throw new \Exception("Query just allow string or array data type", 500);
         }
-        if(!isset($this->connection)) {
+        if(!isset($this->_connection)) {
             $this->connect();
         }
         if(is_array($sql)) {
             $criterias = array_slice($sql, 1);
             $i = 0;
-            $connection = $this->connection;
+            $connection = $this->_connection;
             $sql = preg_replace_callback('/\?/i', function($matches) use($connection, $criterias, &$i) {
                 $i++;
                 return "'".$connection->real_escape_string($criterias[$i-1])."'";
             }, $sql);
             $sql = $sql[0];
         }
-        if($this->connection && !$this->connection->connect_error) {
-            $resource = $this->connection->query($sql);
-            if($this->connection->error) {
-                throw new \Exception($this->connection->error . ' -> ' . $sql, 500);
+        if($this->_connection && !$this->_connection->connect_error) {
+            $resource = $this->_connection->query($sql);
+            if($this->_connection->error) {
+                throw new \Exception($this->_connection->error . ' -> ' . $sql, 500);
             }
             return $resource;
         }
@@ -198,7 +152,7 @@ class Connection
         if(is_array($sql)) {
             $criterias = array_slice($sql, 1);
             $i = 0;
-            $connection = $this->connection;
+            $connection = $this->_connection;
             $sql = preg_replace_callback('/\?/i', function($matches) use($connection, $criterias, &$i) {
                 $i++;
                 return "'".$connection->real_escape_string($criterias[$i-1])."'";
@@ -224,7 +178,7 @@ class Connection
             if(is_array($sql)) {
                 $criterias = array_slice($sql, 1);
                 $i = 0;
-                $connection = $this->connection;
+                $connection = $this->_connection;
                 $sql = preg_replace_callback('/\?/i', function($matches) use($connection, $criterias, &$i) {
                     $i++;
                     return "'".$connection->real_escape_string($criterias[$i-1])."'";
@@ -268,7 +222,7 @@ class Connection
             if(is_array($sql)) {
                 $criterias = array_slice($sql, 1);
                 $i = 0;
-                $connection = $this->connection;
+                $connection = $this->_connection;
                 $sql = preg_replace_callback('/\?/i', function($matches) use($connection, $criterias, &$i) {
                     $i++;
                     return "'".addslashes($criterias[$i-1])."'";
@@ -302,7 +256,7 @@ class Connection
             if(is_array($sql)) {
                 $criterias = array_slice($sql, 1);
                 $i = 0;
-                $connection = $this->connection;
+                $connection = $this->_connection;
                 $sql = preg_replace_callback('/\?/i', function($matches) use($connection, $criterias, &$i) {
                     $i++;
                     return "'".addslashes($criterias[$i-1])."'";
@@ -337,7 +291,7 @@ class Connection
             if(is_array($sql)) {
                 $criterias = array_slice($sql, 1);
                 $i = 0;
-                $connection = $this->connection;
+                $connection = $this->_connection;
                 $sql = preg_replace_callback('/\?/i', function($matches) use($connection, $criterias, &$i) {
                     $i++;
                     return "'".addslashes($criterias[$i-1])."'";
