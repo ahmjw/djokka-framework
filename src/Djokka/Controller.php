@@ -24,15 +24,15 @@ use Djokka\Controller\Plugin;
 /**
  * Kelas pustaka yang bertugas mengontrol atau mengendalikan proses di dalam modul
  */
-class Controller
+class Controller extends Shortcut
 {
-    use TShortcut;
+    //use TShortcut;
 
     /**
      * Nama view
      * @since 1.0.3
      */
-    private $_view;
+    private $_view = array();
 
     /**
      * Instance dari kelas ini
@@ -54,7 +54,7 @@ class Controller
      */
     public static function getInstance()
     {
-        if(self::$_instance == null) {
+        if (self::$_instance == null) {
             self::$_instance = new static();
         }
         return self::$_instance;
@@ -87,10 +87,19 @@ class Controller
      */
     public function view($name, array $vars = array())
     {
-        $this->_view = array(
-            'name' => $name,
-            'vars' => $vars
-        );
+        if (empty($this->_view)) {
+            $this->_view = array(
+                'name' => $name,
+                'vars' => $vars
+            );
+        } else {
+            $info = $this->config('module_info');
+            $path = $info['module_dir'].'views'.DS.$name . '.php';
+            if (!file_exists($path)) {
+                throw new \Exception("View of module '$info[route]' is not found: $path", 404);
+            }
+            return $this->outputBuffering($path, $vars);
+        }
     }
 
     /**
@@ -112,39 +121,22 @@ class Controller
     }
 
     /**
-     * Membaca file PHP menggunakan buffer
-     * @since 1.0.0
-     * @param $path adalah lokasi file yang hendak dibaca
-     * @param $params adalah parameter tambahan yang hendak dimasukkan ke dalam file
-     * @return string hasil pembacaan buffer
-     */
-    public function render($path, $params = array())
-    {
-        ob_start();
-        if(!empty($params)) {
-            extract($params, EXTR_PREFIX_SAME, 'dj_');
-        }
-        if($return = include($path)) {
-            if($return != 1) {
-                return $return;
-            }
-        }
-        return ob_get_clean();
-    }
-
-    /**
      * Run output buffering to render the view
      * @param mixed $viewName string Name of the view
      * @param mixed $vars Array data to extract to the view
      * @return string Output buffering result from the view file
      */
-    public function outputBuffering($viewName, array $vars = null)
+    public function outputBuffering($viewName, array $vars = array())
     {
         ob_start();
         if (!empty($vars)) {
-            extract($vars);
+            extract($vars, EXTR_PREFIX_SAME, 'dj_');
         }
-        include $viewName;
+        if ($return = include($viewName)) {
+            if ($return != 1) {
+                return $return;
+            }
+        }
         return ob_get_clean();
     }
 
@@ -169,33 +161,12 @@ class Controller
     public function uri($i = null)
     {
         $uris = Route::getInstance()->uris;
-        if($i === null) {
+        if ($i === null) {
             return $uris;
         } else {
             if (isset($uris[$i])) {
                 return $uris[$i];
             }
-        }
-    }
-
-    /**
-     * Mengambil nilai parameter yang masuk melalui rute
-     * @since 1.0.0
-     * @param $var adalah nama indeks parameter berupa string
-     * @return nilai parameter
-     */
-    public function param($var = null)
-    {
-        $params = Route::getInstance()->url_params;
-        if($var !== null) {
-            if($this->config('route_format') == 'path') {
-                if(count($params) > 0)
-                    return is_numeric($var) ? $params[$var] : $params[array_search($var, $params)+1];
-            } else {
-                return $params[$var];
-            }
-        } else {
-            return $params;
         }
     }
 
@@ -236,7 +207,7 @@ class Controller
      */
     public function theme()
     {
-        if(func_num_args() == 0) {
+        if (func_num_args() == 0) {
             return $this->config('theme');
         } else {
             return $this->config('theme', func_get_arg(0));
@@ -253,7 +224,7 @@ class Controller
      */
     public function layout()
     {
-        if(func_num_args() == 0) {
+        if (func_num_args() == 0) {
             return $this->config('layout');
         } else {
             return $this->config('layout', func_get_arg(0));
@@ -289,7 +260,7 @@ class Controller
      */
     public function isPlugin($route) 
     {
-        if(preg_match('/^plugin\.([a-zA-Z0-9_\/\-]+)/i', $route, $match)) {
+        if (preg_match('/^plugin\.([a-zA-Z0-9_\/\-]+)/i', $route, $match)) {
             return $match[1];
         } else {
             return false;
@@ -306,11 +277,15 @@ class Controller
     public function import($route, $params = array(), $is_widget = false)
     {
         $is_plugin = false;
-        if($plugin = $this->isPlugin($route)) {
+        if ($plugin = $this->isPlugin($route)) {
             $route = $plugin;
             $is_plugin = true;
         }
-        $info = $route == $this->config('route') ? $this->config('module_info') : Route::getInstance()->getModuleInfo($route, $is_plugin, $is_widget);
+        if (!$is_widget) {
+            $info = $route == $this->config('route') ? $this->config('module_info') : Route::getInstance()->getModuleInfo($route, $is_plugin);
+        } else {
+            $info = Route::getInstance()->getModuleInfo($route, $is_plugin, true);
+        }
         return Hmvc::getInstance()->getViewContent($info, $params);
     }
 
@@ -323,10 +298,10 @@ class Controller
     public function getLayout($layout)
     {
         $path = $this->themeDir().$this->theme().'/'.$layout.'.php';
-        if(!file_exists($path)) {
+        if (!file_exists($path)) {
             throw new \Exception("Layout file not found in path $path", 404);
         }
-        return $this->render($path);
+        return $this->outputBuffering($path);
     }
 
     /**
@@ -335,9 +310,17 @@ class Controller
      * @param $element adalah ID elemen tujuan penempelan widget
      * @param $items adalah daftar widget yang akan ditempelkan dalam bentuk array
      */
-    public function widget($element, $items)
+    public function widget($element, $items = null)
     {
-        Asset::getInstance()->setWidget($element, $items);
+        if ($items !== null) {
+            Asset::getInstance()->setWidget($element, $items);
+        } else {
+            return $this->import($element, null, true);
+        }
     }
 
+    public function extract(array $data)
+    {
+        $this->_view['vars'] = array_merge($this->_view['vars'], $data);
+    }
 }
