@@ -12,36 +12,35 @@
 
 namespace Djokka;
 
+use Djokka\Helpers\Config;
 use Djokka\Helpers\String;
+use Djokka\Helpers\File;
 
 /**
  * Kelas pustaka yang bertugas untuk mengalamatkan dan mengalokasikan rute untuk modul berdasarkan URL
  * yang sedang diakses dan mengatur segala hal yang berhubungan dengan alamat URL
  */
-class Route
+class Route extends Shortcut
 {
-    use TShortcut;
-
     /**
-     * Menampung informasi modul yang sedang diakses
-     * @since 1.0.0
+     * Informasi URI (Uniform Resource Identifier) yang terkandung dalam URL
      */
-    private $modules = array();
+    private $_uris = array();
 
     /**
      * Informasi URI (Uniform Resource Identifier) yang terkandung dalam URL
      */
-    private $uri;
+    private $_uri;
 
     /**
      * Nama direktori project web
      */
-    private $path;
+    private $_path;
 
     /**
      * Alamat URL (Uniform Resource Locator) awal
      */
-    private $base_url;
+    private $_base_url;
 
     /**
      * @var Menampung instance dari kelas
@@ -70,9 +69,9 @@ class Route
     public function __construct()
     {
         // Mengisi properti yang dibutuhkan
-        $this->path = substr($_SERVER['SCRIPT_NAME'], 0, strrpos($_SERVER['SCRIPT_NAME'], '/'));
-        $this->uri = $this->getUri();
-        $this->base_url = $this->getBaseUrl();
+        $this->_path = substr($_SERVER['SCRIPT_NAME'], 0, strrpos($_SERVER['SCRIPT_NAME'], '/'));
+        $this->_uri = $this->getUri();
+        $this->_base_url = $this->getBaseUrl();
     }
 
     /**
@@ -95,7 +94,7 @@ class Route
      */
     public function getUrl()
     {
-        return $this->base_url.'/'.$this->uri;
+        return $this->_base_url.'/'.$this->_uri;
     }
 
     /**
@@ -106,7 +105,7 @@ class Route
     public function getUri()
     {
         $uri = explode('?', $_SERVER['REQUEST_URI'], 2);
-        return substr($uri[0], strlen($this->path.'/'), strlen($uri[0]));
+        return substr($uri[0], strlen($this->_path.'/'), strlen($uri[0]));
     }
 
     /**
@@ -133,7 +132,7 @@ class Route
     {
         switch ($this->config('route_format')) {
             case 'path':
-                $router = $this->uri;
+                $router = $this->_uri;
                 break;
             case 'get':
                 $router = $_GET[$this->config('get_router')];
@@ -146,7 +145,7 @@ class Route
         }
         $info = $this->getModuleInfo($router);
         //$this->url_params = $params;
-        $this->uris = explode('/', $this->uri);
+        $this->_uris = explode('/', $this->_uri);
         $this->config('module_info', $info);
         $this->config('module', $info['module']);
         $this->config('action', $info['action']);
@@ -237,7 +236,8 @@ class Route
             'dir'=>$dir,
             'path'=>$path,
             'module_dir'=>$module_dir,
-            'is_plugin'=>$is_plugin
+            'is_plugin'=>$is_plugin,
+            'is_widget'=>$is_widget
         );
     }
 
