@@ -107,12 +107,12 @@ class Html
      * Membuat elemen checkbox
      * @since 1.0.0
      * @param $name adalah atribut nama untuk elemen checkbox
-     * @param $value adalah atribut nilai untuk elemen checkbox
      * @param $label adalah teks label untuk elemen checkbox
+     * @param $value adalah atribut nilai untuk elemen checkbox
      * @param $options adalah parameter tambahan sebagai atribut elemen checkbox
      * @return skrip HTML elemen
      */
-    public function checkbox($name, $value, $label, $options = array())
+    public function checkbox($name, $label, $value, $options = array())
     {
         $options['name'] = $name;
         $options['type'] = 'checkbox';
