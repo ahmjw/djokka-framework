@@ -2,9 +2,9 @@
 
 namespace Djokka\Models;
 
-use Djokka\DataForm;
+use Djokka\Model;
 
-class Builder extends DataForm
+class Builder extends Model
 {
 	public $tableName;
 	public $className;
@@ -17,6 +17,10 @@ class Builder extends DataForm
 			array('className', 'regex', '/[A-Z][a-zA-Z0-9_]*/i'),
 			array('className', 'check')
 		);
+	}
+
+	public function labels()
+	{
 	}
 
 	public function check()
