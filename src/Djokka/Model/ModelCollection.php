@@ -13,6 +13,7 @@
 namespace Djokka\Model;
 
 use Djokka\Database\Connection;
+use Djokka\Route;
 
 /**
  * Kelas pendampingyang membantu kelas Djokka\Model untuk optimasi
@@ -64,7 +65,7 @@ class ModelCollection
      */
 	public function __get($property)
 	{
-		if($property == 'rows') {
+		if ($property == 'rows') {
 			$this->rows = array();
             while ($row = $this->_result->fetch_assoc()) {
                 $record = clone $this->_model;
@@ -80,8 +81,43 @@ class ModelCollection
         }
 	}
 
+    /**
+     * Mengambil hasil pembagi halaman
+     */
     public function getPager()
     {
         return $this->_model->getPager();
+    }
+
+    /**
+     * Menampilkan pembagi halaman
+     */
+    public function showPager()
+    {
+        $pager = $this->_model->getPager();
+        list($page, $num_page, $total) = $pager;
+
+        if ($num_page > 0) {
+            echo '<p>';
+            for ($i = 1; $i <= $num_page; $i++) {
+                if ($i != $page) {
+                    echo '<a href="'.Route::getInstance()->getUrl().'?page='.$i.'">'.$i.'</a>';
+                } else {
+                    echo '<b>'.$i.'</b>';
+                }
+                if ($i < $num_page) {
+                    echo ' | ';
+                }
+            }
+            echo '</p>';
+        }
+    }
+
+    /**
+     * Menghapus sekelompok data
+     */
+    public function delete()
+    {
+        $this->_model->getDriver('Crud')->deleteData($this->_model->table(), $this->_model->dataset('condition'));
     }
 }
