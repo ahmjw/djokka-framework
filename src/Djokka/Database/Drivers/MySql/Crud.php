@@ -14,33 +14,13 @@ namespace Djokka\Database\Drivers\MySql;
 use Djokka\Database\ICrud;
 use Djokka\Database\Connection;
 use Djokka\Model\ModelCollection;
+use Djokka\Model\TableCollection;
 
 /**
  * Menjalankan CRUD pada database MySQL
  */
-class Crud implements ICrud
+class Crud extends Query implements ICrud
 {
-    /**
-     * Data perintah SQL
-     */
-    private $_sql = array(
-        'select' => null,
-        'from'   => null,
-        'where'  => null,
-        'group'  => null,
-        'order'  => null,
-        'limit'  => null,
-        'insert' => null,
-        'update' => null,
-        'values' => null,
-        'query'  => null
-    );
-
-    /**
-     * Koneksi database
-     */
-    private $_connection;
-
     /**
      * Menampung instance dari kelas
      * @since 1.0.3
@@ -60,145 +40,80 @@ class Crud implements ICrud
         return self::$_instance;
     }
 
-    public function __construct()
+    public function insertImpl($model, array $availables = array())
     {
-        $this->_connection = Connection::getInstance();
-    }
-
-    /**
-     * Membentuk perintah SQL SELECT
-     * @param string $str Nama field yang akan disaring
-     * @return object
-     */
-    public function select($str = '*') 
-    {
-        $this->_sql['select'] = $str;
-        $this->_sql['query'] = 'SELECT '.$str;
-        return $this;
-    }
-
-    /**
-     * Membentuk perintah SQL FROM
-     * @param string $str Nama tabel yang akan disaring
-     * @return object
-     */
-    public function from($str) 
-    {
-        $this->_sql['from'] = $str;
-        $this->_sql['query'] .= ' FROM '.$str;
-        return $this;
-    }
-
-    /**
-     * Membentuk perintah SQL WHERE untuk penyaringan
-     * @return object
-     */
-    public function where($params = array()) 
-    {
-        $sql = $this->_sql['query'] . ' WHERE ';
-        if(is_array($params)) {
-            $criteria = $params[0];
-            $criterias = array_slice($params, 1);
-            $i = 0;
-            $where = preg_replace_callback('/\?/i', function($matches) use($criterias, &$i) {
-                $i++;
-                return "'".addslashes($criterias[$i-1])."'";
-            }, $criteria);
-            $sql .= $where;
-            $this->_sql['where'] = $where;
-        } else {
-            $sql .= $params;
-            $this->_sql['where'] = $params;
-        }
-        $this->_sql['query'] = $sql;
-        return $this;
-    }
-
-    /**
-     * Membentuk perintah SQL ORDER BY
-     * @param string $str Nama field yang akan diurutkan
-     * @return object
-     */
-    public function order($str) 
-    {
-        $this->_sql['order'] = $str;
-        $this->_sql['query'] .= ' ORDER BY '.$str;
-        return $this;
-    }
-
-    /**
-     * Membentuk perintah SQL GROUP BY
-     * @param string $str Nama field yang menjadi grup
-     * @return object
-     */
-    public function group($str) 
-    {
-        $this->_sql['group'] = $str;
-        $this->_sql['query'] .= ' GROUP BY '.$str;
-        return $this;
-    }
-
-    /**
-     * Membentuk perintah SQL LIMIT
-     * @param string $str Teks pembatas untuk membatasi data
-     * @return object
-     */
-    public function limit($str) 
-    {
-        $this->_sql['limit'] = $str;
-        $this->_sql['query'] .= ' LIMIT '.$str;
-        return $this;
-    }
-
-    /**
-     * Membentuk perintah SQL UPDATE
-     * @param array $data Data yang menjadi masukan untuk mengubah data
-     * @return object
-     */
-    public function update($data)
-    {
-        $sql = 'UPDATE '.$this->_sql['from'].' SET ';
-        if(is_array($data)) {
-            $count = count($data)-1;
-            $i = 0;
-            foreach ($data as $key => $value) {
-                $sql .= "$key = '".addslashes($value)."'";
-                if($i < $count) {
-                    $sql .= ', ';
+        $into = $values = null;
+        if (empty($availables)) {
+            $availables = array();
+            $data = TableCollection::getInstance()->table($model->table());
+            foreach ($data['fields'] as $field) {
+                if ($data['describe'][$field]['Extra'] != 'auto_increment' && isset($model->{$field})) {
+                    $availables[] = $field;
                 }
-                $i++;
             }
-        } else {
-            $sql .= $data;
         }
-        $this->_sql['query'] = $sql;
-        return $this;
+        $i = 0;
+        $count = count($availables) - 1;
+        foreach ($availables as $field) {
+            $into .= $field;
+            $values .=  "'".addslashes($model->{$field})."'";
+            if ($i < $count) {
+                $into .= ', ';
+                $values .= ', ';
+            }
+            $i++;
+        }
+
+        $this->from($model->table());
+        $this->insert($into, $values);
+        if ($resource = $this->execute()) {
+            $model->{$model->getPrimaryKey()} = $this->_connector->getConnection()->insert_id;
+            return $resource;
+        }
+        return false;
     }
 
-    /**
-     * Membentuk perintah SQL INSERT INTO
-     * @return object
-     */
-    public function insert() {
-        $sql = "INSERT INTO {$this->From} ";
-        switch (func_num_args()) {
-            case 0:
-                break;
-            case 1:
-                break;
-            case 2:
-                $sql .= '('.func_get_arg(0).') VALUES('.func_get_arg(1).')';
-                break;
+    public function updateImpl($model, array $availables = array())
+    {
+        if (empty($availables)) {
+            $data = TableCollection::getInstance()->table($model->table());
+            $fields = $data['fields'];
+            if ($fields == null) {
+                throw new \Exception("No field in update list", 500);
+            }
+            $availables = array();
+            foreach ($fields as $field) {
+                if (isset($model->{$field})) {
+                    $availables[] = $field;
+                }
+            }
         }
-        $this->Query = $sql;
-        return $this;
+
+        $set = null;
+        $count = count($availables) - 1;
+        $i = 0;
+
+        foreach ($availables as $field) {
+            $set .= $field." = '".addslashes($model->{$field})."'";
+            if ($i < $count) {
+                $set .= ', ';
+            }
+            $i++;
+        }
+        $this->from($model->table());
+        $this->update($set);
+        $this->where($model->dataset('condition'));
+        if ($resource = $this->execute()) {
+            return $resource;
+        }
+        return false;
     }
 
     /**
      * Mengambil jumlah data yang dihasilkan dari perintah SQL yang dijalankan
      * @return int
      */
-    public function count() 
+    public function countImpl() 
     {
         switch (func_num_args()) {
             case 0:
@@ -210,49 +125,6 @@ class Crud implements ICrud
                 return $this->where(func_get_arg(0))
                     ->execute()
                     ->fetch_object()->count;
-        }
-    }
-
-    /**
-     * Membentuk perintah SQL DELETE untuk menghapus data
-     * @return object
-     */
-    public function delete() 
-    {
-        $this->Query = 'DELETE ';
-        $this->From = ' FROM '.$this->From;
-        $this->Query .= $this->From;
-        $sql = '';
-        if(func_num_args() > 0) {
-            $args = func_get_args();
-            $sql .= ' WHERE ';
-            $criteria = $args[0];
-            $criterias = array_slice($args, 1);
-            $i = 0;
-            $connection = $this->connection;
-            $sql .= preg_replace_callback('/\?/i', function($matches) use($connection, $criterias, &$i) {
-                $i++;
-                return "'".addslashes($criterias[$i-1])."'";
-            }, $criteria);
-            $this->Query .= $sql;
-            $this->Where = $args;
-        } else {
-            $this->Query = $this->where($this->Where)->Query;
-        }
-        return $this;
-    }
-
-    /**
-     * Mengeksekusi perintah SQL
-     * @return object
-     */
-    public function execute() 
-    {
-        if($resource = $this->_connection->query($this->_sql['query'])) {
-            foreach ($this->_sql as $key => $value) {
-                $this->_sql[$key] = null;
-            }
-            return $resource;
         }
     }
 
@@ -304,6 +176,14 @@ class Crud implements ICrud
         }
     }
 
+    public function deleteImpl($tableName, $condition)
+    {
+        $this->from($tableName);
+        $this->_data['query'] = 'DELETE' . $this->_data['query'];
+        $this->where($condition);
+        return $this->execute();
+    }
+
     /**
      * Mengambil satu record/baris dari suatu tabel menggunakan model
      * @param string $tableName Nama tabel
@@ -312,13 +192,15 @@ class Crud implements ICrud
      * @since 1.0.3
      * @return object
      */
-	public function find($tableName, $primary_key, $params)
+	public function findImpl($model, $params)
 	{
-        $this->initSelection($tableName, $primary_key, $params);
+        $this->initSelection($model->table(), $model->getPrimaryKey(), $params);
+        $model->dataset('condition', $this->_data['where']);
         // Membaca record dari database
         $resource = $this->execute();
         if($row = $resource->fetch_assoc()) {
-            return $row;
+            $model->input($row);
+            return $model;
         }
 	}
 
@@ -330,7 +212,7 @@ class Crud implements ICrud
      * @since 1.0.3
      * @return mixed
      */
-    public function findData($tableName, $primary_key, $params)
+    public function findDataImpl($tableName, $primary_key, $params)
     {
         $this->initSelection($tableName, $primary_key, $params);
         // Membaca record dari database
@@ -350,7 +232,7 @@ class Crud implements ICrud
      * @since 1.0.3
      * @return array
      */
-    public function findAll($model, $params) 
+    public function findAllImpl($model, $params) 
     {
         $this->select(isset($params['select']) ? $params['select'] : '*');
         if(!isset($params['from'])){
@@ -373,7 +255,9 @@ class Crud implements ICrud
         }
 
         // Mengambil semua record dari database
-        $collection = new ModelCollection($this->_sql['query'], $model);
+        $collection = new ModelCollection($this->_data['query'], $model);
+        $model->dataset('condition', $this->_data['where']);
+        $this->clearData();
         return $collection;
     }
 
@@ -382,7 +266,7 @@ class Crud implements ICrud
      * @param object $model Object model
      * @return array
      */
-    public function getPager($model)
+    public function getPagerImpl($model)
     {
         $primary_key = $model->getPrimaryKey();
         if($primary_key !== null) {
@@ -393,10 +277,16 @@ class Crud implements ICrud
         }
 
         $sql = "SELECT " . $field . " FROM " . $model->table();
-        $resource = $this->_connection->query($sql);
+        $resource = $this->_connector->query($sql);
         $total = $resource->num_rows;
-        $num_page = ceil($total / $this->_pager['limit']);
-        return array($this->_pager['page'], $num_page, $total);
+        if (isset($this->_pager['limit'])) {
+            $num_page = ceil($total / $this->_pager['limit']);
+            $page = $this->_pager['page'];
+        } else {
+            $num_page = 0;
+            $page = 1;
+        }
+        return array($page, $num_page, $total);
     }
 
     private function initPager($data)
