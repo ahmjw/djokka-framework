@@ -5,7 +5,7 @@
 	'close'=>'</div>'
 ));
 if ($success) {
-	echo '<div class="alert alert-success">Module is created successfully</div>';
+	echo '<div class="alert alert-success">Global model is created successfully</div>';
 }
 ?>
 
