@@ -22,7 +22,7 @@ class Config
      * Menampung data konfigurasi web
      * @since 1.0.0
      */
-    private $data = array(
+    private $_data = array(
         // System path
         'theme_path'     => 'themes', // Lokasi folder tema
         'asset_path'     => 'assets', // Lokasi folder aset
@@ -111,7 +111,7 @@ class Config
             if($dir == '') {
                 $dir = String::getInstance()->unlastPart('\\', $_SERVER['SCRIPT_NAME']);
             }
-            $this->data['dir'] = preg_replace("/([\/\\\]+)/i", DS, $_SERVER['DOCUMENT_ROOT'].$dir).DS;
+            $this->_data['dir'] = preg_replace("/([\/\\\]+)/i", DS, $_SERVER['DOCUMENT_ROOT'].$dir).DS;
         }
     }
 
@@ -123,10 +123,10 @@ class Config
         $is_auto = false;
         if($dir === null) {
             $is_auto = true;
-            $dir = $this->data['dir'].DS.$this->data['app_path'].$this->data['config_path'].DS;
+            $dir = $this->_data['dir'].DS.$this->_data['app_path'].$this->_data['config_path'].DS;
         }
         $result = array();
-        $path = $dir.'main.php';
+        $path = $dir.'general.php';
         if(file_exists($path)) {
             $data = include($path);
             if(is_array($data)) {
@@ -188,7 +188,7 @@ class Config
      */
     public function merge($data = array())
     {
-         $this->data = array_merge($this->data, $data);
+         $this->_data = array_merge($this->_data, $data);
     }
 
     /**
@@ -197,9 +197,9 @@ class Config
      * @param $key adalah nama atribut konfigurasi
      * @return data konfigurasi
      */
-    public function exists($key)
+    public function isExists($key)
     {
-        return isset($this->data[$key]);
+        return isset($this->_data[$key]);
     }
 
     /**
@@ -214,7 +214,7 @@ class Config
      */
     public function getConfig()
     {
-        return $this->data;
+        return $this->_data;
     }
 
     /**
@@ -223,7 +223,7 @@ class Config
      */
     public function setConfig($data)
     {
-        $this->data = $data;
+        $this->_data = $data;
     }
 
     /**
@@ -233,8 +233,8 @@ class Config
      */
     public function getData($data)
     {
-        if(isset($this->data[$data])) {
-            return $this->data[$data];
+        if(isset($this->_data[$data])) {
+            return $this->_data[$data];
         }
         return;
     }
@@ -246,7 +246,18 @@ class Config
      */
     public function setData($data, $value)
     {
-        $this->data[$data] = $value;
+        $this->_data[$data] = $value;
     }
 
+    public function delete()
+    {
+        $params = func_get_arg(0);
+        if (!is_array($params)) {
+            unset($this->_data[$params]);
+        } else {
+            foreach ($params as $key) {
+                unset($this->_data[$key]);
+            }
+        }
+    }
 }
