@@ -30,18 +30,6 @@
   </button>
   <a class="navbar-brand" href="<?php echo $this->link('/index'); ?>?djokka=ide">Home</a>
 </div>
-
-<!-- Collect the nav links, forms, and other content for toggling -->
-<div class="collapse navbar-collapse navbar-ex1-collapse">
-  <ul class="nav navbar-nav">
-  </ul>
-  <form class="navbar-form navbar-right" role="search" action="">
-    <div class="form-group">
-      <input name="s" type="text" class="form-control" placeholder="Cari artikel di sini">
-    </div>
-    <button type="submit" class="btn btn-default">Cari</button>
-  </form>
-</div><!-- /.navbar-collapse -->
 </div>
 </nav>
 

@@ -32,7 +32,7 @@ class Builder extends Controller
 
 			$this->makePath($this->_dir, $config['config_path']);
 			$this->lib('File')->write($config_path.DS.'db.php', $this->renderCode('config_db'));
-			$this->lib('File')->write($config_path.DS.'main.php', $this->renderCode('config_main'));
+			$this->lib('File')->write($config_path.DS.'general.php', $this->renderCode('config_general'));
 			$this->lib('File')->write($config_path.DS.'routes.php', $this->renderCode('config_routes'));
 
 			$this->makePath($this->_dir, $config['model_path']);

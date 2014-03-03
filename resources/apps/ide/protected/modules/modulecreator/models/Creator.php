@@ -2,9 +2,9 @@
 
 namespace Djokka\Models;
 
-use Djokka\DataForm;
+use Djokka\Model;
 
-class Creator extends DataForm
+class Creator extends Model
 {
 	public $name;
 	public $dir;
@@ -15,6 +15,10 @@ class Creator extends DataForm
 			array('name', 'required, checkModule'),
 			array('name', 'regex', '/[a-z][a-zA-Z0-9]*(?:\/[a-z][a-zA-Z0-9]*)*/i'),
 		);
+	}
+
+	public function labels()
+	{		
 	}
 
 	public function checkModule()

@@ -66,7 +66,7 @@ class Modulecreator extends Controller
 
 		$temp = $this->makePath($temp, 'views');
 		$this->lib('File')->write($temp.DS.'index.php', "<h1>Index of ".$className."</h1>".
-			"\r\n\r\n<div class=\"alert alert-info\">This module is worked</div>");
+			"\r\n\r\n<div class=\"alert alert-info\">If you see this text, this module is works</div>");
 		return $dir;
 	}
 

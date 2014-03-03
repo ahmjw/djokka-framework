@@ -11,7 +11,7 @@ if ($success) {
 
 <form method="post">
 
-<div class="form-group">
+<div class="form-group clearfix">
 	<label for="input-name1" class="col-lg-3 control-label">Name <span class="text-danger">*</span> </label>
 	<div class="col-lg-9">
 		<input type="text" id="input-name1" class="form-control pull-left" name="name" placeholder="Module route (Example: <module>/<submodule>)" value="<?php echo $model->name; ?>" style="width:95%" />
