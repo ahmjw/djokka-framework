@@ -31,7 +31,7 @@ interface ICrud
      * @since 1.0.3
      * @return object
      */
-	public function find($tableName, $primary_key, $params);
+	public function findImpl($model, $params);
 
 	/**
      * Mengambil nilai field dari perintah SQL yang menyaring satu field
@@ -41,7 +41,7 @@ interface ICrud
      * @since 1.0.3
      * @return mixed
      */
-	public function findData($tableName, $primary_key, $params);
+	public function findDataImpl($tableName, $primary_key, $params);
 
 	/**
      * Mengambil lebih dari satu record/baris dari suatu tabel menggunakan model
@@ -50,12 +50,18 @@ interface ICrud
      * @since 1.0.3
      * @return array
      */
-	public function findAll($model, $params);
+	public function findAllImpl($model, $params);
+
+     public function deleteImpl($tableName, $condition);
+
+     public function updateImpl($model, array $availables = array());
+
+     public function insertImpl($model, array $availables = array());
 
 	/**
      * Mengambil data pembagian halaman
      * @param object $model Object model
      * @return array
      */
-	public function getPager($model);
+	public function getPagerImpl($model);
 }
