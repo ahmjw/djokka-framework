@@ -2,12 +2,12 @@
 
 /**
  * Memproses model yang terdapat di dalam modul
- * @since 1.0.0
+ * @since 1.0.3
  * @author Ahmad Jawahir <rawndummy@gmail.com>
  * @link http://www.djokka.com
  * @license http://creativecommons.org/licenses/by-nc-sa/4.0/deed.en_US
  * @copyright Copyright &copy; 2013 Djokka Media
- * @version 1.0.0
+ * @version 1.0.3
  */
 
 namespace Djokka;
@@ -32,21 +32,21 @@ abstract class ActiveRecord extends Model
      * Data penting yang dibutuhkan oleh model
      */
     public $_dataset = array(
-        'is_new'=>false,
-        'module'=>null,
-        'driver'=>null,
-        'params'=>array(),
-        'externals'=>array()
+        'is_new'     => false,
+        'module'     => null,
+        'driver'     => null,
+        'condition'  => null,
     );
 
     /**
      * Konstruktor kelas
      */
-    public function __construct() {
+    public function __construct()
+    {
         $this->preload();
     }
 
-    private function getDriver($name)
+    public function getDriver($name)
     {
         $class = $this->_dataset['driver'] . '\\' . $name;
         return $class::getInstance();
@@ -114,6 +114,23 @@ abstract class ActiveRecord extends Model
     }
 
     /**
+     * Mengecek status model, apakah menggunakan data lama atau data baru
+     * @return bool
+     */
+    public function isNew()
+    {
+        $this->_dataset['is_new'] = true;
+    }
+
+    /**
+     * Merubah status model menjadi model yang menggunakan data baru
+     */
+    public function setAsNew()
+    {
+        $this->_dataset['is_new'] = true;
+    }
+
+    /**
      * Mengambil nama field yang menjadi primary key dari tabel yang diwakili oleh model
      * @return string
      */
@@ -134,7 +151,7 @@ abstract class ActiveRecord extends Model
 
     /**
      * Mengambil teks label suatu properti/atribut/field model
-     * @since 1.0.0
+     * @since 1.0.3
      * @param $property adalah properti/atribut/field model yang akan diakses
      * @return nilai properti/atribut/field
      */
@@ -149,133 +166,54 @@ abstract class ActiveRecord extends Model
 
     /**
      * Melakukan operasi penyimpanan model (otomatis menentukan ditambah atau diubah)
-     * @since 1.0.0
+     * @since 1.0.3
      * @param $availables adalah Daftar field yang akan disimpan datanya
      * @return objek resource hasil operasi penyimpanan model
      */
-    public function save($availables = null)
+    public function save(array $availables = array())
     {
-        return $this->isNew() ? $this->insert($availables) : $this->update($availables);
+        return $this->_dataset['is_new'] ? $this->insert($availables) : $this->update($availables);
     }
 
     /**
      * Menambah data baru
-     * @since 1.0.0
+     * @since 1.0.3
      * @param optional $availables array Nama-nama field yang akan digunakan
      * @return boolean
      */
-    public function insert($availables = null)
+    public function insert(array $availables = array())
     {
-        if (!$this->isNew()) {
+        if (!$this->_dataset['is_new']) {
             throw new \Exception("This operation just active in new instance", 500);
         }
         if (!$this->validate()) {
             return false;
         }
-        $into = $values = null;
-        if ($availables === null) {
-            $availables = array();
-            $data = TableCollection::getInstance()->table($this->table());
-            foreach ($data['fields'] as $field) {
-                if ($data['describe'][$field]['Extra'] != 'auto_increment' && isset($this->{$field})) {
-                    $availables[] = $field;
-                }
-            }
-        }
-        $i = 0;
-        $count = count($availables) - 1;
-        foreach ($availables as $field) {
-            $into .= $field;
-            $values .=  "'".Db::getInstance()->getConnection()->real_escape_string($this->{$field})."'";
-            if ($i < $count) {
-                $into .= ', ';
-                $values .= ', ';
-            }
-            $i++;
-        }
-        if ($resource = $this->db()->insert($into, $values)->execute()) {
-            $this->{$this->getPrimaryKey()} = Db::getInstance()->getConnection()->insert_id;
-            return $resource;
-        }
-        return false;
+        return $this->getDriver('Crud')->insertImpl($this, $availables);
     }
 
     /**
      * Mengubah data lama
-     * @since 1.0.0
+     * @since 1.0.3
      * @param optional $availables array Nama-nama field yang akan digunakan
      * @return boolean
      */
-    public function update($availables = null)
+    public function update(array $availables = array())
     {
         if (!$this->validate()) {
             return false;
         }
-        if ($availables === null) {
-            $data = TableCollection::getInstance()->table($this->table());
-            $fields = $data['fields'];
-            if ($fields == null) {
-                throw new \Exception("No field in update list", 500);
-            }
-            $availables = array();
-            foreach ($fields as $field) {
-                if (isset($this->{$field})) {
-                    $availables[] = $field;
-                }
-            }
-        }
-
-        $set = null;
-        $count = count($availables) - 1;
-        $i = 0;
-        foreach ($availables as $field) {
-            $set .= $field." = '".Db::getInstance()->getConnection()->real_escape_string($this->{$field})."'";
-            if ($i < $count) {
-                $set .= ', ';
-            }
-            $i++;
-        }
-        if ($resource = $this->db()->update($set)->execute()) {
-            return $resource;
-        }
-        return false;
+        return $this->getDriver('Crud')->updateImpl($this, $availables);
     }
 
     /**
      * Menghapus suatu objek record model
-     * @since 1.0.0
+     * @since 1.0.3
      * @return objek resource hasil penghapusan record model
      */
     public function delete()
     {
-        return $this->db()->query($this->db()->delete()->Query);
-    }
-
-    /**
-     * Mengeksekusi perintah SQL dan mengikat hasilnya pada model
-     * @since 1.0.0
-     * @return object
-     */
-    public function query()
-    {
-        $args = func_get_args();
-        $model = null;
-        $args[0] = preg_replace_callback('/\{([a-zA-Z0-9_\/]*)\}/i', function($matches) use(&$model) {
-            $model = $this->load(trim($matches[1]), false);
-            return $model->table();
-        }, $args[0]);
-        $sql = Db::getInstance()->replaceWith($args);
-        // Membaca record dari database
-        $this->db()->Query = $sql;
-        $resource = $this->db()->execute();
-        if ($row = $resource->fetch_assoc()) {
-            $record = clone $model;
-            foreach ($row as $key => $value) {
-                $record->{$key} = stripslashes($value);
-            }
-            $resource->free_result();
-            return $record;
-        }
+        return $this->getDriver('Crud')->deleteImpl($this->table(), $this->dataset('condition'));
     }
 
     /**
@@ -286,52 +224,48 @@ abstract class ActiveRecord extends Model
      */
     public function count($condition = array())
     {
-        return $this->getDriver('Crud')->count($this->table(), $condition);
+        return $this->getDriver('Crud')->countImpl($this->table(), $condition);
     }
 
     /**
      * Mengambil nilai field dari perintah SQL yang menyaring satu field
-     * @since 1.0.0
+     * @since 1.0.3
      * @return int|string|float
      */
     public function findData()
     {
-        return $this->getDriver('Crud')->findData($this->table(), $this->getPrimaryKey(), func_get_args());
+        return $this->getDriver('Crud')->findDataImpl($this->table(), $this->getPrimaryKey(), func_get_args());
     }
 
     /**
      * Mengambil satu record/baris dari suatu tabel menggunakan model
-     * @since 1.0.0
+     * @since 1.0.3
      * @return object
      */
     public function find()
     {
-        $data = $this->getDriver('Crud')->find($this->table(), $this->getPrimaryKey(), func_get_args());
-        if (!empty($data)) {
-            $this->input($data);
-            return $this;
-        }
+        return $this->getDriver('Crud')->findImpl($this, func_get_args());
     }
 
     /**
      * Mengambil lebih dari satu record/baris dari suatu tabel menggunakan model
      * @param array $params Parameter tambahan untuk mengatur data yang dihasilkan
-     * @since 1.0.0
+     * @since 1.0.3
      * @return array
      */
     public function findAll(array $params = array())
     {
-        return $this->getDriver('Crud')->findAll($this, $params);
+        return $this->getDriver('Crud')->findAllImpl($this, $params);
     }
 
     public function getPager()
     {
-        return $this->getDriver('Crud')->getPager($this);
+        return $this->getDriver('Crud')->getPagerImpl($this);
     }
 
     public function db($from = null)
     {
-        $driver = $this->getDriver('Crud');
+        $driver = $this->getDriver('Query');
         if($from === null) {
             $driver->from($this->table());
         } else {
