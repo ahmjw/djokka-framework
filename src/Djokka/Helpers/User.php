@@ -58,25 +58,17 @@ class User
             case 0:
                 return $this->session('user');
             case 1:
-                $data = func_get_arg(0);
-                if(is_object($data)){
-                    $tmp = $data;
-                    $data = new \stdClass();
-                    foreach ($tmp as $key => $value) {
-                        $data->{$key} = $value;
-                    }
+                $data = new \stdClass();
+                foreach (func_get_arg(0) as $key => $value) {
+                    $data->{$key} = $value;
                 }
                 $this->session('user', $data);
                 break;
             case 2:
                 $type = func_get_arg(0);
-                $data = func_get_arg(1);
-                if(is_object($data)) {
-                    $tmp = $data;
-                    $data = new \stdClass();
-                    foreach ($tmp as $key => $value) {
-                        $data->{$key} = $value;
-                    }
+                $data = new \stdClass();
+                foreach (func_get_arg(1) as $key => $value) {
+                    $data->{$key} = $value;
                 }
                 Session::getInstance()->setData('user', array($type=>$data));
         }
@@ -86,9 +78,9 @@ class User
      * Mengosongkan atau menghapus data user web
      * @since 1.0.0
      */
-    public function clear()
+    public function delete()
     {
-        Session::get()->clear('user');
+        Session::getInstance()->delete('user');
     }
 
     /**
