@@ -85,6 +85,17 @@ class File
     }
 
     /**
+     * Mengambil lokasi folder aset
+     * @since 1.0.3
+     * @return string lokasi folder
+     */
+    public function assetDir()
+    {
+        return $this->realPath(Config::getInstance()->getData('dir') . DS . Config::getInstance()->getData('app_path') .
+            Config::getInstance()->getData('asset_path') . DS);
+    }
+
+    /**
      * Mengambil lokasi folder tema
      * @since 1.0.3
      * @return string lokasi folder
@@ -133,13 +144,12 @@ class File
      * @since 1.0.0
      * @param string $path Lokasi file di dalam folder web
      * @param string $content Teks yang akan dimasukkan ke dalam file tersebut
-     * @param array $params Parameter tambahan yang akan ditambahkan untuk penulisan
+     * @param string $mode Mode penulisan berkas
      * file
      */
-    public function write($path, $content, $params = array())
+    public function write($path, $content, $mode = 'w')
     {
         $dir = String::getInstance()->unlastPart(DS, $path);
-        $mode = isset($params['mode']) && !empty($params['mode']) ? $params['mode'] : 'w';
         if(!file_exists($dir))
             throw new \Exception("Directory not found in path $dir", 404);
         $handle = fopen($path, $mode);
@@ -201,10 +211,10 @@ class File
     /**
      * Mengunduh/download file dalam modus binary
      * @since 1.0.0
-     * @param $path adalah lokasi file pada folder web
-     * @param $name adalah nama ketika file didownload/diunduh
-     * @param $mime adalah MIME-type ketika file didownload/diunduh
-     * @return objek instance kelas
+     * @param string $path Lokasi file pada folder web
+     * @param string $name Nama ketika file didownload/diunduh
+     * @param string $mime MIME-type ketika file didownload/diunduh
+     * @return string
      */
     public function download($path, $name, $mime = 'application/octet-stream')
     {
@@ -235,16 +245,18 @@ class File
                     $realpath = $path.DS.$entry;
                     if(is_dir($realpath)) {
                         // Jika pembacaan hendak dilakukan secara rekursif
-                        if(isset($args['recursive']) && $args['recursive'] === true) {
-                            $files = $this->getFiles($realpath);
+                        if(isset($args['recursively']) && $args['recursively'] === true) {
+                            $files = $this->getFiles($realpath, $args);
                         } else {
-                            $this->getFiles($realpath);
+                            $this->getFiles($realpath, $args);
                         }
                     }
-                    if(isset($args['fullpath']) && $args['fullpath'] === true) {
-                        $files[] = $realpath;
-                    } else {
-                        $files[] = $entry;
+                    if(is_file($realpath)) {
+                        if(isset($args['full_path']) && $args['full_path'] === true) {
+                            $files[] = $realpath;
+                        } else {
+                            $files[] = $entry;
+                        }
                     }
                 }
             }
