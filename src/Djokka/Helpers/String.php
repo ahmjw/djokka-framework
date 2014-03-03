@@ -101,12 +101,12 @@ class String
 
     /**
      * Melakukan replace/ganti berdasarkan simbol dan pasangan data yang dimasukkan
-     * @param mixed $text string Teks yang akan diproses
      * @param mixed $symbol string|char Simbol yang akan diganti
+     * @param mixed $text string Teks yang akan diproses
      * @param mixed $params array Pasangan data yang akan menggantikan simbol berdasarkan urutan
      * @return string
      */
-    public function replaceWith($text, $symbol, $params)
+    public function replaceWith($symbol, $text, $params)
     {
         $i = 0;
         return preg_replace_callback('/\''.$symbol.'/i', function($matches) use($params, &$i) {
