@@ -48,22 +48,18 @@ class Connection
     }
 
     /**
-     * Menginisialisasi data
-     * @return object {@link Djokka\Db}
-     */
-    public function call() {
-        if(func_num_args() == 1) {
-            $this->From = func_get_arg(0);
-        }
-        return $this;
-    }
-
-    /**
      * Mengambil koneksi yang digunakan database
      * @return object
      */
-    public function getConnection() {
+    public function getConnection()
+    {
         return $this->_connection;
+    }
+
+    public function getDriver($name)
+    {
+        $class = __NAMESPACE__ . '\\Drivers\\' . $name;
+        return $class::getInstance();
     }
 
     /**
@@ -312,54 +308,4 @@ class Connection
             return $row;
         }
     }
-
-    /**
-     * Mengambil skema/struktur tabel
-     * @param mixed $table string Nama tabel yang akan diambil
-     * @return array
-     */
-    public function getTableSchema($table)
-    {
-        $this->From = $table;
-        if($desc = $this->desc()) {
-            $pkey = null;
-            $temp = array();
-            foreach ($desc as $schema) {
-                $field = null;
-                $info = array();
-                foreach ($schema as $key => $value) {
-                    if($key == 'Field') {
-                        $field = $value;
-                    } else {
-                        $info[$key] = $value;
-                        if($key == 'Key' && $value == 'PRI') {
-                            $pkey = $field;
-                        }
-                    }
-                }
-                $fields[] = $field;
-                $temp['schema'][$field] = $info;
-            }
-            $temp['fields'] = $fields;
-            $temp['primary_key'] = $pkey;
-            return $temp;
-        }
-    }
-
-    /**
-     * Mengambil daftar tabel yang terdapat di dalam database
-     * @return array
-     */
-    public function getTables()
-    {
-        $items = $this->getArrays('SHOW TABLES', true);
-        if(count($items) > 0) {
-            $tables = array();
-            foreach ($items as $item) {
-                $tables[] = $item[0];
-            }
-            return $tables;
-        }
-    }
-
 }
