@@ -22,6 +22,7 @@ use Djokka\View\Asset;
 use Djokka\Helpers\Config;
 use Djokka\Helpers\Session;
 use Djokka\Helpers\User;
+use Djokka\Helpers\File;
 use Djokka\Model\SchemaCollection;
 
 /**
@@ -63,7 +64,7 @@ class Shortcut
      */
     public function dataDir()
     {
-        return $this->realPath($this->config('dir').DS.$this->config('app_path').$this->config('data_path').DS);
+        return File::getInstance()->dataDir();
     }
 
     /**
@@ -73,7 +74,7 @@ class Shortcut
      */
     public function configDir()
     {
-        return $this->realPath($this->config('dir').DS.$this->config('app_path').$this->config('config_path').DS);
+        return File::getInstance()->configDir();
     }
 
     /**
@@ -83,7 +84,7 @@ class Shortcut
      */
     public function componentDir()
     {
-        return $this->realPath($this->config('dir').DS.$this->config('app_path').$this->config('component_path').DS);
+        return File::getInstance()->componentDir();
     }
 
     /**
@@ -93,7 +94,7 @@ class Shortcut
      */
     public function themeDir()
     {
-        return $this->realPath($this->config('dir').DS.$this->config('app_path').$this->config('theme_path').DS);
+        return File::getInstance()->themeDir();
     }
 
     /**
@@ -103,7 +104,7 @@ class Shortcut
      */
     public function assetDir()
     {
-        return $this->realPath($this->config('dir').DS.$this->config('app_path').$this->config('asset_path').DS);
+        return File::getInstance()->assetDir();
     }
 
     /**
@@ -113,7 +114,7 @@ class Shortcut
      */
     public function moduleDir()
     {
-        return $this->realPath($this->config('dir').DS.$this->config('app_path').$this->config('module_path').DS);
+        return File::getInstance()->moduleDir();
     }
 
     /**
@@ -123,7 +124,7 @@ class Shortcut
      */
     public function modelDir()
     {
-        return $this->realPath($this->config('dir').DS.$this->config('app_path').DS.$this->config('model_path').DS);
+        return File::getInstance()->modelDir();
     }
 
     /**
@@ -133,7 +134,7 @@ class Shortcut
      */
     public function pluginDir()
     {
-        return $this->realPath($this->config('dir').DS.$this->config('app_path').$this->config('plugin_path').DS);
+        return File::getInstance()->pluginDir();
     }
 
     /**
@@ -205,13 +206,13 @@ class Shortcut
     /**
      * Mengecek otorisasi suatu user web
      * @since 1.0.3
-     * @param $type adalah tipe user yang telah ditentukan untuk penyaringan
-     * @return boolean -> user telah terotorisasi atau belum
+     * @param string $type Tipe user yang telah ditentukan untuk penyaringan
+     * @return boolean
      */
-    public function authorized($type = null)
+    public function isAuth($type = null)
     {
         if ($type == null) {
-            return Session::getInstance()->exists('user');
+            return Session::getInstance()->isExists('user');
         } else {
             if ($data = $this->user($type)) {
                 return !empty($data);
@@ -304,7 +305,7 @@ class Shortcut
         $object = new $class;
         $object->dataset('module', $name);
         if ((bool)$is_new && $object instanceof ActiveRecord) {
-            $object->setNew();
+            $object->setAsNew();
             foreach ($object->schema('fields') as $field) {
                 if (!isset($object->{$field})) {
                     $object->{$field} = null;

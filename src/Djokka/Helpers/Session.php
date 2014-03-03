@@ -77,11 +77,17 @@ class Session
     /**
      * Fungsi ini digunakan untuk menghilangkan sesi dari sistem
      * @since 1.0.0
-     * @param $key adalah nama sesi yang tersimpan
      */
-    public function clear($key)
+    public function delete()
     {
-        unset($_SESSION['djokka'][$key]);
+        $params = func_get_arg(0);
+        if (!is_array($params)) {
+            unset($_SESSION['djokka'][$params]);
+        } else {
+            foreach ($params as $key) {
+                unset($_SESSION['djokka'][$key]);
+            }
+        }
     }
 
     /**
@@ -90,9 +96,8 @@ class Session
      * @param $key adalah nama properti sesi yang tersimpan
      * @return boolean status ada atau tidaknya sesi
      */
-    public function exists($key)
+    public function isExists($key)
     {
         return isset($_SESSION['djokka'][$key]);
     }
-
 }
