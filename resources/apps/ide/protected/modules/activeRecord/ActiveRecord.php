@@ -40,7 +40,7 @@ class ActiveRecord extends Controller
 		}
 
 		$tables = array(''=>'-- Select --');
-		$_tables = $this->lib('Db')->getTables();
+		$_tables = $this->lib('Db')->getDriver('MySql\\Table')->getTables();
 		if(!empty($_tables)) {
 			foreach ($_tables as $table) {
 				$tables[$table] = $table;
@@ -54,13 +54,13 @@ class ActiveRecord extends Controller
 				$labels = "return array(\r\n";
 				$rules = "return array(\r\n";
 				$required = $unique = $other = $others = $enum = '';
-				$schema = $this->lib('Db')->getTableSchema($model->tableName);
-				$count = count($schema['schema']);
+				$schema = $this->lib('Db')->getDriver('MySql\\Table')->getSchema($model->tableName);
+				$count = count($schema['describe']);
 				$pkey = $schema['primary_key'];
 				$i = 0;
-				foreach ($schema['schema'] as $field => $item) {
+				foreach ($schema['describe'] as $field => $item) {
 					$labels .= "\t\t\t'$field' => '" . $this->makeLabel($field) . "',\r\n";
-					if($item['Null'] == 'NO' && $item['Extra'] == 'auto_increment') {
+					if($item['Null'] == 'NO' && $item['Extra'] != 'auto_increment') {
 						$required .= $field;
 						if($i < $count - 1) {
 							$required .= ', ';
