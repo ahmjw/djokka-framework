@@ -98,15 +98,15 @@ class Boot extends Shortcut
      */
     public static function handleException(\Exception $e)
     {
-        if (Config::getInstance()->config('error_redirect') === true && $e->getCode() == 403) {
-            $page = Config::getInstance()->config('module').'/'.Config::getInstance()->config('action');
-            if ($page != $redirect = Config::getInstance()->config('module_forbidden')) {
+        if (Config::getInstance()->getData('error_redirect') === true && $e->getCode() == 403) {
+            echo 1;
+            $page = Config::getInstance()->getData('module').'/'.Config::getInstance()->getData('action');
+            if ($page != $redirect = Config::getInstance()->getData('module_forbidden')) {
                 Controller::getInstance()->redirect('/' . $redirect);
             } else {
                 $this->exceptionOutput($exception);
             }
         }
-        
         ob_end_clean();
         $path = SYSTEM_DIR . 'resources' . DIRECTORY_SEPARATOR . 'errors' . DIRECTORY_SEPARATOR . 'view.php';
         include_once($path);
