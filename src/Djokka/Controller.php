@@ -160,12 +160,12 @@ class Controller extends Shortcut
      */
     public function uri($i = null)
     {
-        $uris = Route::getInstance()->uris;
+        $uri_segments = Route::getInstance()->getUriSegments();
         if ($i === null) {
-            return $uris;
+            return $uri_segments;
         } else {
-            if (isset($uris[$i])) {
-                return $uris[$i];
+            if (isset($uri_segments[$i])) {
+                return $uri_segments[$i];
             }
         }
     }

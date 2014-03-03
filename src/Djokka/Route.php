@@ -25,7 +25,7 @@ class Route extends Shortcut
     /**
      * Informasi URI (Uniform Resource Identifier) yang terkandung dalam URL
      */
-    private $_uris = array();
+    private $_uri_segments = array();
 
     /**
      * Informasi URI (Uniform Resource Identifier) yang terkandung dalam URL
@@ -109,6 +109,16 @@ class Route extends Shortcut
     }
 
     /**
+     * Mengambil informasi URI dari URL yang sedang diakses
+     * @since 1.0.0
+     * @return string URI
+     */
+    public function getUriSegments()
+    {
+        return $this->_uri_segments;
+    }
+
+    /**
      * Mengambil alamat URL berdasarkan lokasi folder
      * @since 1.0.0
      * @param $path adalah lokasi folder yang ingin dijadikan URK
@@ -144,8 +154,7 @@ class Route extends Shortcut
             throw new \Exception("Page is not accessible", 500);
         }
         $info = $this->getModuleInfo($router);
-        //$this->url_params = $params;
-        $this->_uris = explode('/', $this->_uri);
+        $this->_uri_segments = explode('/', $this->_uri);
         $this->config('module_info', $info);
         $this->config('module', $info['module']);
         $this->config('action', $info['action']);
@@ -274,5 +283,4 @@ class Route extends Shortcut
             return $attr;
         }
     }
-
 }
