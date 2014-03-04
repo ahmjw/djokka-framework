@@ -46,6 +46,14 @@ class Shortcut
         return call_user_func(array(__NAMESPACE__ . '\\' . $class_map[$subclass], 'getInstance'));
     }
 
+    /**
+     *
+     */
+    public function defVal($data, $default)
+    {
+        return !empty($data) ? $data : $default;
+    }
+
 	/**
      * Mengamankan string dengan slashing dan HTML entitying
      * @since 1.0.3
