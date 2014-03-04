@@ -12,6 +12,8 @@
 
 namespace Djokka\Model;
 
+use Djokka\Database\Connection;
+
 /**
  * Kelas pendamping yang membantu kelas Djokka\Model untuk melakukan validasi terhadap data model
  */
@@ -300,11 +302,7 @@ class Validation
      */
     private function unique($model, $field, $params = array())
     {
-        $primary = $model->getPrimaryKey('primary');
-        $sql = 'SELECT COUNT('.$primary.') AS count FROM '.$model->table().
-            ' WHERE '.$field.' = ? AND '.$primary.' != ?';
-        $exists = $this('Db')->getArray(array($sql, $model->{$field}, $model->{$primary}));
-        if($exists['count'] > 0) {
+        if($model->count(array($field . ' = ?', $model->{$field})) > 0) {
             $message = isset($params['message']) ?
                 str_replace('{attr}', $model->label($field), $params['message']) :
                 $model->label($field).' is must be unique';
