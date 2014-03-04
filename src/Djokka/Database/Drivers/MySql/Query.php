@@ -87,7 +87,11 @@ class Query
     public function select($str = '*') 
     {
         $this->_data['select'] = $str;
-        $this->_data['query'] = 'SELECT '.$str;
+        $postpend = '';
+        if ($this->_data['query'] !== null) {
+            $postpend = $this->_data['query'];
+        }
+        $this->_data['query'] = 'SELECT ' . $str . $postpend;
         return $this;
     }
 
@@ -116,7 +120,7 @@ class Query
             $i = 0;
             $where = preg_replace_callback('/\?/i', function($matches) use($criterias, &$i) {
                 $i++;
-                return "'".addslashes($criterias[$i-1])."'";
+                return "'".addslashes($criterias[$i - 1])."'";
             }, $criteria);
             $sql .= $where;
             $this->_data['where'] = $where;
@@ -184,6 +188,9 @@ class Query
             }
         } else {
             $sql .= $data;
+        }
+        if ($this->_data['where'] !== null) {
+            $sql .= ' WHERE ' . $this->_data['where'];
         }
         $this->_data['query'] = $sql;
         return $this;
