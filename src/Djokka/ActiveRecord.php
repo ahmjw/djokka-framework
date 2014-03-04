@@ -119,7 +119,7 @@ abstract class ActiveRecord extends Model
      */
     public function isNew()
     {
-        $this->_dataset['is_new'] = true;
+        return $this->_dataset['is_new'];
     }
 
     /**
@@ -222,9 +222,9 @@ abstract class ActiveRecord extends Model
      * @since 1.0.3
      * @return int
      */
-    public function count($condition = array())
+    public function count()
     {
-        return $this->getDriver('Crud')->countImpl($this->table(), $condition);
+        return $this->getDriver('Crud')->countImpl($this->table(), $this->getPrimaryKey(), func_get_args());
     }
 
     /**
@@ -270,6 +270,9 @@ abstract class ActiveRecord extends Model
             $driver->from($this->table());
         } else {
             $driver->from($from);
+        }
+        if($this->_dataset['condition'] !== null) {
+            $driver->where($this->_dataset['condition']);
         }
         return $driver;
     }
