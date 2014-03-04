@@ -67,7 +67,9 @@ class Crud extends Query implements ICrud
         $this->from($model->table());
         $this->insert($into, $values);
         if ($resource = $this->execute()) {
-            $model->{$model->getPrimaryKey()} = $this->_connector->getConnection()->insert_id;
+            $pkey = $model->getPrimaryKey();
+            $model->{$pkey} = $this->_connector->getConnection()->insert_id;
+            $model->dataset('condition', array($pkey . ' =?', $model->{$pkey}));
             return $resource;
         }
         return false;
@@ -102,7 +104,9 @@ class Crud extends Query implements ICrud
         }
         $this->from($model->table());
         $this->update($set);
-        $this->where($model->dataset('condition'));
+        if ($model->dataset('condition') !== null) {
+            $this->where($model->dataset('condition'));
+        }
         if ($resource = $this->execute()) {
             return $resource;
         }
@@ -113,19 +117,19 @@ class Crud extends Query implements ICrud
      * Mengambil jumlah data yang dihasilkan dari perintah SQL yang dijalankan
      * @return int
      */
-    public function countImpl() 
+    public function countImpl($tableName, $primary_key, $params) 
     {
-        switch (func_num_args()) {
+        $this->from($tableName);
+        switch (count($params)) {
             case 0:
-                $this->select('COUNT(*) AS count');
-                return $this->execute()
-                    ->fetch_object()->count;
+                $this->select('COUNT('.$primary_key.') AS count');
+                break;
             case 1:
-                $this->select('COUNT(*) AS count');
-                return $this->where(func_get_arg(0))
-                    ->execute()
-                    ->fetch_object()->count;
+                $this->select('COUNT('.$primary_key.') AS count');
+                $this->where($params[0]);
+                break;
         }
+        return $this->execute()->fetch_object()->count;
     }
 
     private function initSelection($tableName, $primary_key, $params)
@@ -151,7 +155,7 @@ class Crud extends Query implements ICrud
         if($num_params > 0) {
             // Membentuk query SQL
             if(is_array($params[0])) {
-                $db = $this->select(isset($params[0]['select']) ? $params[0]['select'] : '*')
+                $this->select(isset($params[0]['select']) ? $params[0]['select'] : '*')
                     ->from($tableName);
                 if(isset($params[0]['where'])){
                     $this->where($params[0]['where']);
@@ -163,12 +167,12 @@ class Crud extends Query implements ICrud
                     $this->order($params[0]['order']);
                 }
             } else {
-                $db = $this->select($field)
+                $this->select($field)
                     ->from($tableName);
                 if($primary_key == null) {
                     throw new \Exception("This table or view doesn't have a primary key", 500);
                 }
-                $where = array($primary_key.'=?', $params[0]);
+                $where = array($primary_key.'=?', !$use_pk_opt ? $params[0] : $params);
                 $this->where($where);
             }
         } else {
@@ -275,9 +279,11 @@ class Crud extends Query implements ICrud
             $fields = $model->schema('fields');
             $field = $fields[0];
         }
-
-        $sql = "SELECT " . $field . " FROM " . $model->table();
-        $resource = $this->_connector->query($sql);
+        $this->select($field)->from($model->table());
+        if ($model->dataset('condition') !== null) {
+            $this->where($model->dataset('condition'));
+        }
+        $resource = $this->execute();
         $total = $resource->num_rows;
         if (isset($this->_pager['limit'])) {
             $num_page = ceil($total / $this->_pager['limit']);
