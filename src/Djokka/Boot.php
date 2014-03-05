@@ -1,43 +1,56 @@
 <?php
 
 /**
- * Melakukan boot/pemuatan sistem
- * @since 1.0.0
+ * Djokka Framework boot class file
+ * @since 1.0.1
  * @author Ahmad Jawahir <rawndummy@gmail.com>
  * @link http://www.djokka.com
  * @license http://creativecommons.org/licenses/by-nc-sa/4.0/deed.en_US
  * @copyright Copyright &copy; 2013 Djokka Media
  * @since 1.0.3
- * @version 1.0.3
  */
 
 namespace Djokka;
 
 use Djokka\Helpers\Config;
 
+/**
+ * Marks the file is loaded by system
+ */
 define('DJOKKA', true);
+
+/**
+ * Short constant for directory separator
+ */
 define('DS', DIRECTORY_SEPARATOR);
+
+/**
+ * Marks the error handling is activate or no
+ */
 defined('HANDLE_ERROR') or define('HANDLE_ERROR', false);
+
+/**
+ * Define the system directory or root directory of Djokka Framework
+ */
 define('SYSTEM_DIR', __DIR__ . DS . '..' . DS . '..' . DS);
 
 /**
- * Kelas pustaka yang digunakan untuk melakukan booting
+ * Boot class is using to booting system to run the website.
+ * @author Ahmad Jawahir <rawndummy@gmail.com>
+ * @since 1.0.3
  */
 class Boot extends Shortcut
 {
-    //use TShortcut;
-
     /**
-     * Instance dari kelas ini
-     * @since 1.0.0
+     * Instance of this class
+     * @since 1.0.1
      */
     private static $_instance;
 
     /**
-     * Mengambil instance kelas ini secara Singleton Pattern
-     * @since 1.0.0
-     * @param $class adalah nama kelas (opsional)
-     * @return objek instance kelas
+     * Get the instance of this class via Singleton Pattern
+     * @since 1.0.1
+     * @return object
      */
     public static function getInstance()
     {
@@ -48,8 +61,8 @@ class Boot extends Shortcut
     }
 
     /**
-     * Mengaktifkan semua otomatisasi pada sistem
-     * @since 1.0.0
+     * Register and activate autoloader and handler
+     * @since 1.0.1
      */
     public function registerAutoload()
     {
@@ -66,7 +79,7 @@ class Boot extends Shortcut
     }
 
     /**
-     * Mengambil error terakhir ketika proses berakhir
+     * Get the last error on the PHP shutting down
      * @since 1.0.3
      */
     public static function onShutdown()
@@ -77,13 +90,13 @@ class Boot extends Shortcut
     }
 
     /**
-     * Menangani error dan melemparnya sebagai Exception
-     * @param mixed $num Kode error
-     * @param mixed $str Pesan error
-     * @param mixed $file Lokasi berkas yang ditemukan error
-     * @param mixed $line Baris kode pada berkas yang ditemukan error
-     * @param optional $context Argumen atau parameter
-     * @throws \ErrorException untuk menjadikan error sebagai Exception
+     * Handle error and throw as exception
+     * @param int $num Error code
+     * @param string $str Error message
+     * @param string $file File path that has error
+     * @param int $line The line number in file that has error
+     * @param array $context Arguments from the PHP system
+     * @throws ErrorException to catch by exception handler
      * @since 1.0.3
      */
     public static function handleError($num, $str, $file, $line, $context = null)
@@ -92,8 +105,8 @@ class Boot extends Shortcut
     }
 
     /**
-     * Menampilkan Exception atau error sebagai HTML
-     * @param mixed $e object Instance object Exception
+     * Show the caught exception as HTML document
+     * @param object $e The exception object. The object must be instance of Exception class
      * @since 1.0.3
      */
     public static function handleException(\Exception $e)
@@ -114,39 +127,32 @@ class Boot extends Shortcut
     }
 
     /**
-     * Memuat secara otomatis suatu kelas pustaka, kontroller, model, dan komponen
-     * @since 1.0.0
-     * @param $class adalah nama kelas yang sedang dimuat
+     * Load the class file automatically on class instantiation.
+     * It will loads class file of model and component
+     * @since 1.0.1
+     * @param string $className Name of the class
      */
-    public function autoload($class)
+    public function autoload($className)
     {
         $path = null;
-        if (preg_match('/^'.__NAMESPACE__.'(.*)$/i', $class, $match)) {
-            $path = $this->realPath(__DIR__.$this->realPath($match[1]).'.php');
+        if (preg_match('/^[a-zA-Z0-9_]+Model$/i', $className, $match)) {
+            $path = $this->moduleDir().'models'.DIRECTORY_SEPARATOR.$className.'.php';
             if (!file_exists($path)) {
-                throw new \Exception("Class file not found in path $path", 404);
+                throw new \Exception("Model file not found at path $path", 404);
             }
-            include_once($path);
         } else {
-            if (preg_match('/^[a-zA-Z0-9_]+Model$/i', $class, $match)) {
-                $path = $this->moduleDir().'models'.DIRECTORY_SEPARATOR.$class.'.php';
-                if (!file_exists($path)) {
-                    throw new \Exception("Model file not found at path $path", 404);
-                }
-            } else {
-                $path = $this->componentDir().$class.'.php';
-                if (!file_exists($path)) {
-                    throw new \Exception("Component file not found at path $path", 404);
-                }
+            $path = $this->componentDir().$className.'.php';
+            if (!file_exists($path)) {
+                throw new \Exception("Component file not found at path $path", 404);
             }
-            include_once($path);
         }
+        include_once($path);
     }
 
     /**
-     * Bootloader, menjalankan sistem web
-     * @param string $route Rute modul yang langsung ingin dieksekusi
-     * @since 1.0.0
+     * Runs the website
+     * @param string $route Module route that wants to load directly
+     * @since 1.0.1
      */
     public function run($route = null)
     {
@@ -157,6 +163,11 @@ class Boot extends Shortcut
         View::getInstance()->renderOutput($route);
     }
 
+    /**
+     * Loads the internal application provided By Djokka Framework
+     * @since 1.0.3
+     * @return bool Returns TRUE if the internal applications is successfully loaded
+     */
     private function loadInternalApp()
     {
         if (isset($_GET['djokka']) && !empty($_GET['djokka'])) {
@@ -172,9 +183,10 @@ class Boot extends Shortcut
     }
 
     /**
-     * Menentukan konfigurasi awal sebelum web dijalankan
-     * @since 1.0.0
-     * @param $config adalah konfigurasi-konfigurasi dalam bentuk array
+     * Initialize the preload configurations
+     * @since 1.0.1
+     * @param array|string $config The preload configurations
+     * @return object Object of this class
      */
     public function init($config = null)
     {

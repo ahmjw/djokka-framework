@@ -1,14 +1,12 @@
 <?php
 
 /**
- * Mengontrol proses pada modul
+ * Djokka Framework parent controller class file
  * @since 1.0.0
  * @author Ahmad Jawahir <rawndummy@gmail.com>
  * @link http://www.djokka.com
  * @license http://creativecommons.org/licenses/by-nc-sa/4.0/deed.en_US
- * @copyright Copyright &copy; 2013 Djokka Media
- * @package \Djokka\
- * @version 1.0.1
+ * @copyright Copyright &copy; 2013-2014 Djokka Media
  */
 
 namespace Djokka;
@@ -22,35 +20,37 @@ use Djokka\Controller\Modular;
 use Djokka\Controller\Plugin;
 
 /**
- * Kelas pustaka yang bertugas mengontrol atau mengendalikan proses di dalam modul
+ * Parent class for all the module controller, not plugin module.
+ * This class will provides access to models and views. The controller class
+ * will control process inside a module.
+ * @author Ahmad Jawahir <rawndummy@gmail.com>
+ * @since 1.0.0
  */
 class Controller extends Shortcut
 {
-    //use TShortcut;
-
     /**
-     * Nama view
+     * Information of main view
      * @since 1.0.3
      */
     private $_view = array();
 
     /**
-     * Instance dari kelas ini
+     * Instance of the core controller class. The system maybe load much controller object,
+     * but only the core controller will set as main controller
      * @since 1.0.3
-     * @access private
      */
     private static $_core;
 
     /**
-     * Menampung instance dari kelas
-     * @since 1.0.1
+     * Instance of this class
+     * @since 1.0.0
      */
     private static $_instance;
 
     /**
-     * Mengambil instance secara Singleton Pattern
-     * @since 1.0.1
-     * @return objek instance kelas
+     * Get the instance of this class via Singleton Pattern
+     * @since 1.0.0
+     * @return object Object of this class
      */
     public static function getInstance()
     {
@@ -61,7 +61,7 @@ class Controller extends Shortcut
     }
 
     /**
-     * Mengambil instance kelas induk kontroller
+     * Get the core controller instance
      * @since 1.0.3
      * @return object
      */
@@ -71,19 +71,22 @@ class Controller extends Shortcut
     }
 
     /**
-     * Menentukan suatu kelas anak sebagai kelas induk kontroller
+     * Set the controller object as core controller instance
      * @since 1.0.3
-     * @param $core adalah instance kelas anak
+     * @param object $core The controller class object. The object must be
+     * instance of Djokka\Controller class
      */
-    public static function setCore($core)
+    public static function setCore(Controller $core)
     {
         self::$_core = $core;
     }
 
     /**
-     * Memanggil bagian view yang akan dijadikan konten
-     * @param string $name Nama view yang akan dipanggil
-     * @param array $vars Data yang akan diekstrak ke view tersebut
+     * Sets the main view or loads the view
+     * @param string $name Name of the view file without extension
+     * @param array $vars The data that wants to extract to the view from controller
+     * @return void|string
+     * @since 1.0.0
      */
     public function view($name, array $vars = array())
     {
@@ -103,8 +106,9 @@ class Controller extends Shortcut
     }
 
     /**
-     * Mengecek apakah modul menggunakan view atau tidak
-     * @return boolean
+     * Checks the controller is use view or no
+     * @since 1.0.3
+     * @return bool Returns TRUE if core controller is use view
      */
     public function isUseView()
     {
@@ -112,8 +116,9 @@ class Controller extends Shortcut
     }
 
     /**
-     * Memanggil data view
-     * @deprecated
+     * Get the view information
+     * @return array
+     * @since 1.0.0
      */
     public function getView()
     {
@@ -122,9 +127,10 @@ class Controller extends Shortcut
 
     /**
      * Run output buffering to render the view
-     * @param mixed $viewName string Name of the view
-     * @param mixed $vars Array data to extract to the view
-     * @return string Output buffering result from the view file
+     * @param string $viewName Name of the view file without extension
+     * @param array $vars Data that wants to extract to the view
+     * @return string
+     * @since 1.0.3
      */
     public function outputBuffering($viewName, array $vars = array())
     {
@@ -141,11 +147,9 @@ class Controller extends Shortcut
     }
 
     /**
-     * Mengambil atau menentukan konten web
+     * Get the core controller's view content
      * @since 1.0.0
-     * @param - Jika tanpa parameter, maka dia memberikan konten web
-     * - Jika memasukkan satu parameter, maka dia menentukan konten web
-     * @return string konten web | void
+     * @return string
      */
     public function getContent()
     {
@@ -153,10 +157,10 @@ class Controller extends Shortcut
     }
 
     /**
-     * Mengambil potongan URL
+     * Get an URI segment or all segments
      * @since 1.0.0
-     * @param $i adalah indeks potongan URL yang berupa angka
-     * @return string potongan URL
+     * @param int $i Index of the URI segment
+     * @return array|string
      */
     public function uri($i = null)
     {
@@ -171,8 +175,8 @@ class Controller extends Shortcut
     }
 
     /**
-     * Memasukkan kode Javascript ke badan HTML
-     * @param mixed $code string Kode Javascript yang akan dimasukkan
+     * Puts the Javascript code to body of layout HTML document
+     * @param string $code Javascript code
      * @since 1.0.0
      */
     public function js($code) {
@@ -180,8 +184,8 @@ class Controller extends Shortcut
     }
 
     /**
-     * Memasukkan kode CSS ke badan HTML
-     * @param mixed $code string Kode CSS yang akan dimasukkan
+     * Puts the CSS code to body of layout HTML document
+     * @param string $code CSS code
      * @since 1.0.0
      */
     public function css($code) {
@@ -189,8 +193,8 @@ class Controller extends Shortcut
     }
 
     /**
-     * Memasukkan link untuk berkas Javascript atau CSS
-     * @param mixed $url string Lokasi berkas yang akan dimasukkan
+     * Puts the link of Javascript or CSS file to the layout HTML document
+     * @param string $url URL of the Javascript or CSS file
      * @since 1.0.0
      */
     public function asset($url) {
@@ -198,29 +202,23 @@ class Controller extends Shortcut
     }
 
     /**
-     * Mengambil atau menentukan nama tema yang sedang aktif
+     * Sets or gets the website theme
      * @since 1.0.0
-     * @param - Jika tanpa parameter, maka dia akan memberikan nama tema
-     * - Jika memasukkan satu parameter, maka dia akan menentukan tema yang
-     *   sedang aktif.
-     * @return string nama tema | void
+     * @return void|string
      */
     public function theme()
     {
         if (func_num_args() == 0) {
             return $this->config('theme');
         } else {
-            return $this->config('theme', func_get_arg(0));
+            $this->config('theme', func_get_arg(0));
         }
     }
 
     /**
-     * Mengambil atau menentukan nama layout yang sedang aktif
+     * Sets or gets the website layout
      * @since 1.0.0
-     * @param - Jika tanpa parameter, maka dia akan memberikan nama layout
-     * - Jika memasukkan satu parameter, maka dia akan menentukan layout yang
-     *   sedang aktif.
-     * @return string nama layout | void
+     * @return void|string
      */
     public function layout()
     {
@@ -232,10 +230,10 @@ class Controller extends Shortcut
     }
 
     /**
-     * Mengambil lokasi URL basis/root web
+     * Gets the base URL
      * @since 1.0.0
-     * @param $url adalah tambahan ke belakang alamat URL
-     * @return string lokasi URL
+     * @param string $url The string that will appends to the base URL
+     * @return string
      */
     public function baseUrl($url = null)
     {
@@ -243,20 +241,20 @@ class Controller extends Shortcut
     }
 
     /**
-     * Memanggil plugin
-     * @since 1.0.1
-     * @param string $name Nama plugin yang akan dipanggil
-     * @return string Konten plugin
+     * Calls the plugin module
+     * @since 1.0.0
+     * @param string $name Name of the plugin module
+     * @return string
      */
-    public function plugin($name) 
+    public function plugin($pluginName) 
     {
-        return $this->import('plugin.'.$name);
+        return $this->import('plugin.' . $pluginName);
     }
 
     /**
-     * Mengecek status suatu modul, apakah termasuk plugin atau modul biasa
-     * @param string $route Rute modul yang akan dicek
-     * @return boolean
+     * Checks the module is plugin or not
+     * @param string $route Route of the module that wants to check
+     * @return bool Returns TRUE if the module is plugin
      */
     public function isPlugin($route) 
     {
@@ -268,13 +266,14 @@ class Controller extends Shortcut
     }
 
     /**
-     * Memanggil atau mengeksekusi suatu aksi/modul
+     * Calls and executes the other module
      * @since 1.0.0
-     * @param string $route adalah alamat aksi/modul yang akan dieksekusi
-     * @param array $params adalah parameter tambahan yang dimasukkan ke dalam aksi/modul
-     * @return string berupa hasil pembacaan bagian view
+     * @param string $route Route of the module that wants to call
+     * @param array $params Paremeter that needs by the module
+     * @param bool $is_widget Marks the module call as a widget or not
+     * @return string
      */
-    public function import($route, $params = array(), $is_widget = false)
+    public function import($route,$params = null, $is_widget = false)
     {
         $is_plugin = false;
         if ($plugin = $this->isPlugin($route)) {
@@ -290,14 +289,14 @@ class Controller extends Shortcut
     }
 
     /**
-     * Membaca konten layout
-     * @param string $layout Nama layout yang akan dibaca
+     * Gets the content of layout file
+     * @param string $layoutName Name of the layout file without extension
      * @since 1.0.0
-     * @return string konten layout
+     * @return string
      */
-    public function getLayout($layout)
+    public function getLayout($layoutName)
     {
-        $path = $this->themeDir().$this->theme().'/'.$layout.'.php';
+        $path = $this->themeDir().$this->theme().'/'.$layoutName.'.php';
         if (!file_exists($path)) {
             throw new \Exception("Layout file not found in path $path", 404);
         }
@@ -305,10 +304,11 @@ class Controller extends Shortcut
     }
 
     /**
-     * Memuat suatu widget dan menempelkannya pada suatu elemen HTML
+     * Calls the widget or append the result to HTML document
      * @since 1.0.0
-     * @param $element adalah ID elemen tujuan penempelan widget
-     * @param $items adalah daftar widget yang akan ditempelkan dalam bentuk array
+     * @param string $element ID of the HTML element that became append target
+     * @param mixed $items The widget module or list of widget modules
+     * @return string|void
      */
     public function widget($element, $items = null)
     {
@@ -319,6 +319,11 @@ class Controller extends Shortcut
         }
     }
 
+    /**
+     * Extracts extended data from controller to the view
+     * @param array $data Data that wants to extract
+     * @since 1.0.3
+     */
     public function extract(array $data)
     {
         $this->_view['vars'] = array_merge($this->_view['vars'], $data);
