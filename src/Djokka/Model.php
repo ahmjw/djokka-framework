@@ -1,13 +1,12 @@
 <?php
 
 /**
- * Memproses model yang terdapat di dalam modul
+ * Djokka Framework model class file
  * @since 1.0.0
  * @author Ahmad Jawahir <rawndummy@gmail.com>
  * @link http://www.djokka.com
  * @license http://creativecommons.org/licenses/by-nc-sa/4.0/deed.en_US
  * @copyright Copyright &copy; 2013 Djokka Media
- * @version 1.0.0
  */
 
 namespace Djokka;
@@ -19,21 +18,13 @@ use Djokka\Model\Validation;
 use Djokka\Helpers\String;
 
 /**
- * Kelas pustaka yang bertugas untuk memproses dan mengendalikan model yang terdapat di dalam suatu modul
+ * This class is parent of all model classes including active record classes. This class
+ * will provides the validation library for model.
+ * @author Ahmad Jawahir <rawndummy@gmail.com>
+ * @since 1.0.0
  */
 abstract class Model extends Shortcut
 {
-    //use TShortcut;
-    
-    /**
-     * Data penting yang dibutuhkan oleh model
-     */
-    protected $_dataset = array(
-        'is_new'=>true,
-        'module'=>null,
-        'params'=>array(),
-    );
-
     /**
      * Fungsi yang digunakan untuk menetapkan label-label yang digunakan oleh model
      * @return array
