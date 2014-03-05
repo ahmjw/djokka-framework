@@ -123,7 +123,8 @@ class Config
         $is_auto = false;
         if($dir === null) {
             $is_auto = true;
-            $dir = $this->_data['dir'].DS.$this->_data['app_path'].$this->_data['config_path'].DS;
+            $dir = $this->_data['dir'].$this->_data['app_path'].$this->_data['config_path'].DS;
+            $dir = File::getInstance()->realPath($dir);
         }
         $result = array();
         $path = $dir.'general.php';
