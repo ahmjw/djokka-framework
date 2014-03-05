@@ -1,13 +1,12 @@
 <?php
 
 /**
- * Memproses model yang terdapat di dalam modul
- * @since 1.0.3
+ * Djokka Framework active record class file
+ * @since 1.0.1
  * @author Ahmad Jawahir <rawndummy@gmail.com>
  * @link http://www.djokka.com
  * @license http://creativecommons.org/licenses/by-nc-sa/4.0/deed.en_US
- * @copyright Copyright &copy; 2013 Djokka Media
- * @version 1.0.3
+ * @copyright Copyright &copy; 2013-2014 Djokka Media
  */
 
 namespace Djokka;
@@ -18,20 +17,25 @@ use Djokka\Model\Validation;
 use Djokka\Helpers\String;
 
 /**
- * Kelas pustaka yang bertugas untuk memproses dan mengendalikan model yang terdapat di dalam suatu modul
+ * Parent class for all model with database connection, that call as Active Record.
+ * This class will provides the record access to your database and validate before saving changes.
+ * @author Ahmad Jawahir <rawndummy@gmail.com>
+ * @since 1.0.1
  */
 abstract class ActiveRecord extends Model
 {
     /**
-     * Fungsi yang digunakan untuk menetapkan nama tabel yang diwakili oleh model
+     * Declare the table name for model abstraction
+     * @since 1.0.3
      * @return string
      */
     abstract function table();
 
     /**
-     * Data penting yang dibutuhkan oleh model
+     * Important information for model to works
+     * @since 1.0.3
      */
-    public $_dataset = array(
+    protected $_dataset = array(
         'is_new'     => false,
         'module'     => null,
         'driver'     => null,
@@ -39,13 +43,21 @@ abstract class ActiveRecord extends Model
     );
 
     /**
-     * Konstruktor kelas
+     * This class constructor
+     * @since 1.0.1
      */
     public function __construct()
     {
         $this->preload();
     }
 
+    /**
+     * Getting the driver subclass object by default connection
+     * @param string $name Name of the subclass name.
+     * The subclass name that you can put is: Table and Query
+     * @since 1.0.3
+     * @return object Subclass object of Djokka\Database\Drivers\[Driver name]\[Subclass name]
+     */
     public function getDriver($name)
     {
         $class = $this->_dataset['driver'] . '\\' . $name;
@@ -53,7 +65,8 @@ abstract class ActiveRecord extends Model
     }
 
     /**
-     * Memasukkan data model ke dalam pemetaan
+     * Loads the table schema and store to the table collector object
+     * @since 1.0.1
      */
     private function preload()
     {
@@ -91,9 +104,9 @@ abstract class ActiveRecord extends Model
     }
 
     /**
-     * Mengambil skema tabel yang digunakan oleh model
-     * @param optional $use_module boolean menentukan apakah pencarian menggunakan module
-     * @return array
+     * Access the table schema that stored in table collector
+     * @since 1.0.2
+     * @return mixed
      */
     public function schema()
     {
@@ -114,8 +127,10 @@ abstract class ActiveRecord extends Model
     }
 
     /**
-     * Mengecek status model, apakah menggunakan data lama atau data baru
-     * @return bool
+     * Checking the model status
+     * @return bool Marks as new record if returns TRUE and marks as exists record
+     * if returns FALSE
+     * @since 1.0.1
      */
     public function isNew()
     {
@@ -123,7 +138,8 @@ abstract class ActiveRecord extends Model
     }
 
     /**
-     * Merubah status model menjadi model yang menggunakan data baru
+     * Directly change the model status as new record
+     * @since 1.0.1
      */
     public function setAsNew()
     {
@@ -131,8 +147,9 @@ abstract class ActiveRecord extends Model
     }
 
     /**
-     * Mengambil nama field yang menjadi primary key dari tabel yang diwakili oleh model
+     * Get the primary key of the table
      * @return string
+     * @since 1.0.1
      */
     public function getPrimaryKey()
     {
@@ -141,8 +158,9 @@ abstract class ActiveRecord extends Model
     }
 
     /**
-     * Menetapkan nama field yang menjadi primary key dari tabel yang diwakili oleh model
-     * @param mixed $key string Nama field
+     * Set the primary key of the table if has no primary key
+     * @param string $key Field name of table
+     * @since 1.0.1
      */
     public function setPrimaryKey($key)
     {
@@ -150,25 +168,26 @@ abstract class ActiveRecord extends Model
     }
 
     /**
-     * Mengambil teks label suatu properti/atribut/field model
-     * @since 1.0.3
-     * @param $property adalah properti/atribut/field model yang akan diakses
-     * @return nilai properti/atribut/field
+     * Get the field label of model
+     * @param string $field Name of model field
+     * @since 1.0.1
+     * @return string
      */
-    public function label($property = null)
+    public function label($field = null)
     {
         if ($this->schema() != null) {
-            return isset($this->schema()->Labels[$property]) ? $this->schema()->Labels[$property] : ucfirst($property);
+            return isset($this->schema()->Labels[$field]) ? $this->schema()->Labels[$field] : ucfirst($field);
         } else {
-            return ucfirst($property);
+            return ucfirst($field);
         }
     }
 
     /**
-     * Melakukan operasi penyimpanan model (otomatis menentukan ditambah atau diubah)
-     * @since 1.0.3
-     * @param $availables adalah Daftar field yang akan disimpan datanya
-     * @return objek resource hasil operasi penyimpanan model
+     * Save the record automatically. The record will inserting if marks as new recod and
+     * the record will be updating if marks as exists record
+     * @param array $availables Declare manually that fields wants to apply
+     * @since 1.0.1
+     * @return bool Returns TRUE if saving succeed and FALSE if saving fails
      */
     public function save(array $availables = array())
     {
@@ -176,10 +195,10 @@ abstract class ActiveRecord extends Model
     }
 
     /**
-     * Menambah data baru
-     * @since 1.0.3
-     * @param optional $availables array Nama-nama field yang akan digunakan
-     * @return boolean
+     * Inserting the new record
+     * @param array $availables Declare manually that fields wants to apply
+     * @since 1.0.1
+     * @return bool Returns TRUE if inserting succeed and FALSE if inserting fails
      */
     public function insert(array $availables = array())
     {
@@ -193,10 +212,10 @@ abstract class ActiveRecord extends Model
     }
 
     /**
-     * Mengubah data lama
-     * @since 1.0.3
-     * @param optional $availables array Nama-nama field yang akan digunakan
-     * @return boolean
+     * Updating the exists record
+     * @param array $availables Declare manually that fields wants to apply
+     * @since 1.0.1
+     * @return bool Returns TRUE if updating succeed and FALSE if updating fails
      */
     public function update(array $availables = array())
     {
@@ -207,9 +226,10 @@ abstract class ActiveRecord extends Model
     }
 
     /**
-     * Menghapus suatu objek record model
-     * @since 1.0.3
-     * @return objek resource hasil penghapusan record model
+     * Deleting the exists record. Before use this function, load the exists record with
+     * function find().
+     * @since 1.0.1
+     * @return bool Returns TRUE if deleting succeed and FALSE if deleting fails
      */
     public function delete()
     {
@@ -217,9 +237,8 @@ abstract class ActiveRecord extends Model
     }
 
     /**
-     * Mengambil jumlah data yang tertampung di dalam model
-     * @param mixed $params Kondisi untuk melakukan filter
-     * @since 1.0.3
+     * Counts the records
+     * @since 1.0.1
      * @return int
      */
     public function count()
@@ -228,8 +247,8 @@ abstract class ActiveRecord extends Model
     }
 
     /**
-     * Mengambil nilai field dari perintah SQL yang menyaring satu field
-     * @since 1.0.3
+     * Get a field or single value
+     * @since 1.0.2
      * @return int|string|float
      */
     public function findData()
@@ -238,9 +257,9 @@ abstract class ActiveRecord extends Model
     }
 
     /**
-     * Mengambil satu record/baris dari suatu tabel menggunakan model
+     * Get a record from table
      * @since 1.0.3
-     * @return object
+     * @return object Object of model contains record
      */
     public function find()
     {
@@ -248,21 +267,32 @@ abstract class ActiveRecord extends Model
     }
 
     /**
-     * Mengambil lebih dari satu record/baris dari suatu tabel menggunakan model
-     * @param array $params Parameter tambahan untuk mengatur data yang dihasilkan
-     * @since 1.0.3
-     * @return array
+     * Get records from table and store as model collection
+     * @param array $params Options for filter the record
+     * @since 1.0.1
+     * @return object Object of Djokka\Model\ModelCollection
      */
     public function findAll(array $params = array())
     {
         return $this->getDriver('Crud')->findAllImpl($this, $params);
     }
 
+    /**
+     * Get the paging information
+     * @since 1.0.3
+     * @return array Results sequentially as: [0] page number, [1] count of pages and [2] total records
+     */
     public function getPager()
     {
         return $this->getDriver('Crud')->getPagerImpl($this);
     }
 
+    /**
+     * Load the database driver subclass 'Query' to runs the query builder
+     * @param string $from Specified the table name or joins with other table
+     * @since 1.0.1
+     * @return object Object of class Djokka\Driver\[Driver name]\Query
+     */
     public function db($from = null)
     {
         $driver = $this->getDriver('Query');
