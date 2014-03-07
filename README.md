@@ -13,7 +13,7 @@ Djokka Framework is PHP Framework using HMVC (Hierarchical Model-View-Controller
 │   │   ├── views
 │   │   │   ├── index.php
 │   │   │   └── form.php
-│   │   ├── models
+│   │   ├── models (Local model)
 │   │   │   └── SigninForm.php
 │   │   └── modules
 │   │       ├── comment (Sub-module)
@@ -29,12 +29,12 @@ Djokka Framework is PHP Framework using HMVC (Hierarchical Model-View-Controller
 │       ├── views
 │       │   ├── index.php
 │       │   └── form.php
-│       └── models
+│       └── models (Local model)
 │           └── SignupForm.php
 └── models (Global model)
-   ├── Blog.php
-   ├── Comment.php
-   └── Category.php
+    ├── Blog.php
+    ├── Comment.php
+    └── Category.php
 ```
 
 This is an example hierarchical module. There is 2 module in root, blog and member. A module is has controller and can has views and models.
