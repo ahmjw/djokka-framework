@@ -175,8 +175,9 @@ abstract class ActiveRecord extends Model
      */
     public function label($field = null)
     {
-        if ($this->schema() != null) {
-            return isset($this->schema()->Labels[$field]) ? $this->schema()->Labels[$field] : ucfirst($field);
+        $schema = $this->schema();
+        if ($schema !== null && isset($schema[$field])) {
+            return  $schema['fields'][$field];
         } else {
             return ucfirst($field);
         }
