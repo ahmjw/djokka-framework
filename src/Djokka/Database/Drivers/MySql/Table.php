@@ -3,7 +3,6 @@
 namespace Djokka\Database\Drivers\MySql;
 
 use Djokka\Db;
-use Djokka\Database\Connection;
 
 class Table
 {

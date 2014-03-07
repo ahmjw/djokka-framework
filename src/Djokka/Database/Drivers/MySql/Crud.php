@@ -12,7 +12,6 @@
 namespace Djokka\Database\Drivers\MySql;
 
 use Djokka\Database\ICrud;
-use Djokka\Database\Connection;
 use Djokka\Model\ModelCollection;
 use Djokka\Model\TableCollection;
 

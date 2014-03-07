@@ -40,7 +40,7 @@ class ActiveRecord extends Controller
 		}
 
 		$tables = array(''=>'-- Select --');
-		$_tables = $this->lib('Db')->getDriver('MySql\\Table')->getTables();
+		$_tables = $this->lib('Db')->getDriver('Table')->getTables();
 		if(!empty($_tables)) {
 			foreach ($_tables as $table) {
 				$tables[$table] = $table;

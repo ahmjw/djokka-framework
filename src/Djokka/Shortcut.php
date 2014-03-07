@@ -43,7 +43,12 @@ class Shortcut
         if (!isset($class_map[$subclass])) {
             throw new \Exception('Class library with name '.$subclass.' not found', 500);
         }
-        return call_user_func(array(__NAMESPACE__ . '\\' . $class_map[$subclass], 'getInstance'));
+        if ($subclass == 'Db') {
+            $className = 'Database\\Drivers\\' . $this->config('database_driver') . '\\Connection';
+        } else {
+            $className = $class_map[$subclass];
+        }
+        return call_user_func(array(__NAMESPACE__ . '\\' . $className, 'getInstance'));
     }
 
     /**

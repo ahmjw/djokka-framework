@@ -58,9 +58,9 @@ class Config
         'theme'  => 'default', // Nama tema yang sedang digunakan web
         'layout' => 'index', // Nama layout yang sedang digunakan web
         'json'   => false, // Menandai apakah output web menggunakan format JSON atau tidak
-        'pager'  => null, // Data sementar untuk pager/pembagi halaman
 
-        'connection' => 0 // Indeks koneksi database yang akan digunakan pada fitur multi-database
+        'connection'      => 0, // Indeks koneksi database yang akan digunakan pada fitur multi-database
+        'database_driver' => 'MySql'
     );
 
     /**
@@ -75,10 +75,10 @@ class Config
         'Image'   => 'Helpers\\Image',
         'File'    => 'Helpers\\File',
         'String'  => 'Helpers\\String',
-        'Db'      => 'Database\\Connection',
         'Route'   => 'Route',
         'Asset'   => 'View\\Asset',
-        'Model'   => 'Model'
+        'Model'   => 'Model',
+        'Db'      => ''
     );
 
     /**

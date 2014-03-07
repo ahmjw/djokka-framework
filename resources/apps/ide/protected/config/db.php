@@ -10,6 +10,6 @@ return array(
 		'hostname' => 'localhost',
 		'username' => 'root',
 		'password' => '',
-		'database' => 'db_djokka',
+		'database' => 'my_test_db',
 	)
 );

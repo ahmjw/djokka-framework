@@ -51,8 +51,7 @@ class ModelCollection
     public function __construct($sql, $model)
     {
         $this->_sql = $sql;
-        $connection = Connection::getInstance();
-        $this->_result = $connection->query($sql);
+        $this->_result = $model->getDriver('Connection')->query($sql);
         $this->rowCount = $this->_result->num_rows;
         $this->fieldCount = $this->_result->field_count;
         $this->_model = $model;
