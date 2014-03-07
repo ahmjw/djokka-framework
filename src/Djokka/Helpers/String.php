@@ -62,7 +62,8 @@ class String
      */
     public function lastPart($symbol, $text)
     {
-        return substr($text, strrpos($text, $symbol) + 1, strlen($text));
+        return is_numeric(strpos($text, $symbol)) ?
+            substr($text, strrpos($text, $symbol) + 1, strlen($text)) : $text;
     }
 
     /**
