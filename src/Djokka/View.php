@@ -66,26 +66,26 @@ class View
 
     /**
      * Memproses konten web berdasarkan informasi modul
-     * @param mixed $info array Informasi terkait modul yang akan diproses
+     * @param mixed $hmvc array Informasi terkait modul yang akan diproses
      * @param mixed $instance object Instance dari modul yang akan diproses
      * @return string
      */
-    public function renderContent($info, $instance) {
+    public function renderContent($instance, $module, $module_dir, $is_plugin) 
+    {
         $view = $instance->getView();
-        $theme = File::getInstance()->themeDir() . Config::getInstance()->getData('theme') . '/';
-        $path = File::getInstance()->realPath($theme . 'views/' . $info['module'] . '/'. $view['name'] . '.php');
+        $path = File::getInstance()->themeDir() . Config::getInstance()->getData('theme') . '/views/' . $module . '/'. $view['name'] . '.php';
+        $path = File::getInstance()->realPath($path);
 
         if(!file_exists($path)) {
-            $path = File::getInstance()->realPath($info['module_dir'] . '/views/' . $view['name'] . '.php');
+            $path = File::getInstance()->realPath($module_dir . '/views/' . $view['name'] . '.php');
             if(!file_exists($path)) {
-                throw new \Exception("View of module '$info[route]' is not found: $path", 404);
+                throw new \Exception("View of module '$module' is not found: $path", 404);
             }
         }
 
-        if(!$this->_activated && !$info['is_plugin']) {
+        if(!$this->_activated && !$is_plugin) {
             $this->_activated = true;
             $this->_content = utf8_decode($instance->outputBuffering($path, $view['vars']));
-            Controller::setCore($instance);
         } else {
             return $instance->outputBuffering($path, $view['vars']);
         }
@@ -110,14 +110,11 @@ class View
         if(!file_exists($theme_path)) {
             throw new \Exception("Layout file not found in path {$theme_path}", 404);
         }
-        if(Controller::getCore() != null) {
-            $theme_content = Controller::getCore()->outputBuffering($theme_path);
-        } else {
-            $theme_content = Controller::getInstance()->outputBuffering($theme_path);
+        if(Controller::getCore() === null) {
+            throw new \Exception("The core controller is not loaded", 404);
         }
+        $theme_content = Controller::getCore()->outputBuffering($theme_path);
         $content = Asset::getInstance()->render($theme_content);
-        //$content = preg_replace('/[\r\n\t]/i', '', $content);
-        //$content = preg_replace('/\s{1,}/i', ' ', $content);
         print $content;
     }
 

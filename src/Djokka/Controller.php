@@ -15,7 +15,6 @@ use Djokka\Route;
 use Djokka\View\Asset;
 use Djokka\Helpers\String;
 use Djokka\Helpers\User;
-use Djokka\Controller\Hmvc;
 use Djokka\Controller\Modular;
 use Djokka\Controller\Plugin;
 
@@ -96,10 +95,10 @@ class Controller extends Shortcut
                 'vars' => $vars
             );
         } else {
-            $info = $this->config('module_info');
-            $path = $info['module_dir'].'views'.DS.$name . '.php';
+            $hmvc = $this->config('module_info');
+            $path = $hmvc->module_dir.'views'.DS.$name . '.php';
             if (!file_exists($path)) {
-                throw new \Exception("View of module '$info[route]' is not found: $path", 404);
+                throw new \Exception("View of module '{$hmvc->route}' is not found: $path", 404);
             }
             return $this->outputBuffering($path, $vars);
         }
@@ -273,7 +272,7 @@ class Controller extends Shortcut
      * @param bool $is_widget Marks the module call as a widget or not
      * @return string
      */
-    public function import($route,$params = null, $is_widget = false)
+    public function import($route, $params = null, $is_widget = false)
     {
         $is_plugin = false;
         if ($plugin = $this->isPlugin($route)) {
@@ -281,11 +280,86 @@ class Controller extends Shortcut
             $is_plugin = true;
         }
         if (!$is_widget) {
-            $info = $route == $this->config('route') ? $this->config('module_info') : Route::getInstance()->getModuleInfo($route, $is_plugin);
+            $hmvc = $route == $this->config('route') ? $this->config('module_info') : new Hmvc($route, $is_plugin);
         } else {
-            $info = Route::getInstance()->getModuleInfo($route, $is_plugin, true);
+            $hmvc = new Hmvc($route, $is_plugin, true);
         }
-        return Hmvc::getInstance()->getViewContent($info, $params);
+        return $this->render($hmvc, $params);
+    }
+
+    /**
+     * Rendering the view
+     * @param mixed $info Informasi modul
+     * @param array $params Parameter yang akan dikirimkan ke fungsi aksi
+     * @return string
+     * @since 1.0.3
+     */
+    private function render($hmvc, $params = array())
+    {
+        // Mengumpulkan informasi aksi
+        if (!file_exists($hmvc->path)) {
+            throw new \Exception("Class of module is not found: {$hmvc->path}", 404);
+        }
+        include_once($hmvc->path);
+        if(!class_exists($hmvc->class)) {
+            throw new \Exception("Class $class is not declared in file $path", 500);
+        }
+        $className = $hmvc->class;
+        $instance = new $className;
+
+        // Self router aliasing
+        if(!$hmvc->is_widget && method_exists($instance, 'routes') && ($routes = call_user_func(array($instance, 'routes')))) {
+            foreach ($routes as $route) {
+                $keys = array();
+                $pattern = preg_replace_callback('/\(([a-zA-Z_](?:[a-zA-Z0-9_]+)?):(.*?)\)/i', function($matches) use(&$keys) {
+                    $keys[] = $matches[1];
+                    $group = $matches[2] !== null ? $matches[2] : '.+';
+                    return '('.$group.')';
+                }, $route[0]);
+                $pattern = '/'.str_replace('/', '\/', $pattern).'/i';
+                if(preg_match($pattern, Route::getInstance()->getUri(), $match)) {
+                    $values = array_slice($match, 1);
+                    $params = array();
+                    foreach ($values as $i => $value) {
+                        $params[$keys[$i]] = $value;
+                    }
+                    $hmvc->function = 'action'.ucfirst($route[1]);
+                    $hmvc->params = $params;
+                    break;
+                }
+            }
+        }
+        
+        // Mengeksekusi suatu aksi
+        if(!method_exists($instance, $hmvc->function)) {
+            throw new \Exception("Method {$hmvc->function}() is not defined in class $className in file {$hmvc->path}", 404);
+        }
+        if(method_exists($instance, 'accessControl') && ($access = call_user_func(array($instance, 'accessControl')))) {
+            if(!empty($access)) {
+                foreach ($access as $rule) {
+                    if(preg_match(
+                        '/(^(?:'.$hmvc->action.')\s*\,|\,\s*(?:'.$hmvc->action.')\s*\,|\s*(?:'.$hmvc->action.')$)/i',
+                        $rule['actions'], $match
+                    )) {
+                        if(!(bool)$rule['condition']) {
+                            throw new \Exception("You doesn't have a credential to access this page", 403);
+                        }
+                    }
+                }
+            }
+        }
+        $return = call_user_func_array(array(
+            $instance, $hmvc->function), $hmvc->params
+        );
+
+        if($this->config('json') === false && $instance->isUseView()) {
+            if(!$hmvc->is_plugin) {
+                self::setCore($instance);
+            }
+            return View::getInstance()->renderContent($instance, $hmvc->module, $hmvc->module_dir, $hmvc->is_plugin);
+        } else {
+            return $return;
+        }
     }
 
     /**

@@ -158,7 +158,7 @@ class Boot extends Shortcut
     {
         if ($route === null) {
             Route::getInstance()->load();
-            $route = $this->config('module').'/'.$this->config('action');
+            $route = $this->config('route');
         }
         View::getInstance()->renderOutput($route);
     }
