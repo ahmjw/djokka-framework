@@ -4,7 +4,7 @@
       <div class="col-md-4" id="sidebar">
       	<div class="list-group">
       		<a class="list-group-item" href="<?php echo $this->link('/builder'); ?>?djokka=ide">Project Builder</a>
-      		<a class="list-group-item" href="<?php echo $this->link('/modulecreator'); ?>?djokka=ide">Module Creator</a>
+      		<a class="list-group-item" href="<?php echo $this->link('/modulecreator'); ?>?djokka=ide">Module Builder</a>
       		<a class="list-group-item" href="<?php echo $this->link('/activeRecord'); ?>?djokka=ide">Active Record Builder</a>
       	</div>
       </div>

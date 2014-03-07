@@ -6,7 +6,6 @@
 body{
 	font-family: Helvetica, Arial, Times;
 	color: #666;
-	background: #333;
 	margin-top: 20px;
 	margin-bottom: 20px;
 	font-size: 12px;
@@ -14,9 +13,19 @@ body{
 .container {
 	width: 600px;
 	margin: auto;
+	border: 1px solid #ccc;
+	padding: 20px;
+	border-radius: 5px;
+	-ms-border-radius: 5px;
+	-o-border-radius: 5px;
+	-webkit-border-radius: 5px;
+	-moz-border-radius: 5px;
+	box-shadow: 0px 2px 2px #333;
 }
 .error{
-	background: #fdd;
+	background: #fee;
+	font-size: 16px;
+	border-bottom: 4px solid #900;
 }
 .row p{
 	margin: 5px;
@@ -39,7 +48,8 @@ body{
 }
 .trace{
 	background: #ffc;
-	border-bottom: 1px solid #ddd;
+	border-bottom: 4px solid #f93;
+	margin-top: 10px;
 }
 </style>
 </head>
@@ -47,6 +57,7 @@ body{
 <body>
 <div class="container">
 
+<h1>Error Message</h1>
 <div class="error">
 <div class="row">
 	<div class="key"><p>Message :</p></div>
@@ -70,7 +81,8 @@ body{
 <?php
 $trace = $e->getTrace();
 if(!empty($trace)) {
-	echo '<div class="trace-list">';
+	echo '<h2>Error Traces</h2>
+		<div class="trace-list">';
 	foreach ($trace as $item) {
 		echo '<div class="trace">';
 		if (isset($item['function'])) {

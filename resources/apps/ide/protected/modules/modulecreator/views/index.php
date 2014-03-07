@@ -1,4 +1,4 @@
-<h1>Module Creator</h1>
+<h1>Module Builder</h1>
 
 <?php $model->showError(array(
 	'open'=>'<div class="alert alert-danger">',
