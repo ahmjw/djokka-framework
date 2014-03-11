@@ -96,19 +96,24 @@ class Hmvc
      * The constructor of this class
      * @since 1.0.3
      */
-    public function __construct($router, $is_plugin = false, $is_widget = false)
+    public function __construct($router, $is_widget = false)
     {
         // Initialize fields
         $this->router = $router;
-        $this->is_plugin = $is_plugin;
+        if ($plugin = $this->isPlugin($router)) {
+            $this->is_plugin = true;
+            $this->router = $plugin;
+            $this->dir = File::getInstance()->pluginDir();
+        } else {
+            $this->is_plugin = false;
+            $this->dir = File::getInstance()->moduleDir();
+        }
         $this->is_widget = $is_widget;
         $this->trace();
     }
 
     private function trace()
     {
-        $this->dir = !$this->is_plugin ? File::getInstance()->moduleDir() : File::getInstance()->pluginDir();
-
         if (is_numeric(strrpos($this->router, '/'))) {
             $routes = explode('/', $this->router, Config::getInstance()->getData('route_max_depth'));
             $i = 0;
@@ -150,5 +155,19 @@ class Hmvc
         $this->class = 'Djokka\\'.(!$this->is_plugin ? 'Controllers' : 'Plugins') . '\\' . $last_part;
         $this->module_dir = $this->path;
         $this->path = File::getInstance()->realPath($this->path . DS . $last_part . '.php');
+    }
+
+    /**
+     * Checks the module is plugin or not
+     * @param string $route Route of the module that wants to check
+     * @return bool Returns TRUE if the module is plugin
+     */
+    public function isPlugin($route) 
+    {
+        if (preg_match('/^plugin\.([a-zA-Z0-9_\/\-]+)/i', $route, $match)) {
+            return $match[1];
+        } else {
+            return false;
+        }
     }
 }

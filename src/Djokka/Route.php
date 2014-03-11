@@ -157,7 +157,7 @@ class Route extends Shortcut
         $this->config('action', $hmvc->action);
         $this->config('route', $hmvc->route);
     }
-
+    
     /**
      * Membentuk parameter yang akan ditambahkan ke dalam URL
      * @since 1.0.0
