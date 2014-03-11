@@ -237,6 +237,7 @@ class Crud extends Query implements ICrud
      */
     public function findAllImpl($model, $params) 
     {
+        $this->_data['query'] = null;
         $this->select(isset($params['select']) ? $params['select'] : '*');
         if(!isset($params['from'])){
         	$this->from($model->table());
@@ -260,6 +261,7 @@ class Crud extends Query implements ICrud
         // Mengambil semua record dari database
         $collection = new ModelCollection($this->_data['query'], $model);
         $model->dataset('condition', $this->_data['where']);
+        $model->dataset('from', $this->_data['from']);
         $this->clearData();
         return $collection;
     }
@@ -278,7 +280,13 @@ class Crud extends Query implements ICrud
             $fields = $model->schema('fields');
             $field = $fields[0];
         }
-        $this->select($field)->from($model->table());
+        if ($model->dataset('from') !== null) {
+            $this->from($model->dataset('from'));
+            $this->select('0');
+        } else {
+            $this->select($field);
+            $this->from($model->table());
+        }
         if ($model->dataset('condition') !== null) {
             $this->where($model->dataset('condition'));
         }
