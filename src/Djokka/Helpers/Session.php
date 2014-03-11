@@ -61,7 +61,7 @@ class Session
      */
     public function getData($data) 
     {
-        return $_SESSION['djokka'][$data];
+        return isset($_SESSION['djokka'][$data]) ? $_SESSION['djokka'][$data] : null;
     }
 
     /**
