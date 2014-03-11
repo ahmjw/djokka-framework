@@ -98,6 +98,7 @@ class Validation
 
         // Memecah aturan validasi
         foreach ($rules as $rule) {
+            if ($rule === null) continue;
             $fields = $rule[0];
             $action = $rule[1];
             $params = array_slice($rule, 2);
