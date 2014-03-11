@@ -21,7 +21,7 @@ use Djokka\Helpers\File;
 class View
 {
     /**
-     * Konten web
+     * Web content
      */
     private $_content;
 
@@ -50,6 +50,19 @@ class View
         return self::$_instance;
     }
 
+    public function __destruct()
+    {
+        $this->showOutput();
+    }
+
+    public function getLayoutPath()
+    {
+        $dir = File::getInstance()->themeDir();
+        $theme = Config::getInstance()->getData('theme');
+        $layout = Config::getInstance()->getData('layout');
+        return File::getInstance()->realPath($dir . $theme . DS . $layout . '.php');
+    }
+
     public function isActivated()
     {
         return $this->_activated;
@@ -64,17 +77,23 @@ class View
         return $this->_content;
     }
 
+    public function getThemeViewPath($moduleName, $viewName)
+    {
+        $rootDir = File::getInstance()->themeDir();
+        $theme = Config::getInstance()->getData('theme');
+        return File::getInstance()->realPath($rootDir . $theme . '/views/' . $moduleName . '/'. $viewName . '.php');
+    }
+
     /**
      * Memproses konten web berdasarkan informasi modul
      * @param mixed $hmvc array Informasi terkait modul yang akan diproses
      * @param mixed $instance object Instance dari modul yang akan diproses
      * @return string
      */
-    public function renderContent($instance, $module, $module_dir, $is_plugin) 
+    public function renderView($instance, $module, $module_dir, $is_plugin) 
     {
         $view = $instance->getView();
-        $path = File::getInstance()->themeDir() . Config::getInstance()->getData('theme') . '/views/' . $module . '/'. $view['name'] . '.php';
-        $path = File::getInstance()->realPath($path);
+        $path = $this->getThemeViewPath($module, $view['name']);
 
         if(!file_exists($path)) {
             $path = File::getInstance()->realPath($module_dir . '/views/' . $view['name'] . '.php');
@@ -83,39 +102,15 @@ class View
             }
         }
 
-        if(!$this->_activated && !$is_plugin) {
+        $content = $instance->outputBuffering($path, $view['vars']);
+
+        if((!$this->_activated || Boot::getInstance()->isErrorHandlerActive()) && !$is_plugin) {
+            Controller::setCore($instance);
             $this->_activated = true;
-            $this->_content = utf8_decode($instance->outputBuffering($path, $view['vars']));
+            $this->_content = $content;
         } else {
-            return $instance->outputBuffering($path, $view['vars']);
+            return $content;
         }
-    }
-
-    /**
-     * Memproses konten tema
-     * @param mixed $content string Konten web yang akan diproses ke tema
-     * @return string
-     */
-    public function renderOutput($route)
-    {
-        $content = Controller::getInstance()->import($route);
-        // Jika dalam mode JSON
-        if(Config::getInstance()->getData('json') === true || HANDLE_ERROR === true) {
-            /*header('Content-type: application/json');
-            echo json_encode($content);
-            return;*/
-        }
-
-        $theme_path = File::getInstance()->realPath(File::getInstance()->themeDir().Config::getInstance()->getData('theme').DS.Config::getInstance()->getData('layout').'.php');
-        if(!file_exists($theme_path)) {
-            throw new \Exception("Layout file not found in path {$theme_path}", 404);
-        }
-        if(Controller::getCore() === null) {
-            throw new \Exception("The core controller is not loaded", 404);
-        }
-        $theme_content = Controller::getCore()->outputBuffering($theme_path);
-        $content = Asset::getInstance()->render($theme_content);
-        print $content;
     }
 
     /**
@@ -126,9 +121,10 @@ class View
      * @return string
      */
     public function getView($instance, $view, $params = array()) {
-        $path = File::getInstance()->themeDir().Config::getInstance()->getData('theme').DS.'views'.DS.Config::getInstance()->getData('module').DS.$view.'.php';
+        $moduleName = Config::getInstance()->getData('module');
+        $path = $this->getThemeViewPath($moduleName, $view);
         if(!file_exists($path)) {
-            $path = $this->moduleDir().Config::getInstance()->getData('module').DS.'views'.DS.$view.'.php';
+            $path = $this->moduleDir() . $moduleName . DS . 'views' . DS . $view . '.php';
             if(!file_exists($path)) {
                 throw new \Exception("View file not found in path $path", 404);
             }
@@ -136,4 +132,13 @@ class View
         return $instance->outputBuffering($path, $params);
     }
 
+    public function showOutput()
+    {
+        $path = View::getInstance()->getLayoutPath();
+        if(!file_exists($path)) {
+            throw new \Exception("Layout file not found in path {$path}", 404);
+        }
+        $content = Controller::getCore()->outputBuffering($path);
+        print Asset::getInstance()->render($content);
+    }
 }

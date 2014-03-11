@@ -15,6 +15,8 @@ use Djokka\Route;
 use Djokka\View\Asset;
 use Djokka\Helpers\String;
 use Djokka\Helpers\User;
+use Djokka\Helpers\File;
+use Djokka\Helpers\Config;
 use Djokka\Controller\Modular;
 use Djokka\Controller\Plugin;
 
@@ -31,7 +33,7 @@ class Controller extends Shortcut
      * Information of main view
      * @since 1.0.3
      */
-    private $_view = array();
+    private $_viewData = array();
 
     /**
      * Instance of the core controller class. The system maybe load much controller object,
@@ -89,8 +91,8 @@ class Controller extends Shortcut
      */
     public function view($name, array $vars = array())
     {
-        if (empty($this->_view)) {
-            $this->_view = array(
+        if (empty($this->_viewData)) {
+            $this->_viewData = array(
                 'name' => $name,
                 'vars' => $vars
             );
@@ -111,7 +113,7 @@ class Controller extends Shortcut
      */
     public function isUseView()
     {
-        return !empty($this->_view);
+        return !empty($this->_viewData);
     }
 
     /**
@@ -121,7 +123,7 @@ class Controller extends Shortcut
      */
     public function getView()
     {
-        return $this->_view;
+        return $this->_viewData;
     }
 
     /**
@@ -224,7 +226,7 @@ class Controller extends Shortcut
         if (func_num_args() == 0) {
             return $this->config('layout');
         } else {
-            return $this->config('layout', func_get_arg(0));
+            $this->config('layout', func_get_arg(0));
         }
     }
 
@@ -251,20 +253,6 @@ class Controller extends Shortcut
     }
 
     /**
-     * Checks the module is plugin or not
-     * @param string $route Route of the module that wants to check
-     * @return bool Returns TRUE if the module is plugin
-     */
-    public function isPlugin($route) 
-    {
-        if (preg_match('/^plugin\.([a-zA-Z0-9_\/\-]+)/i', $route, $match)) {
-            return $match[1];
-        } else {
-            return false;
-        }
-    }
-
-    /**
      * Calls and executes the other module
      * @since 1.0.0
      * @param string $route Route of the module that wants to call
@@ -274,15 +262,10 @@ class Controller extends Shortcut
      */
     public function import($route, $params = null, $is_widget = false)
     {
-        $is_plugin = false;
-        if ($plugin = $this->isPlugin($route)) {
-            $route = $plugin;
-            $is_plugin = true;
-        }
         if (!$is_widget) {
-            $hmvc = $route == $this->config('route') ? $this->config('module_info') : new Hmvc($route, $is_plugin);
+            $hmvc = $route == $this->config('route') ? $this->config('module_info') : new Hmvc($route);
         } else {
-            $hmvc = new Hmvc($route, $is_plugin, true);
+            $hmvc = new Hmvc($route, true);
         }
         return $this->render($hmvc, $params);
     }
@@ -349,14 +332,11 @@ class Controller extends Shortcut
             }
         }
         $return = call_user_func_array(array(
-            $instance, $hmvc->function), $hmvc->params
+            $instance, $hmvc->function), !empty($params) ? $params : $hmvc->params
         );
 
         if($this->config('json') === false && $instance->isUseView()) {
-            if(!$hmvc->is_plugin) {
-                self::setCore($instance);
-            }
-            return View::getInstance()->renderContent($instance, $hmvc->module, $hmvc->module_dir, $hmvc->is_plugin);
+            return View::getInstance()->renderView($instance, $hmvc->module, $hmvc->module_dir, $hmvc->is_plugin);
         } else {
             return $return;
         }
@@ -400,6 +380,6 @@ class Controller extends Shortcut
      */
     public function extract(array $data)
     {
-        $this->_view['vars'] = array_merge($this->_view['vars'], $data);
+        $this->_viewData['vars'] = array_merge($this->_viewData['vars'], $data);
     }
 }

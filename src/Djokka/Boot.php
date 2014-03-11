@@ -42,6 +42,11 @@ define('SYSTEM_DIR', __DIR__ . DS . '..' . DS . '..' . DS);
 class Boot extends Shortcut
 {
     /**
+     *
+     */
+    private static $_errorHandlerActive = false;
+
+    /**
      * Instance of this class
      * @since 1.0.1
      */
@@ -84,6 +89,7 @@ class Boot extends Shortcut
      */
     public static function onShutdown()
     {
+        if (self::$_errorHandlerActive) return;
         if (($error = error_get_last()) !== null) {
             self::handleError($error["type"], $error["message"], $error["file"], $error["line"]);
         }
@@ -111,19 +117,34 @@ class Boot extends Shortcut
      */
     public static function handleException(\Exception $e)
     {
-        if (Config::getInstance()->getData('error_redirect') === true && $e->getCode() == 403) {
-            echo 1;
-            $page = Config::getInstance()->getData('module').'/'.Config::getInstance()->getData('action');
-            if ($page != $redirect = Config::getInstance()->getData('module_forbidden')) {
-                Controller::getInstance()->redirect('/' . $redirect);
-            } else {
-                $this->exceptionOutput($exception);
-            }
-        }
-        ob_end_clean();
+        //print_r($e);
         $path = SYSTEM_DIR . 'resources' . DIRECTORY_SEPARATOR . 'errors' . DIRECTORY_SEPARATOR . 'view.php';
-        include_once($path);
-        exit();
+
+        try {
+            if (Config::getInstance()->getData('error_redirect') === true && $e->getCode() == 403) {
+                $page = Config::getInstance()->getData('module').'/'.Config::getInstance()->getData('action');
+                if ($page != $redirect = Config::getInstance()->getData('module_forbidden')) {
+                    Controller::getInstance()->redirect('/' . $redirect);
+                }
+            } else {
+                self::$_errorHandlerActive = true;
+                $moduleName = Config::getInstance()->getData('module_error');
+                Controller::getInstance()->import($moduleName, array('error' => $e), true);
+                View::getInstance()->showOutput();
+            }
+        } catch (\Exception $ex) {
+            print Controller::getInstance()->outputBuffering($path, array('e'=>$ex));
+        }
+    }
+
+    /**
+     * Gets error handler active status
+     * @return bool
+     * @since 1.0.3
+     */
+    public static function isErrorHandlerActive()
+    {
+        return self::$_errorHandlerActive;
     }
 
     /**
@@ -160,7 +181,7 @@ class Boot extends Shortcut
             Route::getInstance()->load();
             $route = $this->config('route');
         }
-        View::getInstance()->renderOutput($route);
+        Controller::getInstance()->import($route);
     }
 
     /**
