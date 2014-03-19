@@ -11,14 +11,11 @@
 
 namespace Djokka;
 
-use Djokka\Route;
 use Djokka\View\Asset;
 use Djokka\Helpers\String;
 use Djokka\Helpers\User;
 use Djokka\Helpers\File;
 use Djokka\Helpers\Config;
-use Djokka\Controller\Modular;
-use Djokka\Controller\Plugin;
 
 /**
  * Parent class for all the module controller, not plugin module.
@@ -27,13 +24,13 @@ use Djokka\Controller\Plugin;
  * @author Ahmad Jawahir <rawndummy@gmail.com>
  * @since 1.0.0
  */
-class Controller extends Shortcut
+class BaseController extends Shortcut
 {
     /**
      * Information of main view
      * @since 1.0.3
      */
-    private $_viewData = array();
+    private $_data = array();
 
     /**
      * Instance of the core controller class. The system maybe load much controller object,
@@ -77,9 +74,39 @@ class Controller extends Shortcut
      * @param object $core The controller class object. The object must be
      * instance of Djokka\Controller class
      */
-    public static function setCore(Controller $core)
+    public static function setCore(BaseController $core)
     {
         self::$_core = $core;
+    }
+
+    /**
+     * Get the view information
+     * @return array
+     * @since 1.0.0
+     */
+    public function getView()
+    {
+        return $this->_data['view'];
+    }
+
+    /**
+     * Get the core controller's view content
+     * @since 1.0.0
+     * @return string
+     */
+    public function getContent()
+    {
+        return View::getInstance()->getContent();
+    }
+
+    public function setData($key, $value)
+    {
+        $this->_data[$key] = $value;
+    }
+
+    public function getInfo($key)
+    {
+        return $this->_data['info']->{$key};
     }
 
     /**
@@ -91,8 +118,8 @@ class Controller extends Shortcut
      */
     public function view($name, array $vars = array())
     {
-        if (empty($this->_viewData)) {
-            $this->_viewData = array(
+        if (empty($this->_data['view'])) {
+            $this->_data['view'] = array(
                 'name' => $name,
                 'vars' => $vars
             );
@@ -113,17 +140,7 @@ class Controller extends Shortcut
      */
     public function isUseView()
     {
-        return !empty($this->_viewData);
-    }
-
-    /**
-     * Get the view information
-     * @return array
-     * @since 1.0.0
-     */
-    public function getView()
-    {
-        return $this->_viewData;
+        return !empty($this->_data['view']);
     }
 
     /**
@@ -145,16 +162,6 @@ class Controller extends Shortcut
             }
         }
         return ob_get_clean();
-    }
-
-    /**
-     * Get the core controller's view content
-     * @since 1.0.0
-     * @return string
-     */
-    public function getContent()
-    {
-        return View::getInstance()->getContent();
     }
 
     /**
@@ -284,61 +291,72 @@ class Controller extends Shortcut
             throw new \Exception("Class of module is not found: {$hmvc->path}", 404);
         }
         include_once($hmvc->path);
-        if(!class_exists($hmvc->class)) {
+        if (!class_exists($hmvc->class)) {
             throw new \Exception("Class $class is not declared in file $path", 500);
         }
         $className = $hmvc->class;
         $instance = new $className;
+        $instance->setData('info', $hmvc);
 
-        // Self router aliasing
-        if(!$hmvc->is_widget && method_exists($instance, 'routes') && ($routes = call_user_func(array($instance, 'routes')))) {
-            foreach ($routes as $route) {
-                $keys = array();
-                $pattern = preg_replace_callback('/\(([a-zA-Z_](?:[a-zA-Z0-9_]+)?):(.*?)\)/i', function($matches) use(&$keys) {
-                    $keys[] = $matches[1];
-                    $group = $matches[2] !== null ? $matches[2] : '.+';
-                    return '('.$group.')';
-                }, $route[0]);
-                $pattern = '/'.str_replace('/', '\/', $pattern).'/i';
-                if(preg_match($pattern, Route::getInstance()->getUri(), $match)) {
-                    $values = array_slice($match, 1);
-                    $params = array();
-                    foreach ($values as $i => $value) {
-                        $params[$keys[$i]] = $value;
-                    }
-                    $hmvc->function = 'action'.ucfirst($route[1]);
-                    $hmvc->params = $params;
-                    break;
-                }
+        // Preparing
+        if (!$hmvc->is_widget && !$hmvc->is_plugin) {
+            if (method_exists($instance, 'routes') && ($routes = call_user_func(array($instance, 'routes')))) {
+                $this->executeRoutes($hmvc, $routes);
+            }
+            if (method_exists($instance, 'accessControl') && ($access = call_user_func(array($instance, 'accessControl')))) {
+                $this->executeAccessControl($hmvc->action, $access);
             }
         }
-        
-        // Mengeksekusi suatu aksi
-        if(!method_exists($instance, $hmvc->function)) {
+
+        if (!method_exists($instance, $hmvc->function)) {
             throw new \Exception("Method {$hmvc->function}() is not defined in class $className in file {$hmvc->path}", 404);
         }
-        if(method_exists($instance, 'accessControl') && ($access = call_user_func(array($instance, 'accessControl')))) {
-            if(!empty($access)) {
-                foreach ($access as $rule) {
-                    if(preg_match(
-                        '/(^(?:'.$hmvc->action.')\s*\,|\,\s*(?:'.$hmvc->action.')\s*\,|\s*(?:'.$hmvc->action.')$)/i',
-                        $rule['actions'], $match
-                    )) {
-                        if(!(bool)$rule['condition']) {
-                            throw new \Exception("You doesn't have a credential to access this page", 403);
-                        }
-                    }
-                }
-            }
-        }
+        
         $return = call_user_func_array(array(
             $instance, $hmvc->function), !empty($params) ? $params : $hmvc->params
         );
 
-        if($this->config('json') === false && $instance->isUseView()) {
+        if ($this->config('json') === false && $instance->isUseView()) {
             return View::getInstance()->renderView($instance, $hmvc->module, $hmvc->module_dir, $hmvc->is_plugin);
         } else {
             return $return;
+        }
+    }
+
+    private function executeAccessControl($action, $access)
+    {
+        if (!empty($access)) {
+            foreach ($access as $rule) {
+                $pattern = '/(^(?:'.$action.')\s*\,|\,\s*(?:'.$action.')\s*\,|\s*(?:'.$action.')$)/i';
+                if (preg_match($pattern, $rule[0], $match)) {
+                    if (!(bool)$rule[1]) {
+                        throw new \Exception("You doesn't have a credential to access this page", 403);
+                    }
+                }
+            }
+        }
+    }
+
+    private function executeRoutes(&$hmvc, $routes)
+    {
+        foreach ($routes as $route) {
+            $keys = array();
+            $pattern = preg_replace_callback('/\(([a-zA-Z_](?:[a-zA-Z0-9_]+)?):(.*?)\)/i', function($matches) use(&$keys) {
+                $keys[] = $matches[1];
+                $group = $matches[2] !== null ? $matches[2] : '.+';
+                return '('.$group.')';
+            }, $route[0]);
+            $pattern = '/'.str_replace('/', '\/', $pattern).'/i';
+            if (preg_match($pattern, Route::getInstance()->getUri(), $match)) {
+                $values = array_slice($match, 1);
+                $params = array();
+                foreach ($values as $i => $value) {
+                    $params[$keys[$i]] = $value;
+                }
+                $hmvc->function = $hmvc->func_prefix . ucfirst($route[1]);
+                $hmvc->params = $params;
+                break;
+            }
         }
     }
 
@@ -367,9 +385,13 @@ class Controller extends Shortcut
     public function widget($element, $items = null)
     {
         if ($items !== null) {
+            if (is_string($items)) {
+                $items = $items[0] == '/' ? substr($items, 1, strlen($items)) : $this->config('module') . '/' . $items;
+            }
             Asset::getInstance()->setWidget($element, $items);
         } else {
-            return $this->import($element, null, true);
+            $route = $element[0] == '/' ? substr($element, 1, strlen($element)) : $this->config('module') . '/' . $element;
+            return $this->import($route, null, true);
         }
     }
 
@@ -380,6 +402,6 @@ class Controller extends Shortcut
      */
     public function extract(array $data)
     {
-        $this->_viewData['vars'] = array_merge($this->_viewData['vars'], $data);
+        $this->_data['view']['vars'] = array_merge($this->_data['view']['vars'], $data);
     }
 }
