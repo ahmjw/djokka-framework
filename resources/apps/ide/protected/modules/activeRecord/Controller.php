@@ -1,11 +1,11 @@
 <?php
 
-namespace Djokka\Controllers;
+namespace Djokka\Modules\ActiveRecord;
 
-use Djokka\Controller;
+use Djokka\Controller as Base;
 use Djokka\Helpers\Config;
 
-class ActiveRecord extends Controller
+class Controller extends Base
 {
 	private $_config;
 
@@ -54,7 +54,7 @@ class ActiveRecord extends Controller
 				$labels = "return array(\r\n";
 				$rules = "return array(\r\n";
 				$required = $unique = $other = $others = $enum = '';
-				$schema = $this->lib('Db')->getDriver('MySql\\Table')->getSchema($model->tableName);
+				$schema = $this->lib('Db')->getDriver('Table')->getSchema($model->tableName);
 				$count = count($schema['describe']);
 				$pkey = $schema['primary_key'];
 				$i = 0;

@@ -1,10 +1,10 @@
 <?php
 
-namespace Djokka\Controllers;
+namespace Djokka\Modules\Builder;
 
-use Djokka\Controller;
+use Djokka\Controller as Base;
 
-class Builder extends Controller
+class Controller extends Base
 {
 	private $_dir;
 	private $_module_path;
