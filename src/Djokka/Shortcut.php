@@ -184,12 +184,22 @@ class Shortcut
      * @param $url adalah alamat URL lain target pengalihan halaman
      * @param $params adalah parameter tambahan untuk alamat URL
      */
-    public function redirect($url = null, $params = array())
+    public function redirect($route = null, $session_name = null)
     {
-        if ($url == -1) {
-            header('Location: '.$_SERVER['HTTP_REFERER']);
+        if ($route === -1 && $session_name !== null) {
+            $url = $this->session($session_name);
+            if ($this->lib('Session')->isExists($session_name) && trim($url) != '') {
+                $this->lib('Session')->delete($session_name);
+                header('Location: ' . $url);
+            } else {
+                return false;
+            }
         } else {
-            header('Location: '.$this->link($url, $params));
+            if ($route !== -1) {
+                header('Location: '.$this->link($route));
+            } else {
+                header('Location: '.$_SERVER['HTTP_REFERER']);
+            }
         }
     }
 
@@ -200,20 +210,13 @@ class Shortcut
      * @param mixed $var Variabel yang akan diisi
      * @return string Lokasi folder
      */
-    public function using($class, &$var = null) 
+    public function using($class)
     {
         $path = $this->componentDir().$class.'.php';
         if (!file_exists($path)) {
             throw new \Exception("Failed to importing object file. File not found in path $path", 404);
         }
         include_once($path);
-        if (preg_match('/[a-zA-Z0-9_]+\/([a-zA-Z0-9_]+$)/i', $class, $match)) {
-            $class = $match[1];
-        }
-        if (!class_exists($class)) {
-            throw new \Exception("Class $class is not defiend in file $path", 500);
-        }
-        $var = new $class;
     }
 
     /**
@@ -224,12 +227,10 @@ class Shortcut
      */
     public function isAuth($type = null)
     {
-        if ($type == null) {
+        if ($type === null) {
             return Session::getInstance()->isExists('user');
         } else {
-            if ($data = $this->user($type)) {
-                return !empty($data);
-            }
+            return User::getInstance()->isTypeExists($type);
         }
     }
 
@@ -346,17 +347,6 @@ class Shortcut
      */
     public function link()
     {
-        switch (func_num_args()) {
-            case 0:
-                return $this->getUrl();
-            case 1:
-                return Linker::getInstance()->getLink(func_get_arg(0));
-            case 2:
-                if (is_array(func_get_arg(0))) {
-                    return Linker::getInstance()->appendGet(func_get_arg(0));
-                } else {
-                    return Linker::getInstance()->getLinkParameter(func_get_arg(0), func_get_arg(1));
-                }
-        }
+        return Route::getInstance()->buildUrl(func_get_args());
     }
 }

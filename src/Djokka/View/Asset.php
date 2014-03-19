@@ -13,7 +13,7 @@
 namespace Djokka\View;
 
 use Djokka\Helpers\String;
-use Djokka\Controller;
+use Djokka\BaseController;
 
 /**
  * Kelas pendamping yang membantu kelas Djokka\View untuk mengelola aset web
@@ -270,11 +270,11 @@ class Asset
             foreach ($items as $module => $params) {
                 if(is_numeric($module)){
                     Dom::getInstance()->append($elements, 
-                        Controller::getInstance()->import($params, null, true)
+                        BaseController::getInstance()->import($params, null, true)
                     );
                 } else {
                     Dom::getInstance()->append($elements, 
-                        Controller::getInstance()->import($module, $params, true)
+                        BaseController::getInstance()->import($module, $params, true)
                     );
                 }
             }

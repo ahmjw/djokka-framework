@@ -119,7 +119,7 @@ class Html
         if((bool)$value) {
             $options['checked'] = 'checked';
         }
-        return $this->tag('input', $options).' '.$label;
+        return '<label>' . $this->tag('input', $options).' '.$label . '</label>';
     }
 
     /**

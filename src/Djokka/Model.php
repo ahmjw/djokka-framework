@@ -116,15 +116,6 @@ abstract class Model extends Shortcut
         }
     }
 
-    /**
-     * Mengambil objek asli model
-     * @param optional $is_new boolean Objek diambil sebagai data baru atau data lama
-     */
-    public function origin($is_new = false)
-    {
-        return self::getObject(get_class($this), $this->_dataset['module'], (bool)$is_new);
-    }
-
     public function showError(array $params = array())
     {
         if ($this->hasError()) {

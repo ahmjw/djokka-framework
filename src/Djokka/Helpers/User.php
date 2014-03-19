@@ -17,13 +17,6 @@ namespace Djokka\Helpers;
  */
 class User
 {
-
-    /**
-     * Menampung data user web
-     * @since 1.0.0
-     */
-    private static $data;
-
     /**
      * Menampung instance dari kelas
      * @since 1.0.0
@@ -56,21 +49,20 @@ class User
     {
         switch (func_num_args()) {
             case 0:
-                return $this->session('user');
+                return Session::getInstance()->getData('user');
             case 1:
                 $data = new \stdClass();
                 foreach (func_get_arg(0) as $key => $value) {
                     $data->{$key} = $value;
                 }
-                $this->session('user', $data);
+                Session::getInstance()->setData('user', $data);
                 break;
             case 2:
-                $type = func_get_arg(0);
                 $data = new \stdClass();
                 foreach (func_get_arg(1) as $key => $value) {
                     $data->{$key} = $value;
                 }
-                Session::getInstance()->setData('user', array($type=>$data));
+                Session::getInstance()->setData('user', array(func_get_arg(0)=>$data));
         }
     }
     
@@ -100,11 +92,21 @@ class User
     public function getUserByType($type) 
     {
         $user = Session::getInstance()->getData('user');
-        if(is_array($user)) {
-            return $user[$type];
+
+        if (is_array($user) && isset($user[$type])) {
+            if(is_array($user)) {
+                return $user[$type];
+            } else {
+                return $user->{$type};
+            }
         } else {
-            return $user->{$type};
+            return $user;
         }
     }
 
+    public function isTypeExists($type)
+    {
+        $user = Session::getInstance()->getData('user');
+        return is_array($user) && isset($user[$type]);
+    }
 }

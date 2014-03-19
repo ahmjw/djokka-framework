@@ -52,7 +52,9 @@ class View
 
     public function __destruct()
     {
-        $this->showOutput();
+        if (BaseController::getCore() !== null) {
+            $this->showOutput();
+        }
     }
 
     public function getLayoutPath()
@@ -97,15 +99,15 @@ class View
 
         if(!file_exists($path)) {
             $path = File::getInstance()->realPath($module_dir . '/views/' . $view['name'] . '.php');
-            if(!file_exists($path)) {
-                throw new \Exception("View of module '$module' is not found: $path", 404);
+            if(!file_exists($path)) {;
+                throw new \Exception("View of ".$instance->getInfo('module_type')." '$module' is not found: $path", 404);
             }
         }
 
         $content = $instance->outputBuffering($path, $view['vars']);
 
         if((!$this->_activated || Boot::getInstance()->isErrorHandlerActive()) && !$is_plugin) {
-            Controller::setCore($instance);
+            BaseController::setCore($instance);
             $this->_activated = true;
             $this->_content = $content;
         } else {
@@ -138,7 +140,7 @@ class View
         if(!file_exists($path)) {
             throw new \Exception("Layout file not found in path {$path}", 404);
         }
-        $content = Controller::getCore()->outputBuffering($path);
-        print Asset::getInstance()->render($content);
+        ob_end_clean();
+        print Asset::getInstance()->render(BaseController::getCore()->outputBuffering($path));
     }
 }
