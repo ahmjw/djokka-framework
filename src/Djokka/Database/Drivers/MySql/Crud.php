@@ -142,7 +142,6 @@ class Crud extends Query implements ICrud
                 break;
             case 2:
                 $use_pk_opt = $params[1];
-                $params = $params[0];
                 $field = $primary_key;
 
                 if($field == null) {
@@ -166,12 +165,21 @@ class Crud extends Query implements ICrud
                     $this->order($params[0]['order']);
                 }
             } else {
-                $this->select($field)
-                    ->from($tableName);
-                if($primary_key == null) {
-                    throw new \Exception("This table or view doesn't have a primary key", 500);
+                if (isset($params[1]) && is_array($params[1])) {
+                    $this->select(isset($params[1]['select']) ? $params[1]['select'] : '*')
+                        ->from($tableName);
+                    if(isset($params[1]['group'])){
+                        $this->group($params[1]['group']);
+                    }
+                    if(isset($params[1]['order'])){
+                        $this->order($params[1]['order']);
+                    }
+                    $where = array($primary_key.'=?', $params[0]);
+                } else {
+                    $this->select($field)
+                        ->from($tableName);
+                    $where = array($primary_key.'=?', !$use_pk_opt ? $params[0] : $params);
                 }
-                $where = array($primary_key.'=?', !$use_pk_opt ? $params[0] : $params);
                 $this->where($where);
             }
         } else {

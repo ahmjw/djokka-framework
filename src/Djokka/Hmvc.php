@@ -92,14 +92,21 @@ class Hmvc
      */
     public $is_widget = false;
 
+    public $func_prefix = 'action';
+
+    public $module_type = 'plugin_module';
+
     /**
      * The constructor of this class
      * @since 1.0.3
      */
-    public function __construct($router, $is_widget = false)
+    public function __construct($router, $is_widget = false, $params = array())
     {
         // Initialize fields
         $this->router = $router;
+        $this->params = $params;
+        $this->is_widget = $is_widget;
+
         if ($plugin = $this->isPlugin($router)) {
             $this->is_plugin = true;
             $this->router = $plugin;
@@ -108,7 +115,9 @@ class Hmvc
             $this->is_plugin = false;
             $this->dir = File::getInstance()->moduleDir();
         }
-        $this->is_widget = $is_widget;
+        if (!$this->is_plugin) {
+            $this->module_type = !$is_widget ? 'basic_module' : 'widget_module';
+        }
         $this->trace();
     }
 
@@ -142,7 +151,9 @@ class Hmvc
                 }
                 $i++;
             }
-            $this->params = array_slice($routes, $i + 1);
+            if (empty($this->params)) {
+                $this->params = array_slice($routes, $i + 1);
+            }
         } else {
             $this->module = !empty($this->router) ? $this->router: 'index';
             $this->path = $this->dir . $this->module . DS;
@@ -151,10 +162,24 @@ class Hmvc
         // Update the fields
         $last_part = ucfirst(String::getInstance()->lastPart('/', $this->module));
         $this->route = $this->module . '/' . $this->action;
-        $this->function = $this->is_widget ? 'widget' . ucfirst($this->action) : 'action' . ucfirst($this->action);
-        $this->class = 'Djokka\\'.(!$this->is_plugin ? 'Controllers' : 'Plugins') . '\\' . $last_part;
+        $this->function = $this->func_prefix . ucfirst($this->action);
+        $this->path = File::getInstance()->realPath($this->path.'/' . ($this->is_widget ? 'widget/' : ''));
         $this->module_dir = $this->path;
-        $this->path = File::getInstance()->realPath($this->path . DS . $last_part . '.php');
+
+        if (!$this->is_plugin) {
+            if (!$this->is_widget) {
+                $this->class = 'Djokka\\Modules\\' . $last_part . '\\Controller';
+                $this->path .= 'Controller.php';
+            } else {
+                $this->class = 'Djokka\\Modules\\' . $last_part . '\\Widget';
+                $this->path .= 'Widget.php';
+            }
+            $this->url = Config::getInstance()->getData('base_url') . $this->route . '/';
+        } else {
+            $this->class = 'Djokka\\Plugins\\' . $last_part . '\\Controller';
+            $this->path .= 'Controller.php';
+            $this->url = Config::getInstance()->getData('plugin_url') . $this->module . '/';
+        }
     }
 
     /**

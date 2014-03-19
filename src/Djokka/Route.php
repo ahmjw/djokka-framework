@@ -42,6 +42,8 @@ class Route extends Shortcut
      */
     private $_base_url;
 
+    private $_alias;
+
     /**
      * @var Menampung instance dari kelas
      * @access private
@@ -84,7 +86,7 @@ class Route extends Shortcut
         $host = $_SERVER['HTTP_HOST'];
         $protocol = isset($_SERVER['HTTPS']) && ($_SERVER['HTTPS'] == 'on' || $_SERVER['HTTPS'] == 1) ? 'https' : 'http';
         $path = str_replace('/'.basename($_SERVER['SCRIPT_NAME']), '', $_SERVER['PHP_SELF']);
-        return "{$protocol}://{$host}{$path}";
+        return "{$protocol}://{$host}{$path}/";
     }
 
     /**
@@ -94,7 +96,7 @@ class Route extends Shortcut
      */
     public function getUrl()
     {
-        return $this->_base_url.'/'.$this->_uri;
+        return $this->_base_url.$this->_uri;
     }
 
     /**
@@ -133,6 +135,42 @@ class Route extends Shortcut
         return "{$protocol}://{$host}{$url}";
     }
 
+    private function aliasing()
+    {
+        $routes = $this->config('routes');
+        $router = $this->_uri;
+        $params = array();
+
+        if (is_array($routes) && !empty($routes)) {
+            foreach ($routes as $route) {
+                $keys = array();
+                $pattern = preg_replace_callback('/\(([a-zA-Z_](?:[a-zA-Z0-9_]+)?):(.*?)\)/i', function($matches) use(&$keys) {
+                    $keys[] = $matches[1];
+                    $group = $matches[2] !== null ? $matches[2] : '.+';
+                    return '('.$group.')';
+                }, $route[0]);
+                $pattern = '/'.str_replace('/', '\/', $pattern).'/i';
+                if (preg_match($pattern, $this->_uri, $matches)) {
+                    $this->_alias = preg_replace_callback('/:([a-zA-Z_][a-zA-Z0-9_]*)/i', function($match) use($matches, $keys) {
+                        $i = array_search($match[1], $keys) + 1;
+                        return $matches[$i];
+                    }, $route[1]);
+                    if (isset($route[2])) {
+                        $params = explode('/', preg_replace_callback('/:([a-zA-Z_][a-zA-Z0-9_]*)/i', function($match) use($matches, $keys) {
+                            $i = array_search($match[1], $keys) + 1;
+                            return $matches[$i];
+                        }, $route[2]));
+                    }
+                    $router = $this->_alias;
+                }
+            }
+        }
+        return array(
+            'router' => $router,
+            'params' => $params
+        );
+    }
+
     /**
      * Memuat informasi rute berdasarkan formatnya. Informasi rute ini akan diteruskan
      * ke bagian kontroller
@@ -140,18 +178,12 @@ class Route extends Shortcut
      */
     public function load()
     {
-        switch ($this->config('route_format')) {
-            case 'path':
-                $router = $this->_uri;
-                break;
-            case 'get':
-                $router = $_GET[$this->config('get_router')];
-                break;
-            default:
-                throw new \Exception("Route format is not supported", 500);
-        }
         $this->_uri_segments = explode('/', $this->_uri);
-        $hmvc = new Hmvc($router);
+        $this->config('base_url', $this->_base_url);
+        $this->config('plugin_url', $this->urlPath($this->pluginDir()));
+
+        $data = $this->aliasing();
+        $hmvc = new Hmvc($data['router'], false, $data['params']);
         $this->config('module_info', $hmvc);
         $this->config('module', $hmvc->module);
         $this->config('action', $hmvc->action);
@@ -189,6 +221,37 @@ class Route extends Shortcut
                     break;
             }
             return $attr;
+        }
+    }
+
+    /**
+     * Mengambil URL suatu modul
+     * @param mixed $route string Rute modul
+     * @return string
+     */
+    private function getLinkFromRoute($route)
+    {
+        // Menentukan lokasi URL
+        $url = null;
+        if(!is_numeric(strpos($route, '/'))) {
+            $url = $this->_base_url . $this->config('module') . '/' . $route;
+        }else {
+            if($route[0] != '/') {
+                $url = $this->_base_url . $this->config('module') . '/' . $route;
+            } else {
+                $url = $this->_base_url . substr($route, 1, strlen($route));
+            }
+        }
+        return $url;
+    }
+
+    public function buildUrl($params)
+    {
+        switch (count($params)) {
+            case 0:
+                return $this->_base_url;
+            case 1:
+                return $this->getLinkFromRoute($params[0]);
         }
     }
 }

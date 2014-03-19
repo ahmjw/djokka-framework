@@ -51,6 +51,15 @@ abstract class ActiveRecord extends Model
         $this->preload();
     }
 
+    public function __get($field)
+    {
+        $func = 'get' . ucfirst($field);
+        if (method_exists($this, $func)) {
+            $this->{$field} = call_user_func(array($this, $func));
+        }
+        return $this->{$field};
+    }
+
     /**
      * Getting the driver subclass object by default connection
      * @param string $name Name of the subclass name.
@@ -144,6 +153,7 @@ abstract class ActiveRecord extends Model
     public function setAsNew()
     {
         $this->_dataset['is_new'] = true;
+        return $this;
     }
 
     /**
@@ -175,9 +185,9 @@ abstract class ActiveRecord extends Model
      */
     public function label($field = null)
     {
-        $schema = $this->schema();
-        if ($schema !== null && isset($schema[$field])) {
-            return  $schema['fields'][$field];
+        $labels = $this->labels();
+        if ($labels !== null && isset($labels[$field])) {
+            return  $labels[$field];
         } else {
             return ucfirst($field);
         }
