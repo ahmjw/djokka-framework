@@ -53,6 +53,7 @@ class Config
         'router'          => null, // Pengolah rute untuk Route-Aliasing
         'asset_url'       => null, // URL untuk aset
         'theme_url'       => null, // URL untuk tema
+        'plugin_url'      => null,
 
         // View configuration
         'theme'  => 'default', // Nama tema yang sedang digunakan web

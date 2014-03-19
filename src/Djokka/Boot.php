@@ -75,10 +75,10 @@ class Boot extends Shortcut
         if (HANDLE_ERROR === true) {
             register_shutdown_function(array(__CLASS__, 'onShutdown'));
             set_error_handler(array(__CLASS__, 'handleError'), E_ALL ^ E_NOTICE);
-            set_exception_handler(array(__CLASS__, 'handleException'));
             ini_set('display_errors', 'off');
             error_reporting(E_ALL ^ E_NOTICE);
         }
+        set_exception_handler(array(__CLASS__, 'handleException'));
         // Internal class autoloader
         spl_autoload_register(array($this, 'autoload'));
     }
@@ -117,23 +117,25 @@ class Boot extends Shortcut
      */
     public static function handleException(\Exception $e)
     {
-        //print_r($e);
         $path = SYSTEM_DIR . 'resources' . DIRECTORY_SEPARATOR . 'errors' . DIRECTORY_SEPARATOR . 'view.php';
 
         try {
-            if (Config::getInstance()->getData('error_redirect') === true && $e->getCode() == 403) {
-                $page = Config::getInstance()->getData('module').'/'.Config::getInstance()->getData('action');
-                if ($page != $redirect = Config::getInstance()->getData('module_forbidden')) {
-                    Controller::getInstance()->redirect('/' . $redirect);
+            if (Config::getInstance()->getData('error_redirect') === true) {
+                if ($e->getCode() == 403) {
+                    $page = Config::getInstance()->getData('module').'/'.Config::getInstance()->getData('action');
+                    if ($page != ($redirect = Config::getInstance()->getData('module_forbidden'))) {
+                        BaseController::getInstance()->redirect('/' . $redirect);
+                    }
+                } else {
+                    self::$_errorHandlerActive = true;
+                    $moduleName = Config::getInstance()->getData('module_error');
+                    BaseController::getInstance()->import($moduleName, array('error' => $e), true);
                 }
             } else {
-                self::$_errorHandlerActive = true;
-                $moduleName = Config::getInstance()->getData('module_error');
-                Controller::getInstance()->import($moduleName, array('error' => $e), true);
-                View::getInstance()->showOutput();
+                print BaseController::getInstance()->outputBuffering($path, array('e'=>$e));
             }
         } catch (\Exception $ex) {
-            print Controller::getInstance()->outputBuffering($path, array('e'=>$ex));
+            print BaseController::getInstance()->outputBuffering($path, array('e'=>$ex));
         }
     }
 
@@ -181,7 +183,7 @@ class Boot extends Shortcut
             Route::getInstance()->load();
             $route = $this->config('route');
         }
-        Controller::getInstance()->import($route);
+        BaseController::getInstance()->import($route);
     }
 
     /**
