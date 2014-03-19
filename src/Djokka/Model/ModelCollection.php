@@ -80,6 +80,11 @@ class ModelCollection
         }
 	}
 
+    public function getModel()
+    {
+        return $this->_model;
+    }
+
     /**
      * Mengambil hasil pembagi halaman
      */
@@ -93,11 +98,12 @@ class ModelCollection
      */
     public function showPager()
     {
+        if($this->rowCount == 0) return;
         $pager = $this->_model->getPager();
         list($page, $num_page, $total) = $pager;
 
         if ($num_page > 0) {
-            echo '<p>';
+            echo '<p><b>Page:</b> ';
             for ($i = 1; $i <= $num_page; $i++) {
                 if ($i != $page) {
                     echo '<a href="'.Route::getInstance()->getUrl().'?page='.$i.'">'.$i.'</a>';
