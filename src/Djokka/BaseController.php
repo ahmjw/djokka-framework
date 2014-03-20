@@ -11,7 +11,6 @@
 
 namespace Djokka;
 
-use Djokka\View\Asset;
 use Djokka\Helpers\String;
 use Djokka\Helpers\User;
 use Djokka\Helpers\File;
@@ -188,7 +187,7 @@ class BaseController extends Shortcut
      * @since 1.0.0
      */
     public function js($code) {
-        Asset::getInstance()->js($code);
+        View::getInstance()->addScript($code);
     }
 
     /**
@@ -196,8 +195,9 @@ class BaseController extends Shortcut
      * @param string $code CSS code
      * @since 1.0.0
      */
-    public function css($code) {
-        Asset::getInstance()->css($code);
+    public function css($code)
+    {
+        View::getInstance()->addStyle($code);
     }
 
     /**
@@ -205,8 +205,9 @@ class BaseController extends Shortcut
      * @param string $url URL of the Javascript or CSS file
      * @since 1.0.0
      */
-    public function asset($url) {
-        Asset::getInstance()->add($url);
+    public function asset($url)
+    {
+        View::getInstance()->addFile($url);
     }
 
     /**
@@ -366,13 +367,32 @@ class BaseController extends Shortcut
      * @since 1.0.0
      * @return string
      */
-    public function getLayout($layoutName)
+    public function loadLayout($layoutName, $params = array())
     {
-        $path = $this->themeDir().$this->theme().'/'.$layoutName.'.php';
+        $extension = Config::getInstance()->getData('use_html_layout') === true ? 'html' : 'php';
+        $path = $this->themeDir().$this->theme().'/'.$layoutName.'.'.$extension;
         if (!file_exists($path)) {
             throw new \Exception("Layout file not found in path $path", 404);
         }
-        return $this->outputBuffering($path);
+        if (Config::getInstance()->getData('use_html_layout') === false) {
+            print $this->outputBuffering($path, $params);
+        } else {
+            print $this->outputBuffering($path);
+        }
+    }
+
+    public function getLayout($layoutName, $params = array())
+    {
+        $extension = Config::getInstance()->getData('use_html_layout') === true ? 'html' : 'php';
+        $path = $this->themeDir().$this->theme().'/'.$layoutName.'.'.$extension;
+        if (!file_exists($path)) {
+            throw new \Exception("Layout file not found in path $path", 404);
+        }
+        if (Config::getInstance()->getData('use_html_layout') === false) {
+            return $this->outputBuffering($path, $params);
+        } else {
+            print $this->outputBuffering($path);
+        }
     }
 
     /**
@@ -388,7 +408,7 @@ class BaseController extends Shortcut
             if (is_string($items)) {
                 $items = $items[0] == '/' ? substr($items, 1, strlen($items)) : $this->config('module') . '/' . $items;
             }
-            Asset::getInstance()->setWidget($element, $items);
+            View::getInstance()->addWidget($element, $items);
         } else {
             $route = $element[0] == '/' ? substr($element, 1, strlen($element)) : $this->config('module') . '/' . $element;
             return $this->import($route, null, true);
@@ -403,5 +423,10 @@ class BaseController extends Shortcut
     public function extract(array $data)
     {
         $this->_data['view']['vars'] = array_merge($this->_data['view']['vars'], $data);
+    }
+
+    public function appendTo($element, $content)
+    {
+        View::getInstance()->addAppendItem($element, $content);
     }
 }

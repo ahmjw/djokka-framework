@@ -304,7 +304,7 @@ abstract class ActiveRecord extends Model
      * @since 1.0.1
      * @return object Object of class Djokka\Driver\[Driver name]\Query
      */
-    public function db($from = null)
+    public function q($from = null)
     {
         $driver = $this->getDriver('Query');
         if($from === null) {

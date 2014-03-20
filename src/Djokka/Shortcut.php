@@ -43,11 +43,14 @@ class Shortcut
         if (!isset($class_map[$subclass])) {
             throw new \Exception('Class library with name '.$subclass.' not found', 500);
         }
-        if ($subclass == 'Db') {
-            $className = 'Database\\Drivers\\' . $this->config('database_driver') . '\\Connection';
-        } else {
-            $className = $class_map[$subclass];
-        }
+        $className = $class_map[$subclass];
+        return call_user_func(array(__NAMESPACE__ . '\\' . $className, 'getInstance'));
+    }
+
+    public function db($driver=null)
+    {
+        $driver = $driver === null ? $this->config('database_driver') : $driver;
+        $className = 'Database\\Drivers\\' . $driver . '\\Connection';
         return call_user_func(array(__NAMESPACE__ . '\\' . $className, 'getInstance'));
     }
 

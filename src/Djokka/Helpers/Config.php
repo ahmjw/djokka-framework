@@ -40,28 +40,30 @@ class Config
         'module_forbidden' => 'index/signin', // Nama modul tujuan pengalihan saat terjadi error akses ditolak
 
         // Controller configurarion
-        'main_module' => 'index', // Nama modul utama
-        'module'      => null, // Nama modul yang sedang diakses
+        'main_module'      => 'index', // Nama modul utama
+        'module'           => null, // Nama modul yang sedang diakses
 
         // Router configuration
-        'get_router'      => 'r', // Nama key untuk format rute GET
-        'route_format'    => 'path', // Format rute yang akan digunakan
-        'route_max_depth' => 20, // Maksimum kedalaman hirarki modul
-        'route_params'    => array(), // Parameter yang tersedia untuk Route-Aliasing
-        'router_action'   => null, // Aksi yang menjadi target untuk Route-Aliasing
-        'ref_dir'         => null, // Lokasi folder untuk mengganti lokasi folder standar pada suatu kondisi tertentu
-        'router'          => null, // Pengolah rute untuk Route-Aliasing
-        'asset_url'       => null, // URL untuk aset
-        'theme_url'       => null, // URL untuk tema
-        'plugin_url'      => null,
+        'get_router'       => 'r', // Nama key untuk format rute GET
+        'route_format'     => 'path', // Format rute yang akan digunakan
+        'route_max_depth'  => 20, // Maksimum kedalaman hirarki modul
+        'route_params'     => array(), // Parameter yang tersedia untuk Route-Aliasing
+        'router_action'    => null, // Aksi yang menjadi target untuk Route-Aliasing
+        'ref_dir'          => null, // Lokasi folder untuk mengganti lokasi folder standar pada suatu kondisi tertentu
+        'router'           => null, // Pengolah rute untuk Route-Aliasing
+        'asset_url'        => null, // URL untuk aset
+        'theme_url'        => null, // URL untuk tema
+        'plugin_url'       => null,
 
         // View configuration
-        'theme'  => 'default', // Nama tema yang sedang digunakan web
-        'layout' => 'index', // Nama layout yang sedang digunakan web
-        'json'   => false, // Menandai apakah output web menggunakan format JSON atau tidak
+        'theme'            => 'default', // Nama tema yang sedang digunakan web
+        'layout'           => 'index', // Nama layout yang sedang digunakan web
+        'json'             => false, // Menandai apakah output web menggunakan format JSON atau tidak
+        'use_html_layout'  => false,
+        'html_content_id'  => 'main',
 
-        'connection'      => 0, // Indeks koneksi database yang akan digunakan pada fitur multi-database
-        'database_driver' => 'MySql'
+        'connection'       => 0, // Indeks koneksi database yang akan digunakan pada fitur multi-database
+        'database_driver'  => 'MySql'
     );
 
     /**
@@ -79,7 +81,6 @@ class Config
         'Route'   => 'Route',
         'Asset'   => 'View\\Asset',
         'Model'   => 'Model',
-        'Db'      => ''
     );
 
     /**
