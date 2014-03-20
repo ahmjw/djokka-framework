@@ -1,23 +1,18 @@
 <?php
 
 /**
- * Menyediakan manipulasi HTML menggunakan object DomDocument
- * @since 1.0.0
+ * Memproses bagian view
  * @author Ahmad Jawahir <rawndummy@gmail.com>
  * @link http://www.djokka.com
  * @license http://creativecommons.org/licenses/by-nc-sa/4.0/deed.en_US
  * @copyright Copyright &copy; 2013 Djokka Media
- * @version 1.0.0
+ * @version 1.0.1
  */
 
-namespace Djokka\View;
+namespace Djokka;
 
-/**
- * Kelas pendamping yang membantu kelas Djokka\View untuk melakukan manipulasi HTML
- */
-class Dom extends \DomDocument
+class DomHtml extends \DomDocument
 {
-
     /**
      * Menampung instance dari kelas
      * @since 1.0.0
@@ -68,5 +63,4 @@ class Dom extends \DomDocument
             }
         }
     }
-
 }
