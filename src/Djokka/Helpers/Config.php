@@ -39,18 +39,14 @@ class Config
         'module_error'     => 'index/error', // Nama modul tujuan pengalihan jika terjadi error
         'module_forbidden' => 'index/signin', // Nama modul tujuan pengalihan saat terjadi error akses ditolak
 
-        // Controller configurarion
-        'main_module'      => 'index', // Nama modul utama
-        'module'           => null, // Nama modul yang sedang diakses
-
         // Router configuration
+        'routes'           => array(), // Data route-aliasing
         'get_router'       => 'r', // Nama key untuk format rute GET
         'route_format'     => 'path', // Format rute yang akan digunakan
-        'route_max_depth'  => 20, // Maksimum kedalaman hirarki modul
-        'route_params'     => array(), // Parameter yang tersedia untuk Route-Aliasing
-        'router_action'    => null, // Aksi yang menjadi target untuk Route-Aliasing
-        'ref_dir'          => null, // Lokasi folder untuk mengganti lokasi folder standar pada suatu kondisi tertentu
-        'router'           => null, // Pengolah rute untuk Route-Aliasing
+        'route_max_depth'  => 20, // Maksimum kedalaman rute
+        'module'           => null, // Nama modul yang sedang diakses
+        'action'           => null, // Nama action yang sedang diakses
+        'route'           => null, // Rute yang sedang diakses
         'asset_url'        => null, // URL untuk aset
         'theme_url'        => null, // URL untuk tema
         'plugin_url'       => null,
@@ -79,8 +75,8 @@ class Config
         'File'    => 'Helpers\\File',
         'String'  => 'Helpers\\String',
         'Route'   => 'Route',
-        'Asset'   => 'View\\Asset',
-        'Model'   => 'Model',
+        'DomHtml' => 'DomHtml',
+        'Hmvc'    => 'Hmvc',
     );
 
     /**

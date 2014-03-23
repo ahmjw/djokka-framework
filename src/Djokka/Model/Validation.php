@@ -177,6 +177,27 @@ class Validation
      */
     private function length($model, $field, $params = array())
     {
+        $stop = false;
+        if (isset($params['exact'])) {
+            $message = isset($params['message']) ?
+                str_replace('{attr}', $model->label($field), $params['message']) :
+                $model->label($field).' is more than max value';
+            $model->error($field, $message);
+            $stop = true;
+        }
+        if (isset($params['max']) && strlen($model->{$field}) > $params['max']) {
+            $message = isset($params['message']) ?
+                str_replace('{attr}', $model->label($field), $params['message']) :
+                $model->label($field).' is more than max value';
+            $model->error($field, $message);
+            $stop = true;
+        }
+        if (isset($params['min'])) {
+            $message = isset($params['message']) ?
+                str_replace('{attr}', $model->label($field), $params['message']) :
+                $model->label($field).' is more than max value';
+            $model->error($field, $message);
+        }
     }
 
     /**

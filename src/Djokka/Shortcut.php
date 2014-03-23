@@ -215,7 +215,7 @@ class Shortcut
      */
     public function using($class)
     {
-        $path = $this->componentDir().$class.'.php';
+        $path = $this->realPath($this->componentDir().$class.'.php');
         if (!file_exists($path)) {
             throw new \Exception("Failed to importing object file. File not found in path $path", 404);
         }
@@ -351,5 +351,14 @@ class Shortcut
     public function link()
     {
         return Route::getInstance()->buildUrl(func_get_args());
+    }
+
+    public function param($key = null)
+    {
+        $info = $this->config('module_info');
+        if ($key !== null) {
+            return $info->params[$key];
+        }
+        return $info->params;
     }
 }

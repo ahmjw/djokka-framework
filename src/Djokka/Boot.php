@@ -157,17 +157,9 @@ class Boot extends Shortcut
      */
     public function autoload($className)
     {
-        $path = null;
-        if (preg_match('/^[a-zA-Z0-9_]+Model$/i', $className, $match)) {
-            $path = $this->moduleDir().'models'.DIRECTORY_SEPARATOR.$className.'.php';
-            if (!file_exists($path)) {
-                throw new \Exception("Model file not found at path $path", 404);
-            }
-        } else {
-            $path = $this->componentDir().$className.'.php';
-            if (!file_exists($path)) {
-                throw new \Exception("Component file not found at path $path", 404);
-            }
+        $path = $this->realPath($this->componentDir().$className.'.php');
+        if (!file_exists($path)) {
+            throw new \Exception("Component file not found at path $path", 404);
         }
         include_once($path);
     }
