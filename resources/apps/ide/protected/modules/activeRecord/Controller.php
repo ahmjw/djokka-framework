@@ -2,10 +2,10 @@
 
 namespace Djokka\Modules\ActiveRecord;
 
-use Djokka\Controller as Base;
+use Djokka\BaseController;
 use Djokka\Helpers\Config;
 
-class Controller extends Base
+class Controller extends BaseController
 {
 	private $_config;
 

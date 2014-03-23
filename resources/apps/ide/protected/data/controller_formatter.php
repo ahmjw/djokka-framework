@@ -4,14 +4,14 @@
  * This file is controller of module '(=className)'
  */
 
-namespace Djokka\Controllers;
+namespace Djokka\Modules\(=className);
 
-use Djokka\Controller;
+use Djokka\BaseController;
 
 /**
  * This class will controller of module '(=className)'
  */
-class (=className) extends Controller
+class Controller extends BaseController
 {
 	/**
 	 * The page for action 'index'

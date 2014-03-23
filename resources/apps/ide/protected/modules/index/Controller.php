@@ -2,9 +2,9 @@
 
 namespace Djokka\Modules\Index;
 
-use Djokka\Controller as Base;
+use Djokka\BaseController;
 
-class Controller extends Base
+class Controller extends BaseController
 {
 	public function actionIndex()
 	{

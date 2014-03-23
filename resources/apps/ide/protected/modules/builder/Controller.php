@@ -2,9 +2,9 @@
 
 namespace Djokka\Modules\Builder;
 
-use Djokka\Controller as Base;
+use Djokka\BaseController;
 
-class Controller extends Base
+class Controller extends BaseController
 {
 	private $_dir;
 	private $_module_path;

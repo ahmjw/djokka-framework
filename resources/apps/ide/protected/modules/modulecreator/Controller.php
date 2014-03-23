@@ -2,9 +2,9 @@
 
 namespace Djokka\Modules\Modulecreator;
 
-use Djokka\Controller as Base;
+use Djokka\BaseController;
 
-class Controller extends Base
+class Controller extends BaseController
 {
 	private $_dir;
 	private $_config;
@@ -62,7 +62,7 @@ class Controller extends Base
 		$code = $this->renderCode('controller_formatter', array(
 			'className'=>$className
 		));
-		$this->lib('File')->write($dir.DS.$className.'.php', $code);
+		$this->lib('File')->write($dir.DS.'Controller.php', $code);
 
 		$temp = $this->makePath($temp, 'views');
 		$this->lib('File')->write($temp.DS.'index.php', "<h1>Index of ".$className."</h1>".
