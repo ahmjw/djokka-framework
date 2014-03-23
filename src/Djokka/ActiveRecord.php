@@ -304,17 +304,8 @@ abstract class ActiveRecord extends Model
      * @since 1.0.1
      * @return object Object of class Djokka\Driver\[Driver name]\Query
      */
-    public function q($from = null)
+    public function q()
     {
-        $driver = $this->getDriver('Query');
-        if($from === null) {
-            $driver->from($this->table());
-        } else {
-            $driver->from($from);
-        }
-        if($this->_dataset['condition'] !== null) {
-            $driver->where($this->_dataset['condition']);
-        }
-        return $driver;
+        return $this->getDriver('Crud')->getPagerImpl($this, func_get_args());
     }
 }

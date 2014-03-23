@@ -195,6 +195,23 @@ class Crud extends Query implements ICrud
         return $this->execute();
     }
 
+    public function qImpl($model, $params)
+    {
+        if($from === null) {
+            $this->from($this->table());
+        } else {
+            if (is_array($params)) {
+                $this->from($this->table() . ' ' . $this->replaceParam($params));
+            } else {
+                $this->from($this->table() . ' ' . $params);
+            }
+        }
+        if($model->dataset('condition') !== null) {
+            $this->where($model->dataset('condition'));
+        }
+        return $this;
+    }
+
     /**
      * Mengambil satu record/baris dari suatu tabel menggunakan model
      * @param string $tableName Nama tabel
@@ -250,7 +267,11 @@ class Crud extends Query implements ICrud
         if(!isset($params['from'])){
         	$this->from($model->table());
         } else {
-        	$this->from($params['from']);
+            if (is_array($params['from'])) {
+                $this->from($model->table() . ' ' . $this->replaceParam($params['from']));
+            } else {
+                $this->from($model->table() . ' ' . $params['from']);
+            }
         }
         if(isset($params['where'])){
             $this->where($params['where']);

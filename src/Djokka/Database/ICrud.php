@@ -58,6 +58,8 @@ interface ICrud
 
      public function insertImpl($model, array $availables = array());
 
+     public function qImpl($model, $params);
+
 	/**
      * Mengambil data pembagian halaman
      * @param object $model Object model

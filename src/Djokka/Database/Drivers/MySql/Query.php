@@ -106,6 +106,17 @@ class Query
         return $this;
     }
 
+    public function replaceParam(array $params)
+    {
+        $criteria = $params[0];
+        $criterias = array_slice($params, 1);
+        $i = 0;
+        return preg_replace_callback('/\?/i', function($matches) use($criterias, &$i) {
+            $i++;
+            return "'".addslashes($criterias[$i - 1])."'";
+        }, $criteria);
+    }
+
     /**
      * Membentuk perintah SQL WHERE untuk penyaringan
      * @return object
@@ -114,14 +125,7 @@ class Query
     {
         $sql = $this->_data['query'] . ' WHERE ';
         if(is_array($params)) {
-            $criteria = $params[0];
-            $criterias = array_slice($params, 1);
-            $i = 0;
-            $where = preg_replace_callback('/\?/i', function($matches) use($criterias, &$i) {
-                $i++;
-                return "'".addslashes($criterias[$i - 1])."'";
-            }, $criteria);
-            $sql .= $where;
+            $sql .= $this->replaceParam($params);
             $this->_data['where'] = $where;
         } else {
             $sql .= $params;
