@@ -23,12 +23,12 @@ class ModelCollection
     /**
      * Jumlah baris yang dihasilkan dari hasil eksekusi perintah SQL
      */
-	public $rowCount;
+    public $rowCount;
 
     /**
      * Jumlah kolom yang dihasilkan dari hasil eksekusi perintah SQL
      */
-	public $fieldCount;
+    public $fieldCount;
 
     /**
      * Perintah SQL
@@ -62,10 +62,10 @@ class ModelCollection
      * @param string $property Nama properti/field
      * @return mixed
      */
-	public function __get($property)
-	{
-		if ($property == 'rows') {
-			$this->rows = array();
+    public function __get($property)
+    {
+        if ($property == 'rows') {
+            $this->rows = array();
             while ($row = $this->_result->fetch_assoc()) {
                 $record = clone $this->_model;
                 foreach ($row as $key => $value) {
@@ -74,11 +74,11 @@ class ModelCollection
                 $this->rows[] = $record;
             }
             $this->_result->free_result();
-		}
+        }
         if (isset($this->{$property})) {
           return $this->{$property};
         }
-	}
+    }
 
     public function getModel()
     {
@@ -123,6 +123,6 @@ class ModelCollection
      */
     public function delete()
     {
-        $this->_model->getDriver('Crud')->deleteData($this->_model->table(), $this->_model->dataset('condition'));
+        $this->_model->getDriver('Crud')->deleteImpl($this->_model->table(), $this->_model->dataset('condition'));
     }
 }

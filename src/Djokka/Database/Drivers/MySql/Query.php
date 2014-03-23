@@ -125,8 +125,9 @@ class Query
     {
         $sql = $this->_data['query'] . ' WHERE ';
         if(is_array($params)) {
-            $sql .= $this->replaceParam($params);
-            $this->_data['where'] = $where;
+            $condition = $this->replaceParam($params);
+            $sql .= $condition;
+            $this->_data['where'] = $condition;
         } else {
             $sql .= $params;
             $this->_data['where'] = $params;
