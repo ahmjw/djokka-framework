@@ -83,9 +83,19 @@ class BaseController extends Shortcut
      * @return array
      * @since 1.0.0
      */
-    public function getView()
+    public function getViewData()
     {
         return $this->_data['view'];
+    }
+
+    public function getView($name, array $vars = array())
+    {
+        $hmvc = $this->_data['info'];
+        $path = $hmvc->module_dir.'views'.DS.$name . '.php';
+        if (!file_exists($path)) {
+            throw new \Exception("View of module '{$hmvc->route}' is not found: $path", 404);
+        }
+        return $this->outputBuffering($path, $vars);
     }
 
     /**
@@ -123,7 +133,7 @@ class BaseController extends Shortcut
                 'vars' => $vars
             );
         } else {
-            $hmvc = $this->config('module_info');
+            $hmvc = $this->_data['info'];
             $path = $hmvc->module_dir.'views'.DS.$name . '.php';
             if (!file_exists($path)) {
                 throw new \Exception("View of module '{$hmvc->route}' is not found: $path", 404);

@@ -112,7 +112,7 @@ class View
      */
     public function renderView($instance, $module, $module_dir, $is_plugin) 
     {
-        $view = $instance->getView();
+        $view = $instance->getViewData();
         $path = $this->getThemeViewPath($module, $view['name']);
 
         if(!file_exists($path)) {
@@ -188,7 +188,7 @@ class View
             foreach ($this->_css_codes as $code) {
                 $value .= $code;
             }
-            $style->nodeValue = $value;
+            $style->nodeValue = $this->removeWhiteSpace($value);
         }
         // For JS files
         if (!empty($this->_js_files)) {
@@ -206,7 +206,7 @@ class View
             foreach ($this->_js_codes as $code) {
                 $value .= $code;
             }
-            $script->nodeValue = $value;
+            $script->nodeValue = $this->removeWhiteSpace($value);
         }
         // For DOM append
         if(!empty($this->_append_items)) {
@@ -259,6 +259,11 @@ class View
     public function addStyle($code)
     {
         $this->_css_codes = array_merge($this->_css_codes, array($code));
+    }
+
+    private function removeWhiteSpace($text)
+    {
+        return preg_replace('/\s{2,}/i', null, $text);
     }
 
     public function addWidget($element, $items) {
