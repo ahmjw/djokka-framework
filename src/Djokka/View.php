@@ -25,11 +25,6 @@ class View
      */
     private $_content;
 
-    /**
-     * Menandai view telah diaktifkan atau belum
-     */
-    private $_activated = false;
-
     private $_js_files = array();
 
     private $_js_codes = array();
@@ -83,11 +78,6 @@ class View
         return File::getInstance()->realPath($dir . $theme . DS . $layout . '.' . $extension);
     }
 
-    public function isActivated()
-    {
-        return $this->_activated;
-    }
-
     /**
      * Mengambil konten web
      * @return string
@@ -110,7 +100,7 @@ class View
      * @param mixed $instance object Instance dari modul yang akan diproses
      * @return string
      */
-    public function renderView($instance, $module, $module_dir, $is_plugin) 
+    public function renderView($instance, $module, $module_dir) 
     {
         $view = $instance->getViewData();
         $path = $this->getThemeViewPath($module, $view['name']);
@@ -124,9 +114,7 @@ class View
 
         $content = $instance->outputBuffering($path, $view['vars']);
 
-        if((!$this->_activated || Boot::getInstance()->isErrorHandlerActive()) && !$is_plugin) {
-            BaseController::setCore($instance);
-            $this->_activated = true;
+        if($instance->getInfo('is_core') || Boot::getInstance()->isErrorHandlerActive()) {
             $this->_content = $content;
         } else {
             return $content;
@@ -167,6 +155,11 @@ class View
 
         $headElement = DomHtml::getInstance()->getElementsByTagName('head')->item(0);
         $bodyElement = DomHtml::getInstance()->getElementsByTagName('body')->item(0);
+
+        if ($bodyElement === null) {
+            $bodyElement = $headElement;
+        }
+        
         if (Config::getInstance()->getData('use_html_layout') === true) {
             DomHtml::getInstance()->append(Config::getInstance()->getData('html_content_id'), $this->_content);
         }
@@ -188,7 +181,7 @@ class View
             foreach ($this->_css_codes as $code) {
                 $value .= $code;
             }
-            $style->nodeValue = $this->removeWhiteSpace($value);
+            $style->nodeValue = $value;
         }
         // For JS files
         if (!empty($this->_js_files)) {
@@ -206,7 +199,7 @@ class View
             foreach ($this->_js_codes as $code) {
                 $value .= $code;
             }
-            $script->nodeValue = $this->removeWhiteSpace($value);
+            $script->nodeValue = $value;
         }
         // For DOM append
         if(!empty($this->_append_items)) {
@@ -224,31 +217,8 @@ class View
                 }
             }
         }
+        
         print DomHtml::getInstance()->saveHtml();
-    }
-
-    /**
-     * Menempelkan suatu konten pada suatu elemen HTML
-     * @since 1.0.0
-     * @param $element adalah ID elemen HTML tempat penempelan konten
-     * @param $content adalah konten yang akan ditempelkan pada elemen
-     */
-    public function append($element, $content)
-    {
-        if($content == null) return;
-
-        libxml_use_internal_errors(true);
-        $this->helper->loadHTML($content);
-        libxml_clear_errors();
-        $pAttach = $this->helper->getElementsByTagName('body');
-        $document = $this->getElementById($element);
-
-        if($document == null) return;
-        if ($pAttach->length) {
-            for ($i = 0; $i < $pAttach->item(0)->childNodes->length; $i++) {
-                $document->appendChild($this->importNode($pAttach->item(0)->childNodes->item($i), true));
-            }
-        }
     }
 
     public function addScript($code)

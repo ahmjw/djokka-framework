@@ -13,8 +13,7 @@
 namespace Djokka;
 
 use Djokka\Route;
-use Djokka\Controller;
-use Djokka\Controller\Linker;
+use Djokka\BaseController;
 use Djokka\View;
 use Djokka\Model;
 use Djokka\Model\Pager;
@@ -23,6 +22,7 @@ use Djokka\Helpers\Config;
 use Djokka\Helpers\Session;
 use Djokka\Helpers\User;
 use Djokka\Helpers\File;
+use Djokka\Helpers\String;
 use Djokka\Model\SchemaCollection;
 
 /**
@@ -243,8 +243,14 @@ class Shortcut
      * @since 1.0.3
      * @return string
      */
-    public function realPath($path) {
+    public function realPath($path) 
+    {
         return preg_replace("/([\/\\\]+)/i", DS, $path);
+    }
+
+    public function getController()
+    {
+        return BaseController::getCore();
     }
 
     /**
@@ -308,7 +314,8 @@ class Shortcut
             $path = $this->modelDir()."$match[1].php";
             $class = 'Djokka\\Models\\'.$match[1];
         } else {
-            $path = $this->moduleDir().$this->config('module').DS."models".DS."$name.php";
+            $info = $this->config('module_info');
+            $path = $info->module_dir."models".DS."$name.php";
             $class = 'Djokka\\Models\\'.$name;
         }
         $path = $this->realPath($path);
@@ -356,9 +363,14 @@ class Shortcut
     public function param($key = null)
     {
         $info = $this->config('module_info');
-        if ($key !== null) {
+        if ($key !== null && isset($info->params[$key])) {
             return $info->params[$key];
         }
         return $info->params;
+    }
+
+    public function slugify($str)
+    {
+        return String::getInstance()->slugify($str);
     }
 }

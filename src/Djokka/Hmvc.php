@@ -92,6 +92,8 @@ class Hmvc
      */
     public $is_widget = false;
 
+    public $is_core = false;
+
     public $func_prefix = 'action';
 
     public $module_type = 'plugin_module';

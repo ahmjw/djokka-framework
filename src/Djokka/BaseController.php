@@ -38,6 +38,8 @@ class BaseController extends Shortcut
      */
     private static $_core;
 
+    private static $_is_core_loaded = false;
+
     /**
      * Instance of this class
      * @since 1.0.0
@@ -307,6 +309,11 @@ class BaseController extends Shortcut
         }
         $className = $hmvc->class;
         $instance = new $className;
+        if (!$instance->is_plugin && !$instance->is_widget && self::$_is_core_loaded === false) {
+            self::$_is_core_loaded = true;
+            self::$_core = $instance;
+            $hmvc->is_core = true;
+        }
         $instance->setData('info', $hmvc);
 
         // Preparing
@@ -328,7 +335,7 @@ class BaseController extends Shortcut
         );
 
         if ($this->config('json') === false && $instance->isUseView()) {
-            return View::getInstance()->renderView($instance, $hmvc->module, $hmvc->module_dir, $hmvc->is_plugin);
+            return View::getInstance()->renderView($instance, $hmvc->module, $hmvc->module_dir);
         } else {
             return $return;
         }

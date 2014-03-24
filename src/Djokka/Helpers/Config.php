@@ -75,7 +75,6 @@ class Config
         'File'    => 'Helpers\\File',
         'String'  => 'Helpers\\String',
         'Route'   => 'Route',
-        'DomHtml' => 'DomHtml',
         'Hmvc'    => 'Hmvc',
     );
 
