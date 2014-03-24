@@ -40,7 +40,7 @@ class Controller extends BaseController
 		}
 
 		$tables = array(''=>'-- Select --');
-		$_tables = $this->lib('Db')->getDriver('Table')->getTables();
+		$_tables = $this->db()->getDriver('Table')->getTables();
 		if(!empty($_tables)) {
 			foreach ($_tables as $table) {
 				$tables[$table] = $table;
@@ -54,7 +54,7 @@ class Controller extends BaseController
 				$labels = "return array(\r\n";
 				$rules = "return array(\r\n";
 				$required = $unique = $other = $others = $enum = '';
-				$schema = $this->lib('Db')->getDriver('Table')->getSchema($model->tableName);
+				$schema = $this->db()->getDriver('Table')->getSchema($model->tableName);
 				$count = count($schema['describe']);
 				$pkey = $schema['primary_key'];
 				$i = 0;

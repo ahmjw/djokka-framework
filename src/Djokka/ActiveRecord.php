@@ -295,7 +295,7 @@ abstract class ActiveRecord extends Model
      */
     public function getPager()
     {
-        return $this->getDriver('Crud')->getPagerImpl($this);
+        return $this->getDriver('Crud')->getPagerImpl($this, func_get_args());
     }
 
     /**
@@ -306,6 +306,6 @@ abstract class ActiveRecord extends Model
      */
     public function q()
     {
-        return $this->getDriver('Crud')->getPagerImpl($this, func_get_args());
+        return $this->getDriver('Crud')->qImpl($this, func_get_args());
     }
 }

@@ -324,7 +324,7 @@ class Validation
      */
     private function unique($model, $field, $params = array())
     {
-        if($model->count(array($field . ' = ?', $model->{$field})) > 0) {
+        if($model->isNew() && $model->count(array($field . ' = ?', $model->{$field})) > 0) {
             $message = isset($params['message']) ?
                 str_replace('{attr}', $model->label($field), $params['message']) :
                 $model->label($field).' is must be unique';
@@ -344,7 +344,10 @@ class Validation
     private function email($model, $field, $params = array())
     {
         if(!filter_var($model->{$field}, FILTER_VALIDATE_EMAIL)) {
-            $model->error($field, $model->label($field).' is not valid email format');
+            $message = isset($params['message']) ?
+                str_replace('{attr}', $model->label($field), $params['message']) :
+                $model->label($field).' is not valid email format';
+            $model->error($field, $message);
         }
     }
 

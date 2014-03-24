@@ -178,7 +178,7 @@ class Crud extends Query implements ICrud
                 } else {
                     $this->select($field)
                         ->from($tableName);
-                    $where = array($primary_key.'=?', !$use_pk_opt ? $params[0] : $params);
+                    $where = array($primary_key.'=?', !$use_pk_opt ? $params[0] : $params[0]);
                 }
                 $this->where($where);
             }
@@ -198,12 +198,12 @@ class Crud extends Query implements ICrud
     public function qImpl($model, $params)
     {
         if($from === null) {
-            $this->from($this->table());
+            $this->from($model->table());
         } else {
             if (is_array($params)) {
-                $this->from($this->table() . ' ' . $this->replaceParam($params));
+                $this->from($model->table() . ' ' . $this->replaceParam($params));
             } else {
-                $this->from($this->table() . ' ' . $params);
+                $this->from($model->table() . ' ' . $params);
             }
         }
         if($model->dataset('condition') !== null) {
