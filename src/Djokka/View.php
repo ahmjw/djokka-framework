@@ -25,6 +25,8 @@ class View
      */
     private $_content;
 
+    private $_is_activated = false;
+
     private $_js_files = array();
 
     private $_js_codes = array();
@@ -62,13 +64,6 @@ class View
         $this->_dom = new \DomDocument(1.0, 'UTF-8');
     }
 
-    public function __destruct()
-    {
-        if (BaseController::getCore() !== null) {
-            $this->showOutput();
-        }
-    }
-
     public function getLayoutPath()
     {
         $dir = File::getInstance()->themeDir();
@@ -85,6 +80,11 @@ class View
     public function getContent()
     {
         return $this->_content;
+    }
+
+    public function isActivated()
+    {
+        return $this->_is_activated;
     }
 
     public function getThemeViewPath($moduleName, $viewName)
@@ -115,6 +115,7 @@ class View
         $content = $instance->outputBuffering($path, $view['vars']);
 
         if($instance->getInfo('is_core') || Boot::getInstance()->isErrorHandlerActive()) {
+            $this->_is_activated = true;
             $this->_content = $content;
         } else {
             return $content;

@@ -334,8 +334,11 @@ class BaseController extends Shortcut
             $instance, $hmvc->function), !empty($params) ? $params : $hmvc->params
         );
 
-        if ($this->config('json') === false && $instance->isUseView()) {
+        if ($instance->isUseView()) {
             return View::getInstance()->renderView($instance, $hmvc->module, $hmvc->module_dir);
+        } else if($this->config('json') === true) {
+            header('Content-type: application/json');
+            exit(json_encode($return));
         } else {
             return $return;
         }

@@ -71,13 +71,6 @@ class Boot extends Shortcut
      */
     public function registerAutoload()
     {
-        // Error and exception handling
-        if (HANDLE_ERROR === true) {
-            register_shutdown_function(array(__CLASS__, 'onShutdown'));
-            set_error_handler(array(__CLASS__, 'handleError'), E_ALL ^ E_NOTICE);
-            ini_set('display_errors', 'off');
-            error_reporting(E_ALL ^ E_NOTICE);
-        }
         set_exception_handler(array(__CLASS__, 'handleException'));
         // Internal class autoloader
         spl_autoload_register(array($this, 'autoload'));
@@ -130,6 +123,7 @@ class Boot extends Shortcut
                     self::$_errorHandlerActive = true;
                     $moduleName = Config::getInstance()->getData('module_error');
                     BaseController::getInstance()->import($moduleName, array('error' => $e), true);
+                    View::getInstance()->showOutput();
                 }
             } else {
                 print BaseController::getInstance()->outputBuffering($path, array('e'=>$e));
@@ -176,6 +170,9 @@ class Boot extends Shortcut
             $route = $this->config('route');
         }
         BaseController::getInstance()->import($route);
+        if (View::getInstance()->isActivated()) {
+            View::getInstance()->showOutput();
+        }
     }
 
     /**
