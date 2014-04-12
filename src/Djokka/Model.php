@@ -134,9 +134,13 @@ abstract class Model extends Shortcut
      * error pada properti tersebut. Bernilai FALSE jika tidak terdapat error pada
      * properti tersebut
      */
-    public function hasError()
+    public function hasError($field = null)
     {
-        return count($this->error()) > 0;
+        if ($field === null) {
+            return count($this->error()) > 0;
+        } else {
+            return isset(Validation::getInstance()->errors[$field]);
+        }
     }
 
     /**

@@ -47,10 +47,10 @@ class Shortcut
         return call_user_func(array(__NAMESPACE__ . '\\' . $className, 'getInstance'));
     }
 
-    public function db($driver=null)
+    public function db($driver=null, $component='Connection')
     {
         $driver = $driver === null ? $this->config('database_driver') : $driver;
-        $className = 'Database\\Drivers\\' . $driver . '\\Connection';
+        $className = 'Database\\Drivers\\' . $driver . '\\' . $component;
         return call_user_func(array(__NAMESPACE__ . '\\' . $className, 'getInstance'));
     }
 
