@@ -24,6 +24,8 @@ class Validation
      */
     public $errors = array();
 
+    public $success = array();
+
     /**
      * Daftar aturan validasi yang telah dimuat
      */
@@ -64,7 +66,7 @@ class Validation
      * @param mixed $rules string Nama aturan validasi
      * @param optional $params array Parameter yang dibutuhkan untuk aturan validasi yang digunakan
      */
-    public function setRules($field, $rules, $params)
+    public function setRule($field, $rules, $params)
     {
         $this->rules[] = array_merge($this->rules, array_merge(array(
             $field, $rules
@@ -91,10 +93,16 @@ class Validation
         // Mengumpulkan informasi validasi
         if($this->unvalidate) return true;
         $rules = $model->rules();
-        if($rules === null) return true;
-        if(!empty($this->rules)) {
-            $rules = array_merge($rules, $this->rules);
+        if (is_array($rules)) {
+            if (is_array($this->rules)) {
+                $rules = array_merge($rules, $this->rules);
+            } else {
+                $rules = $this->rules;
+            }
+        } else {
+            $rules = $this->rules;
         }
+        if($rules === null) return true;
 
         // Memecah aturan validasi
         foreach ($rules as $rule) {

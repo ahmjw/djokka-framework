@@ -70,9 +70,9 @@ abstract class Model extends Shortcut
      * @param mixed $rules aturan validasi yang akan diberikan pada field tersebut
      * @param optional $params array Parameter yang dibutuhkan oleh aturan validasi yang digunakan
      */
-    public function setRules($field, $rules, $params = array())
+    public function setRule($field, $rules, $params = array())
     {
-        Validation::getInstance()->setRules($field, $rules, $params);
+        Validation::getInstance()->setRule($field, $rules, $params);
     }
 
     /**
@@ -84,7 +84,22 @@ abstract class Model extends Shortcut
     public function label($property = null)
     {
         $labels = $this->labels();
-        return !empty($labels) && isset($labels[$property]) ? $labels[$property] : ucfirst($property);
+        if (!preg_match_all('/\[(.*?)\]/i', $property, $matches)) {
+            return !empty($labels) && isset($labels[$property]) ? $labels[$property] : ucfirst($property);
+        } else {
+            preg_match('/^(.*?)\[/i', $property, $match);
+            $data = null;
+            $key_name = null;
+            foreach ($matches as $key => $m) {
+                $key_name = $matches[1][$key];
+                if ($key == 0) {
+                    $data = $labels[$match[1]][$key_name];
+                } else {
+                    $data = $data[$key_name];
+                }
+            }
+            return $data === null ? ucfirst($key_name) : $data;
+        }
     }
 
     /**
@@ -127,6 +142,17 @@ abstract class Model extends Shortcut
         }
     }
 
+    public function showSuccess(array $params = array())
+    {
+        if ($this->isSuccess()) {
+            echo isset($params['open']) ? $params['open'] : '<ul>';
+            foreach ($this->success() as $message) {
+                echo '<li>' . $message . '</li>';
+            }
+            echo isset($params['close']) ? $params['close'] : '</ul>';
+        }
+    }
+
     /**
      * Mengecek suatu properti model memiliki error atau tidak
      * @since 1.0.0
@@ -141,6 +167,11 @@ abstract class Model extends Shortcut
         } else {
             return isset(Validation::getInstance()->errors[$field]);
         }
+    }
+
+    public function isSuccess()
+    {
+        return count(Validation::getInstance()->success) > 0;
     }
 
     /**
@@ -162,6 +193,17 @@ abstract class Model extends Shortcut
                 break;
             case 2:
                 Validation::getInstance()->errors[func_get_arg(0)] = func_get_arg(1);
+                break;
+        }
+    }
+
+    public function success()
+    {
+        switch (func_num_args()) {
+            case 0:
+                return Validation::getInstance()->success;
+            case 1:
+                Validation::getInstance()->success[] = func_get_arg(0);
                 break;
         }
     }

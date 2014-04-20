@@ -125,7 +125,7 @@ class File
     public function modelDir()
     {
         return $this->realPath(Config::getInstance()->getData('dir') . DS . Config::getInstance()->getData('app_path') .
-            DS.Config::getInstance()->getData('model_path') . DS);
+            Config::getInstance()->getData('model_path') . DS);
     }
 
     /**
@@ -263,5 +263,31 @@ class File
             closedir($handle);
         }
         return $files;
+    }
+
+    public function getDirs($path, $args = array())
+    {
+        $dirs = array();
+        if ($handle = opendir($path)) {
+            while (false !== ($entry = readdir($handle))) {
+                if ($entry != "." && $entry != "..") {
+                    $realpath = $path.DS.$entry;
+                    if(is_dir($realpath)) {
+                        // Jika pembacaan hendak dilakukan secara rekursif
+                        if(isset($args['recursively']) && $args['recursively'] === true) {
+                            $dirs = $this->getDirs($realpath, $args);
+                        } else {
+                            if(isset($args['full_path']) && $args['full_path'] === true) {
+                                $dirs[] = $realpath;
+                            } else {
+                                $dirs[] = $entry;
+                            }
+                        }
+                    }
+                }
+            }
+            closedir($handle);
+        }
+        return $dirs;
     }
 }

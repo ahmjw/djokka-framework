@@ -203,6 +203,10 @@ class Boot extends Shortcut
     public function init($config = null)
     {
         $this->registerAutoload();
+        if (isset($_GET['djokka'])) {
+            JsonDataExtractor::getInstance()->render();
+            exit;
+        }
         if (!$this->loadInternalApp()) {
             if ($config !== null) {
                 if (is_array($config)) {
