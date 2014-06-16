@@ -20,6 +20,7 @@ use Djokka\Model\Pager;
 use Djokka\View\Asset;
 use Djokka\Helpers\Config;
 use Djokka\Helpers\Session;
+use Djokka\Helpers\Cookie;
 use Djokka\Helpers\User;
 use Djokka\Helpers\File;
 use Djokka\Helpers\String;
@@ -274,6 +275,26 @@ class Shortcut
     }
 
     /**
+     * Membaca, menambah atau mengubah nilai konfigurasi
+     */
+    public function userConfig() 
+    {
+        switch (func_num_args()) {
+            case 0:
+                return Config::getInstance()->getUserConfig();
+            case 1:
+                if (!is_array(func_get_arg(0))) {
+                    return Config::getInstance()->getUserConfigData(func_get_arg(0));
+                } else {
+                    return Config::getInstance()->mergeUserConfig(func_get_arg(0));
+                }
+            case 2:
+                Config::getInstance()->setUserConfigData(func_get_arg(0), func_get_arg(1));
+                break;
+        }
+    }
+
+    /**
      * Membaca, menambah atau mengubah nilai sesi
      */
     public function session() 
@@ -285,6 +306,22 @@ class Shortcut
                 return Session::getInstance()->getData(func_get_arg(0));
             case 2:
                 Session::getInstance()->setData(func_get_arg(0), func_get_arg(1));
+                break;
+        }
+    }
+
+    /**
+     * Membaca, menambah atau mengubah nilai kuki
+     */
+    public function cookie() 
+    {
+        switch (func_num_args()) {
+            case 0:
+                return Cookie::getInstance()->getCookie();
+            case 1:
+                return Cookie::getInstance()->getData(func_get_arg(0));
+            case 2:
+                Cookie::getInstance()->setData(func_get_arg(0), func_get_arg(1));
                 break;
         }
     }
@@ -318,13 +355,16 @@ class Shortcut
             $path = $info->module_dir."models".DS."$name.php";
             $class = 'Djokka\\Models\\'.$name;
         }
-        $path = $this->realPath($path);
-        if (!file_exists($path)) {
-            throw new \Exception("Model file not found in path $path", 404);
-        }
-        include_once($path);
-        if (!class_exists($class)) {
-            throw new \Exception("Class $class is not defined in file $path", 500);
+
+        if ($this->config('application') === true) {
+            $path = $this->realPath($path);
+            if (!file_exists($path)) {
+                throw new \Exception("Model file not found in path $path", 404);
+            }
+            include_once($path);
+            if (!class_exists($class)) {
+                throw new \Exception("Class $class is not defined in file $path", 500);
+            }
         }
         $object = new $class;
         $object->dataset('module', $name);

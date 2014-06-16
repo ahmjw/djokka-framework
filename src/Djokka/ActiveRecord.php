@@ -80,7 +80,14 @@ abstract class ActiveRecord extends Model
     private function preload()
     {
         $config = $this->config('db');
-        $this->_dataset['driver'] = 'Djokka\\Database\\Drivers\\' . $config[0]['driver'];
+        $driver = $config[0]['driver'];
+        if (!isset($config[0]['driver'])) {
+            $driver = $this->config('database_driver');
+        }
+        if (trim($driver) == "") {
+            throw new \Exception("No database driver to load", 500);
+        }
+        $this->_dataset['driver'] = 'Djokka\\Database\\Drivers\\' . $driver;
 
         $this->schema('labels', $this->labels());
         if (!TableCollection::getInstance()->exists($this->table()))
@@ -190,6 +197,22 @@ abstract class ActiveRecord extends Model
             return  $labels[$field];
         } else {
             return ucfirst($field);
+        }
+    }
+
+    /**
+     * Get the field label of model
+     * @param string $field Name of model field
+     * @since 1.0.1
+     * @return string
+     */
+    public function enum($field = null)
+    {
+        $enums = $this->enums();
+        if ($enums !== null && isset($enums[$field])) {
+            return  $enums[$field];
+        } else {
+            return array();
         }
     }
 

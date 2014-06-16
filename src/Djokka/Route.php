@@ -132,7 +132,11 @@ class Route extends Shortcut
         $protocol = isset($_SERVER['HTTPS']) && ($_SERVER['HTTPS'] == 'on' || $_SERVER['HTTPS'] == 1) ? 'https' : 'http';
         $path = str_replace(realpath($_SERVER['DOCUMENT_ROOT']), '', $path);
         $url = str_replace('\\', '/', $path);
-        return "{$protocol}://{$host}{$url}";
+        if ($_SERVER['PHP_SELF'] != "-") {
+            return "{$protocol}://{$host}{$url}";
+        } else {
+            return "file:///" . str_replace(DS, '/', $this->config('dir')) . "{$url}";
+        }
     }
 
     private function aliasing()

@@ -110,26 +110,37 @@ class Boot extends Shortcut
      */
     public static function handleException(\Exception $e)
     {
-        $path = SYSTEM_DIR . 'resources' . DIRECTORY_SEPARATOR . 'errors' . DIRECTORY_SEPARATOR . 'view.php';
+        if (Config::getInstance()->getData('json') === false) {
+            $path = SYSTEM_DIR . 'resources' . DIRECTORY_SEPARATOR . 'errors' . DIRECTORY_SEPARATOR . 'view.php';
 
-        try {
-            if (Config::getInstance()->getData('error_redirect') === true) {
-                if ($e->getCode() == 403) {
-                    $page = Config::getInstance()->getData('module').'/'.Config::getInstance()->getData('action');
-                    if ($page != ($redirect = Config::getInstance()->getData('module_forbidden'))) {
-                        BaseController::getInstance()->redirect('/' . $redirect);
+            try {
+                if (Config::getInstance()->getData('error_redirect') === true) {
+                    if ($e->getCode() == 403) {
+                        $page = Config::getInstance()->getData('module').'/'.Config::getInstance()->getData('action');
+                        if ($page != ($redirect = Config::getInstance()->getData('module_forbidden'))) {
+                            BaseController::getInstance()->redirect('/' . $redirect);
+                        }
+                    } else {
+                        self::$_errorHandlerActive = true;
+                        $moduleName = Config::getInstance()->getData('module_error');
+                        BaseController::getInstance()->import($moduleName, array('error' => $e), true);
+                        View::getInstance()->showOutput();
                     }
                 } else {
-                    self::$_errorHandlerActive = true;
-                    $moduleName = Config::getInstance()->getData('module_error');
-                    BaseController::getInstance()->import($moduleName, array('error' => $e), true);
-                    View::getInstance()->showOutput();
+                    print BaseController::getInstance()->outputBuffering($path, array('e'=>$e));
                 }
-            } else {
-                print BaseController::getInstance()->outputBuffering($path, array('e'=>$e));
+            } catch (\Exception $ex) {
+                print BaseController::getInstance()->outputBuffering($path, array('e'=>$ex));
             }
-        } catch (\Exception $ex) {
-            print BaseController::getInstance()->outputBuffering($path, array('e'=>$ex));
+        } else {
+            self::$_instance->jsonOutput(array(
+                'error' => array(
+                    'code' => $e->getCode(),
+                    'message' => $e->getMessage(),
+                    'file' => $e->getFile(),
+                    'line' => $e->getLine(),
+                ),
+            ));
         }
     }
 
@@ -173,6 +184,12 @@ class Boot extends Shortcut
         if (View::getInstance()->isActivated()) {
             View::getInstance()->showOutput();
         }
+    }
+
+    public function jsonOutput(array $data = array())
+    {
+        header('Content-type: application/json');
+        echo json_encode($data);
     }
 
     /**

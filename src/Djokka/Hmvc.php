@@ -145,11 +145,11 @@ class Hmvc
                     $this->path = File::getInstance()->realPath($this->dir . $prev_mod);
                     break;
                 }
-                if ($i > 0) {
+                if ($i == 0) {
+                    $prev_mod .= $route . '/';
+                } else {
                     $this->module .= '/'.$route;
                     $prev_mod .= 'modules/' . $route . '/';
-                } else {
-                    $prev_mod .= $route . '/';
                 }
                 $i++;
             }

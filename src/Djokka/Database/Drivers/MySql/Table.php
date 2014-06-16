@@ -29,8 +29,14 @@ class Table
     {
         if($resource = $this->_connector->query($sql)) {
             $rows = array();
-            while ($row = $resource->fetch_array()) {
-                $rows[] = $row;
+            if ($is_numeric_key === true) {
+                while ($row = $resource->fetch_array()) {
+                    $rows[] = $row;
+                }
+            } else {
+                while ($row = $resource->fetch_assoc()) {
+                    $rows[] = $row;
+                }
             }
             $resource->free_result();
             return $rows;

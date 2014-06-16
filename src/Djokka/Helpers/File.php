@@ -242,7 +242,7 @@ class File
         if ($handle = opendir($path)) {
             while (false !== ($entry = readdir($handle))) {
                 if ($entry != "." && $entry != "..") {
-                    $realpath = $path.DS.$entry;
+                    $realpath = $path . DS . $entry;
                     if(is_dir($realpath)) {
                         // Jika pembacaan hendak dilakukan secara rekursif
                         if(isset($args['recursively']) && $args['recursively'] === true) {
@@ -271,7 +271,7 @@ class File
         if ($handle = opendir($path)) {
             while (false !== ($entry = readdir($handle))) {
                 if ($entry != "." && $entry != "..") {
-                    $realpath = $path.DS.$entry;
+                    $realpath = $path . DS . $entry . DS;
                     if(is_dir($realpath)) {
                         // Jika pembacaan hendak dilakukan secara rekursif
                         if(isset($args['recursively']) && $args['recursively'] === true) {

@@ -56,26 +56,30 @@ class Config
         'layout'           => 'index', // Nama layout yang sedang digunakan web
         'json'             => false, // Menandai apakah output web menggunakan format JSON atau tidak
         'use_html_layout'  => false,
+        'application'      => true,
         'html_content_id'  => 'main',
 
         'connection'       => 0, // Indeks koneksi database yang akan digunakan pada fitur multi-database
-        'database_driver'  => 'MySql'
+        'database_driver'  => 'MySql',
+        'user_config'      => array(),
     );
 
     /**
      * Peta kelas yang akan menjadi anggota pustaka yang dapat dipanggil
      */
     private $class_map = array(
-        'Session' => 'Helpers\\Session',
-        'User'    => 'Helpers\\User',
-        'Config'  => 'Helpers\\Config',
-        'Html'    => 'Helpers\\Html',
-        'Email'   => 'Helpers\\Email',
-        'Image'   => 'Helpers\\Image',
-        'File'    => 'Helpers\\File',
-        'String'  => 'Helpers\\String',
-        'Route'   => 'Route',
-        'Hmvc'    => 'Hmvc',
+        'Session'    => 'Helpers\\Session',
+        'Cookie'    => 'Helpers\\Cookie',
+        'User'       => 'Helpers\\User',
+        'Config'     => 'Helpers\\Config',
+        'Html'       => 'Helpers\\Html',
+        'Email'      => 'Helpers\\Email',
+        'Image'      => 'Helpers\\Image',
+        'File'       => 'Helpers\\File',
+        'String'     => 'Helpers\\String',
+        'Route'      => 'Route',
+        'Hmvc'       => 'Hmvc',
+        'Controller' => 'BaseController',
     );
 
     /**
@@ -152,6 +156,22 @@ class Config
             }
         }
 
+        $path = $dir.'user.php';
+        if(file_exists($path)) {
+            $data = include($path);
+            if(is_array($data)) {
+                if($is_auto) {
+                    $this->merge(array(
+                        'user_config'=>$data
+                    ));
+                } else {
+                    $result = array_merge($result, array(
+                        'user_config'=>$data
+                    ));
+                }
+            }
+        }
+
         $path = $dir.'routes.php';
         if(file_exists($path)) {
             $data = include($path);
@@ -215,6 +235,11 @@ class Config
         return $this->_data;
     }
 
+    public function getUserConfig()
+    {
+        return $this->_data['user_config'];
+    }
+
     /**
      * Menetapkan konfigurasi secara langsung
      * @param mixed $data array Pasangan key dan value konfigurasi yang akan dimasukkan
@@ -233,6 +258,14 @@ class Config
     {
         if(isset($this->_data[$data])) {
             return $this->_data[$data];
+        }
+        return;
+    }
+
+    public function getUserConfigData($data)
+    {
+        if(isset($this->_data['user_config'][$data])) {
+            return $this->_data['user_config'][$data];
         }
         return;
     }

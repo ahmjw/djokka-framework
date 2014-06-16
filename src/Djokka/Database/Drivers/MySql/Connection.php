@@ -90,9 +90,15 @@ class Connection
         if($config == null) {
             throw new \Exception("No database configuration", 500);
         }
+        if(!isset($config['driver']) || trim($config['driver']) == "") {
+            $config['driver'] = Config::getInstance()->getData('database_driver');
+        }
+        if(trim($config['driver']) == "") {
+            throw new \Exception("Current connection is not has database driver", 500);
+        }
         switch ($config['driver']) {
             case 'MySql':
-                @$this->_connection = new \Mysqli($config['hostname'], $config['username'], $config['password'], $config['database']);
+                $this->_connection = new \Mysqli($config['hostname'], $config['username'], $config['password'], $config['database']);
                 if($this->_connection->connect_error) {
                     throw new \Exception($this->_connection->connect_error, 500);
                 }
@@ -103,6 +109,8 @@ class Connection
             case 'Odbc':
                 $pdo = new \PDO('odbc:datasource='.$config['datasource']);
                 break;
+            default:
+                throw new \Exception("No database driver available for '$config[driver]'", 500);
         }
     }
 
