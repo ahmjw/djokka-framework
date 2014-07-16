@@ -80,16 +80,6 @@ class BaseController extends Shortcut
         self::$_core = $core;
     }
 
-    /**
-     * Get the view information
-     * @return array
-     * @since 1.0.0
-     */
-    public function getViewData()
-    {
-        return $this->_data['view'];
-    }
-
     public function getView($name, array $vars = array())
     {
         $hmvc = $this->_data['info'];
@@ -133,29 +123,7 @@ class BaseController extends Shortcut
      */
     public function view($name, array $vars = array())
     {
-        if (empty($this->_data['view']) || Boot::getInstance()->isFoundError()) {
-            $this->_data['view'] = array(
-                'name' => $name,
-                'vars' => $vars
-            );
-        } else {
-            $hmvc = $this->_data['info'];
-            $path = $hmvc->module_dir.'views'.DS.$name . '.php';
-            if (!file_exists($path)) {
-                throw new \Exception("View of module '{$hmvc->route}' is not found: $path", 404);
-            }
-            return $this->outputBuffering($path, $vars);
-        }
-    }
-
-    /**
-     * Checks the controller is use view or no
-     * @since 1.0.3
-     * @return bool Returns TRUE if core controller is use view
-     */
-    public function isUseView()
-    {
-        return !empty($this->_data['view']);
+        return new ViewData($name, $vars);
     }
 
     /**
@@ -341,8 +309,8 @@ class BaseController extends Shortcut
         $params = !empty($params) ? $params : $hmvc->params;
         $return = call_user_func_array(array($instance, $hmvc->function), $params);
 
-        if ($instance->isUseView()) {
-            return View::getInstance()->renderView($instance, $hmvc->module, $hmvc->module_dir);
+        if ($return instanceof ViewData) {
+            return View::getInstance()->renderView($instance, $return, $hmvc->module, $hmvc->module_dir);
         } else if($this->config('json') === true) {
             header('Content-type: application/json');
             exit(json_encode($return));
@@ -440,16 +408,6 @@ class BaseController extends Shortcut
             $route = $element[0] == '/' ? substr($element, 1, strlen($element)) : $this->config('module') . '/' . $element;
             return $this->import($route, null, true);
         }
-    }
-
-    /**
-     * Extracts extended data from controller to the view
-     * @param array $data Data that wants to extract
-     * @since 1.0.3
-     */
-    public function extract(array $data)
-    {
-        $this->_data['view']['vars'] = array_merge($this->_data['view']['vars'], $data);
     }
 
     public function appendTo($element, $content)
