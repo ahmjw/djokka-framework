@@ -23,21 +23,21 @@ class View
     /**
      * Web content
      */
-    private $_content;
+    private $content;
 
-    private $_is_activated = false;
+    private $is_activated = false;
 
-    private $_js_files = array();
+    private $js_files = array();
 
-    private $_js_codes = array();
+    private $js_codes = array();
 
-    private $_css_files = array();
+    private $css_files = array();
 
-    private $_css_codes = array();
+    private $css_codes = array();
 
-    private $_widgets = array();
+    private $widgets = array();
 
-    private $_append_items = array();
+    private $append_items = array();
 
     /**
      * Menampung instance dari kelas
@@ -79,12 +79,12 @@ class View
      */
     public function getContent()
     {
-        return $this->_content;
+        return $this->content;
     }
 
     public function isActivated()
     {
-        return $this->_is_activated;
+        return $this->is_activated;
     }
 
     public function getThemeViewPath($moduleName, $viewName)
@@ -114,9 +114,9 @@ class View
 
         $content = $instance->outputBuffering($path, $view['vars']);
 
-        if($instance->getInfo('is_core') || Boot::getInstance()->isErrorHandlerActive()) {
-            $this->_is_activated = true;
-            $this->_content = $content;
+        if($instance->getInfo('is_core') || Boot::getInstance()->isFoundError()) {
+            $this->is_activated = true;
+            $this->content = $content;
         } else {
             return $content;
         }
@@ -143,12 +143,13 @@ class View
 
     public function showOutput()
     {
+        if (!$this->is_activated) return;
+
         $path = View::getInstance()->getLayoutPath();
         if(!file_exists($path)) {
             throw new \Exception("Layout file not found in path {$path}", 404);
         }
 
-        ob_end_clean();
         $content = BaseController::getCore()->outputBuffering($path);
         libxml_use_internal_errors(true);
         DomHtml::getInstance()->loadHtml($content);
@@ -162,12 +163,12 @@ class View
         }
         
         if (Config::getInstance()->getData('use_html_layout') === true) {
-            DomHtml::getInstance()->append(Config::getInstance()->getData('html_content_id'), $this->_content);
+            DomHtml::getInstance()->append(Config::getInstance()->getData('htmlcontent_id'), $this->content);
         }
 
         // For CSS files
-        if (!empty($this->_css_files)) {
-            foreach ($this->_css_files as $file => $params) {
+        if (!empty($this->css_files)) {
+            foreach ($this->css_files as $file => $params) {
                 $link = $headElement->appendChild(new \DomElement('link'));
                 $link->setAttribute('rel', 'stylesheet');
                 $link->setAttribute('type', 'text/css');
@@ -175,61 +176,70 @@ class View
             }
         }
         // For CSS codes
-        if (!empty($this->_css_codes)) {
+        if (!empty($this->css_codes)) {
             $style = $headElement->appendChild(new \DomElement('style'));
             $style->setAttribute('type', 'text/css');
             $value = null;
-            foreach ($this->_css_codes as $code) {
+            foreach ($this->css_codes as $code) {
                 $value .= $code;
             }
             $style->nodeValue = $value;
         }
         // For JS files
-        if (!empty($this->_js_files)) {
-            foreach ($this->_js_files as $file => $params) {
+        if (!empty($this->js_files)) {
+            foreach ($this->js_files as $file => $params) {
                 $script = $bodyElement->appendChild(new \DomElement('script'));
                 $script->setAttribute('language', 'javascript');
                 $script->setAttribute('src', $file);
             }
         }
         // For JS codes
-        if (!empty($this->_js_codes)) {
+        if (!empty($this->js_codes)) {
             $script = $bodyElement->appendChild(new \DomElement('script'));
             $script->setAttribute('language', 'javascript');
             $value = null;
-            foreach ($this->_js_codes as $code) {
+            foreach ($this->js_codes as $code) {
                 $value .= $code;
             }
             $script->nodeValue = $value;
         }
         // For DOM append
-        if(!empty($this->_append_items)) {
-            foreach ($this->_append_items as $element => $items) {
+        if(!empty($this->append_items)) {
+            foreach ($this->append_items as $element => $items) {
                 foreach ($items as $item) {
                     DomHtml::getInstance()->append($element, $item);
                 }
             }
         }
         // For widgets
-        if (!empty($this->_widgets)) {
-            foreach ($this->_widgets as $element => $widgets) {
+        if (!empty($this->widgets)) {
+            foreach ($this->widgets as $element => $widgets) {
                 foreach ($widgets as $module => $params) {
                     DomHtml::getInstance()->append($element, BaseController::getInstance()->import($params, null, true));
                 }
             }
         }
         
-        print DomHtml::getInstance()->saveHtml();
+        $errors = Boot::getInstance()->getErrors();
+        if (count($errors) == 0) {
+            print DomHtml::getInstance()->saveHtml();
+        } else {
+            if (ob_get_level() > 0) {
+                //ob_end_clean();
+            }
+            $path = SYSTEM_DIR . 'resources' . DIRECTORY_SEPARATOR . 'views' . DIRECTORY_SEPARATOR . 'error_reporting.php';
+            print BaseController::getInstance()->outputBuffering($path, array('errors'=>$errors));
+        }
     }
 
     public function addScript($code)
     {
-        $this->_js_codes = array_merge($this->_js_codes, array($code));
+        $this->js_codes = array_merge($this->js_codes, array($code));
     }
 
     public function addStyle($code)
     {
-        $this->_css_codes = array_merge($this->_css_codes, array($code));
+        $this->css_codes = array_merge($this->css_codes, array($code));
     }
 
     private function removeWhiteSpace($text)
@@ -239,16 +249,16 @@ class View
 
     public function addWidget($element, $items) {
         if(is_array($items)) {
-            if(isset($this->_widgets[$element])) {
-                $this->_widgets[$element] = array_merge($this->_widgets[$element], $items);
+            if(isset($this->widgets[$element])) {
+                $this->widgets[$element] = array_merge($this->widgets[$element], $items);
             } else {
-                $this->_widgets[$element] = $items;
+                $this->widgets[$element] = $items;
             }
         } else {
-            if(isset($this->_widgets[$element])) {
-                $this->_widgets[$element][] = $items;
+            if(isset($this->widgets[$element])) {
+                $this->widgets[$element][] = $items;
             } else {
-                $this->_widgets[$element] = array($items);
+                $this->widgets[$element] = array($items);
             }
         }
     }
@@ -259,11 +269,11 @@ class View
             switch ($match[1]) {
                 // For Javascript
                 case 'js':
-                    $this->_js_files = array_merge($this->_js_files, array($source => $params));
+                    $this->js_files = array_merge($this->js_files, array($source => $params));
                     break;
                 // For CSS
                 case 'css':
-                    $this->_css_files = array_merge($this->_css_files, array($source => $params));
+                    $this->css_files = array_merge($this->css_files, array($source => $params));
                     break;
             }
         } else {
@@ -273,10 +283,10 @@ class View
 
     public function addAppendItem($element, $content)
     {
-        if(isset($this->_append_items[$element])) {
-            $this->_append_items[$element][] = $content;
+        if(isset($this->append_items[$element])) {
+            $this->append_items[$element][] = $content;
         } else {
-            $this->_append_items[$element] = array($content);
+            $this->append_items[$element] = array($content);
         }
     }
 }
