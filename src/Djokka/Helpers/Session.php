@@ -80,13 +80,20 @@ class Session
      */
     public function delete()
     {
-        $params = func_get_arg(0);
-        if (!is_array($params)) {
-            unset($_SESSION['djokka'][$params]);
-        } else {
-            foreach ($params as $key) {
-                unset($_SESSION['djokka'][$key]);
-            }
+        switch (func_num_args()) {
+            case 1:
+                $params = func_get_arg(0);
+                if (!is_array($params)) {
+                    unset($_SESSION['djokka'][$params]);
+                } else {
+                    foreach ($params as $key) {
+                        unset($_SESSION['djokka'][$key]);
+                    }
+                }
+                break;
+            case 2:
+                unset($_SESSION['djokka'][func_get_arg(0)][func_get_arg(1)]);
+                break;
         }
     }
 
