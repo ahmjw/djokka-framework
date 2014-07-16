@@ -115,9 +115,13 @@ class BaseController extends Shortcut
         $this->_data[$key] = $value;
     }
 
-    public function getInfo($key)
+    public function getInfo($key = null)
     {
-        return $this->_data['info']->{$key};
+        if ($key === null) {
+            return $this->_data['info'];
+        } else {
+            return $this->_data['info']->{$key};
+        }
     }
 
     /**
@@ -129,7 +133,7 @@ class BaseController extends Shortcut
      */
     public function view($name, array $vars = array())
     {
-        if (empty($this->_data['view'])) {
+        if (empty($this->_data['view']) || Boot::getInstance()->isFoundError()) {
             $this->_data['view'] = array(
                 'name' => $name,
                 'vars' => $vars
@@ -299,17 +303,21 @@ class BaseController extends Shortcut
      */
     private function render($hmvc, $params = array())
     {
+        if (Boot::getInstance()->getErrorInfo('file') == $hmvc->path) {
+            return;
+        }
         // Mengumpulkan informasi aksi
         if (!file_exists($hmvc->path)) {
             throw new \Exception("Class of module is not found: {$hmvc->path}", 404);
         }
         include_once($hmvc->path);
+
         if (!class_exists($hmvc->class)) {
-            throw new \Exception("Class $class is not declared in file $path", 500);
+            throw new \Exception("Class {$hmvc->class} is not declared in file {$hmvc->path}", 500);
         }
         $className = $hmvc->class;
         $instance = new $className;
-        if (!$instance->is_plugin && !$instance->is_widget && self::$_is_core_loaded === false) {
+        if (!$hmvc->is_plugin && !$hmvc->is_widget && self::$_is_core_loaded === false || Boot::getInstance()->isFoundError()) {
             self::$_is_core_loaded = true;
             self::$_core = $instance;
             $hmvc->is_core = true;
@@ -330,9 +338,8 @@ class BaseController extends Shortcut
             throw new \Exception("Method {$hmvc->function}() is not defined in class $className in file {$hmvc->path}", 404);
         }
         
-        $return = call_user_func_array(array(
-            $instance, $hmvc->function), !empty($params) ? $params : $hmvc->params
-        );
+        $params = !empty($params) ? $params : $hmvc->params;
+        $return = call_user_func_array(array($instance, $hmvc->function), $params);
 
         if ($instance->isUseView()) {
             return View::getInstance()->renderView($instance, $hmvc->module, $hmvc->module_dir);
@@ -390,7 +397,7 @@ class BaseController extends Shortcut
     public function loadLayout($layoutName, $params = array())
     {
         $extension = Config::getInstance()->getData('use_html_layout') === true ? 'html' : 'php';
-        $path = $this->themeDir().$this->theme().'/'.$layoutName.'.'.$extension;
+        $path = $this->themeDir().$this->theme() . DS . $layoutName . '.' . $extension;
         if (!file_exists($path)) {
             throw new \Exception("Layout file not found in path $path", 404);
         }
