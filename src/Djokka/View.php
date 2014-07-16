@@ -100,19 +100,18 @@ class View
      * @param mixed $instance object Instance dari modul yang akan diproses
      * @return string
      */
-    public function renderView($instance, $module, $module_dir) 
+    public function renderView($instance, $data, $module, $module_dir) 
     {
-        $view = $instance->getViewData();
-        $path = $this->getThemeViewPath($module, $view['name']);
+        $path = $this->getThemeViewPath($module, $data->name);
 
         if(!file_exists($path)) {
-            $path = File::getInstance()->realPath($module_dir . '/views/' . $view['name'] . '.php');
-            if(!file_exists($path)) {;
+            $path = File::getInstance()->realPath($module_dir . '/views/' . $data->name . '.php');
+            if(!file_exists($path)) {
                 throw new \Exception("View of ".$instance->getInfo('module_type')." '$module' is not found: $path", 404);
             }
         }
 
-        $content = $instance->outputBuffering($path, $view['vars']);
+        $content = $instance->outputBuffering($path, $data->vars);
 
         if($instance->getInfo('is_core') || Boot::getInstance()->isFoundError()) {
             $this->is_activated = true;
