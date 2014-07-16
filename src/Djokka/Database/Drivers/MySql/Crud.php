@@ -197,7 +197,7 @@ class Crud extends Query implements ICrud
 
     public function qImpl($model, $params)
     {
-        if($from === null) {
+        if(!isset($params['from'])) {
             $this->from($model->table());
         } else {
             if (is_array($params)) {
