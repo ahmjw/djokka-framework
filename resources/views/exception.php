@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-	<title>Error</title>
+	<title>Error <?php echo $e->getCode(); ?></title>
 <style type="text/css">
 body{
 	font-family: Helvetica, Arial, Times;
