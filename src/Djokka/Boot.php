@@ -44,7 +44,9 @@ class Boot extends Shortcut
     /**
      *
      */
-    private static $_errorHandlerActive = false;
+    private $found_error = false;
+    private $error_info = false;
+    private $errors = array();
 
     /**
      * Instance of this class
@@ -71,36 +73,38 @@ class Boot extends Shortcut
      */
     public function registerAutoload()
     {
-        set_exception_handler(array(__CLASS__, 'handleException'));
+        // Error reporting
+        if (error_reporting() > 0) {
+            set_error_handler(array($this, 'onError'));
+        }
+        register_shutdown_function(array($this, 'onShutdown'));
+        // Exception handler
+        set_exception_handler(array($this, 'handleException'));
         // Internal class autoloader
         spl_autoload_register(array($this, 'autoload'));
+    }
+
+    public function onError($code, $message, $file, $line, $context = null)
+    {
+        $this->errors[] = array(
+            'code' => $code,
+            'message' => $message,
+            'file' => $file,
+            'line' => $line,
+        );
     }
 
     /**
      * Get the last error on the PHP shutting down
      * @since 1.0.3
      */
-    public static function onShutdown()
+    public function onShutdown()
     {
-        if (self::$_errorHandlerActive) return;
         if (($error = error_get_last()) !== null) {
-            self::handleError($error["type"], $error["message"], $error["file"], $error["line"]);
+            $this->error_info = $error;
+            $this->handleException(new \ErrorException($error['message'], 500, $error["type"], $error["file"], $error["line"]));
         }
-    }
-
-    /**
-     * Handle error and throw as exception
-     * @param int $num Error code
-     * @param string $str Error message
-     * @param string $file File path that has error
-     * @param int $line The line number in file that has error
-     * @param array $context Arguments from the PHP system
-     * @throws ErrorException to catch by exception handler
-     * @since 1.0.3
-     */
-    public static function handleError($num, $str, $file, $line, $context = null)
-    {
-        self::handleException(new \ErrorException( $str, 0, $num, $file, $line));
+        die();
     }
 
     /**
@@ -108,31 +112,45 @@ class Boot extends Shortcut
      * @param object $e The exception object. The object must be instance of Exception class
      * @since 1.0.3
      */
-    public static function handleException(\Exception $e)
+    public function handleException(\Exception $e)
     {
         if (Config::getInstance()->getData('json') === false) {
-            $path = SYSTEM_DIR . 'resources' . DIRECTORY_SEPARATOR . 'errors' . DIRECTORY_SEPARATOR . 'view.php';
-
+            $path = SYSTEM_DIR . 'resources' . DIRECTORY_SEPARATOR . 'views' . DIRECTORY_SEPARATOR . 'exception.php';
+            $use_default_view = false;
             try {
                 if (Config::getInstance()->getData('error_redirect') === true) {
                     if ($e->getCode() == 403) {
+                        // Forbidden access
                         $page = Config::getInstance()->getData('module').'/'.Config::getInstance()->getData('action');
                         if ($page != ($redirect = Config::getInstance()->getData('module_forbidden'))) {
                             BaseController::getInstance()->redirect('/' . $redirect);
                         }
                     } else {
-                        self::$_errorHandlerActive = true;
+                        // Show error with defined view
+                        $this->found_error = true;
                         $moduleName = Config::getInstance()->getData('module_error');
                         BaseController::getInstance()->import($moduleName, array('error' => $e), true);
+                        $this->found_error = false;
+                        if (ob_get_level() > 0) {
+                            ob_end_clean();
+                        }
                         View::getInstance()->showOutput();
                     }
                 } else {
-                    print BaseController::getInstance()->outputBuffering($path, array('e'=>$e));
+                    $use_default_view = true;
                 }
             } catch (\Exception $ex) {
-                print BaseController::getInstance()->outputBuffering($path, array('e'=>$ex));
+                $use_default_view = true;
+            }
+            if ($use_default_view) {
+                // Show error with default view
+                if (ob_get_level() > 0) {
+                    ob_end_clean();
+                }
+                print BaseController::getInstance()->outputBuffering($path, array('e'=>$e));
             }
         } else {
+            // Show error with JSON view
             self::$_instance->jsonOutput(array(
                 'error' => array(
                     'code' => $e->getCode(),
@@ -149,9 +167,23 @@ class Boot extends Shortcut
      * @return bool
      * @since 1.0.3
      */
-    public static function isErrorHandlerActive()
+    public function isFoundError()
     {
-        return self::$_errorHandlerActive;
+        return $this->found_error;
+    }
+
+    public function getErrors()
+    {
+        return $this->errors;
+    }
+
+    public function getErrorInfo($key = null)
+    {
+        if ($key === null) {
+            return $this->error_info;
+        } else {
+            return $this->error_info[$key];
+        }
     }
 
     /**
@@ -162,9 +194,9 @@ class Boot extends Shortcut
      */
     public function autoload($className)
     {
-        $path = $this->realPath($this->componentDir().$className.'.php');
+        $path = $this->realPath($this->componentDir() . $className . '.php');
         if (!file_exists($path)) {
-            throw new \Exception("Component file not found at path $path", 404);
+            throw new \Exception("Component file not found at path $className", 404);
         }
         include_once($path);
     }
@@ -181,9 +213,7 @@ class Boot extends Shortcut
             $route = $this->config('route');
         }
         BaseController::getInstance()->import($route);
-        if (View::getInstance()->isActivated()) {
-            View::getInstance()->showOutput();
-        }
+        View::getInstance()->showOutput();
     }
 
     public function jsonOutput(array $data = array())
