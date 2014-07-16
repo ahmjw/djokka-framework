@@ -76,8 +76,8 @@ class Boot extends Shortcut
         // Error reporting
         if (error_reporting() > 0) {
             set_error_handler(array($this, 'onError'));
+            register_shutdown_function(array($this, 'onShutdown'));
         }
-        register_shutdown_function(array($this, 'onShutdown'));
         // Exception handler
         set_exception_handler(array($this, 'handleException'));
         // Internal class autoloader
