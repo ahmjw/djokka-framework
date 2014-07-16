@@ -65,14 +65,32 @@ class User
                 Session::getInstance()->setData('user', array(func_get_arg(0)=>$data));
         }
     }
+
+    public function addData($keyset, $dataset)
+    {
+        if (is_array($dataset) || is_object($dataset)) {
+            $data = new \stdClass();
+            foreach ($dataset as $key => $value) {
+                $data->{$key} = $value;
+            }
+        } else {
+            $data = $dataset;
+        }
+        $new = array($keyset => $data);
+        $user = Session::getInstance()->getData('user');
+        if ($user !== null) {
+            $new = array_merge($user, $new);
+        }
+        Session::getInstance()->setData('user', $new);
+    }
     
     /**
      * Mengosongkan atau menghapus data user web
      * @since 1.0.0
      */
-    public function delete()
+    public function delete($keyset = null)
     {
-        Session::getInstance()->delete('user');
+        Session::getInstance()->delete('user', $keyset);
     }
 
     /**
