@@ -36,7 +36,7 @@ class Config
 
         // Error handler
         'error_redirect'   => false, // Menandai apakah dilakukan pengalihan halaman saat terjadi error
-        'module_error'     => 'index/error', // Nama modul tujuan pengalihan jika terjadi error
+        'module_error'     => 'error', // Nama modul tujuan pengalihan jika terjadi error
         'module_forbidden' => 'index/signin', // Nama modul tujuan pengalihan saat terjadi error akses ditolak
 
         // Router configuration
