@@ -29,7 +29,7 @@ abstract class ActiveRecord extends Model
      * @since 1.0.3
      * @return string
      */
-    abstract function table();
+    abstract function tableName();
 
     /**
      * Important information for model to works
@@ -80,6 +80,9 @@ abstract class ActiveRecord extends Model
     private function preload()
     {
         $config = $this->config('db');
+        if (!isset($config[0]['driver'])) {
+            throw new \Exception("Database driver name must be declared", 500);
+        }
         $driver = $config[0]['driver'];
         if (!isset($config[0]['driver'])) {
             $driver = $this->config('database_driver');
@@ -90,9 +93,9 @@ abstract class ActiveRecord extends Model
         $this->_dataset['driver'] = 'Djokka\\Database\\Drivers\\' . $driver;
 
         $this->schema('labels', $this->labels());
-        if (!TableCollection::getInstance()->exists($this->table()))
+        if (!TableCollection::getInstance()->exists($this->tableName()))
         {
-            $desc = $this->getDriver('Table')->desc($this->table());
+            $desc = $this->getDriver('Table')->desc($this->tableName());
             if ($desc !== null) {
                 $pkey = null;
                 $temp = array();
@@ -126,7 +129,7 @@ abstract class ActiveRecord extends Model
      */
     public function schema()
     {
-        $data = TableCollection::getInstance()->table($this->table());
+        $data = TableCollection::getInstance()->table($this->tableName());
         switch (func_num_args()) {
             case 0:
                 return $data;
@@ -134,7 +137,7 @@ abstract class ActiveRecord extends Model
                 if (!is_array(func_get_arg(0)) && isset($data[func_get_arg(0)])) {
                     return $data[func_get_arg(0)];
                 } else {
-                    TableCollection::getInstance()->table($this->table(), func_get_arg(0));
+                    TableCollection::getInstance()->table($this->tableName(), func_get_arg(0));
                 }
                 break;
             default:
@@ -267,7 +270,7 @@ abstract class ActiveRecord extends Model
      */
     public function delete()
     {
-        return $this->getDriver('Crud')->deleteImpl($this->table(), $this->dataset('condition'));
+        return $this->getDriver('Crud')->deleteImpl($this->tableName(), $this->dataset('condition'));
     }
 
     /**
@@ -277,7 +280,7 @@ abstract class ActiveRecord extends Model
      */
     public function count()
     {
-        return $this->getDriver('Crud')->countImpl($this->table(), $this->getPrimaryKey(), func_get_args());
+        return $this->getDriver('Crud')->countImpl($this->tableName(), $this->getPrimaryKey(), func_get_args());
     }
 
     /**
@@ -287,7 +290,7 @@ abstract class ActiveRecord extends Model
      */
     public function findData()
     {
-        return $this->getDriver('Crud')->findDataImpl($this->table(), $this->getPrimaryKey(), func_get_args());
+        return $this->getDriver('Crud')->findDataImpl($this->tableName(), $this->getPrimaryKey(), func_get_args());
     }
 
     /**
