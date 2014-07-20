@@ -319,13 +319,13 @@ class BaseController extends Shortcut
         }
     }
 
-    private function executeAccessControl($action, $access)
+    private function executeAccessControl($current, $access)
     {
         if (!empty($access)) {
-            foreach ($access as $rule) {
-                $pattern = '/(^(?:'.$action.')\s*\,|\,\s*(?:'.$action.')\s*\,|\s*(?:'.$action.')$)/i';
-                if (preg_match($pattern, $rule[0], $match)) {
-                    if (!(bool)$rule[1]) {
+            foreach ($access as $action => $condition) {
+                $pattern = '/(^(?:'.$current.')\s*\,|\,\s*(?:'.$current.')\s*\,|\s*(?:'.$current.')$)/i';
+                if (preg_match($pattern, $action, $match)) {
+                    if (!(bool)$condition) {
                         throw new \Exception("You doesn't have a credential to access this page", 403);
                     }
                 }
