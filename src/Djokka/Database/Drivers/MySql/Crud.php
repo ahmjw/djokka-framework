@@ -44,7 +44,7 @@ class Crud extends Query implements ICrud
         $into = $values = null;
         if (empty($availables)) {
             $availables = array();
-            $data = TableCollection::getInstance()->table($model->table());
+            $data = TableCollection::getInstance()->table($model->tableName());
             foreach ($data['fields'] as $field) {
                 if ($data['describe'][$field]['Extra'] != 'auto_increment' && isset($model->{$field})) {
                     $availables[] = $field;
@@ -63,7 +63,7 @@ class Crud extends Query implements ICrud
             $i++;
         }
 
-        $this->from($model->table());
+        $this->from($model->tableName());
         $this->insert($into, $values);
         if ($resource = $this->execute()) {
             $pkey = $model->getPrimaryKey();
@@ -77,7 +77,7 @@ class Crud extends Query implements ICrud
     public function updateImpl($model, array $availables = array())
     {
         if (empty($availables)) {
-            $data = TableCollection::getInstance()->table($model->table());
+            $data = TableCollection::getInstance()->table($model->tableName());
             $fields = $data['fields'];
             if ($fields == null) {
                 throw new \Exception("No field in update list", 500);
@@ -101,7 +101,7 @@ class Crud extends Query implements ICrud
             }
             $i++;
         }
-        $this->from($model->table());
+        $this->from($model->tableName());
         $this->update($set);
         if ($model->dataset('condition') !== null) {
             $this->where($model->dataset('condition'));
@@ -198,12 +198,12 @@ class Crud extends Query implements ICrud
     public function qImpl($model, $params)
     {
         if(!isset($params['from'])) {
-            $this->from($model->table());
+            $this->from($model->tableName());
         } else {
             if (is_array($params)) {
-                $this->from($model->table() . ' ' . $this->replaceParam($params));
+                $this->from($model->tableName() . ' ' . $this->replaceParam($params));
             } else {
-                $this->from($model->table() . ' ' . $params);
+                $this->from($model->tableName() . ' ' . $params);
             }
         }
         if($model->dataset('condition') !== null) {
@@ -222,7 +222,7 @@ class Crud extends Query implements ICrud
      */
 	public function findImpl($model, $params)
 	{
-        $this->initSelection($model->table(), $model->getPrimaryKey(), $params);
+        $this->initSelection($model->tableName(), $model->getPrimaryKey(), $params);
         $model->dataset('condition', $this->_data['where']);
         // Membaca record dari database
         $resource = $this->execute();
@@ -265,12 +265,12 @@ class Crud extends Query implements ICrud
         $this->_data['query'] = null;
         $this->select(isset($params['select']) ? $params['select'] : '*');
         if(!isset($params['from'])){
-        	$this->from($model->table());
+        	$this->from($model->tableName());
         } else {
             if (is_array($params['from'])) {
-                $this->from($model->table() . ' ' . $this->replaceParam($params['from']));
+                $this->from($model->tableName() . ' ' . $this->replaceParam($params['from']));
             } else {
-                $this->from($model->table() . ' ' . $params['from']);
+                $this->from($model->tableName() . ' ' . $params['from']);
             }
         }
         if(isset($params['where'])){
@@ -314,7 +314,7 @@ class Crud extends Query implements ICrud
             $this->select('0');
         } else {
             $this->select($field);
-            $this->from($model->table());
+            $this->from($model->tableName());
         }
         if ($model->dataset('condition') !== null) {
             $this->where($model->dataset('condition'));

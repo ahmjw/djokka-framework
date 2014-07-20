@@ -123,6 +123,6 @@ class ModelCollection
      */
     public function delete()
     {
-        $this->_model->getDriver('Crud')->deleteImpl($this->_model->table(), $this->_model->dataset('condition'));
+        $this->_model->getDriver('Crud')->deleteImpl($this->_model->tableName(), $this->_model->dataset('condition'));
     }
 }
