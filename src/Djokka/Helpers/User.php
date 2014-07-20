@@ -90,7 +90,10 @@ class User
      */
     public function delete($keyset = null)
     {
-        Session::getInstance()->delete('user', $keyset);
+        if ($keyset !== null)
+            Session::getInstance()->delete('user', $keyset);
+        else
+            Session::getInstance()->delete('user');
     }
 
     /**
