@@ -26,12 +26,12 @@ class Config
         // System path
         'theme_path'     => 'themes', // Lokasi folder tema
         'asset_path'     => 'assets', // Lokasi folder aset
-        'module_path'    => 'protected/modules', // Lokasi folder module
+        'module_path'    => 'application/modules', // Lokasi folder module
         'plugin_path'    => 'plugins', // Lokasi folder plugin
-        'component_path' => 'protected/components', // Lokasi folder komponen
-        'model_path'     => 'protected/models', // Lokasi folder model
-        'data_path'      => 'protected/data', // Lokasi folder model
-        'config_path'    => 'protected/config', // Lokasi folder konfigurasi
+        'component_path' => 'application/components', // Lokasi folder komponen
+        'model_path'     => 'application/models', // Lokasi folder model
+        'data_path'      => 'application/data', // Lokasi folder model
+        'config_path'    => 'application/config', // Lokasi folder konfigurasi
         'app_path'       => null, // Lokasi folder project/aplikasi web
 
         // Error handler
