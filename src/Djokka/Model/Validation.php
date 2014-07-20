@@ -94,14 +94,11 @@ class Validation
         if($this->unvalidate) return true;
         $rules = $model->rules();
         if (is_array($rules)) {
-            if (is_array($this->rules)) {
-                $rules = array_merge($rules, $this->rules);
-            } else {
-                $rules = $this->rules;
+            if (!empty($this->rules)) {
+                $rules = array_merge($this->rules, $rules);
             }
-        } else {
-            $rules = $this->rules;
         }
+        $this->rules = $rules;
         if($rules === null) return true;
 
         // Memecah aturan validasi
