@@ -306,7 +306,7 @@ class Crud extends Query implements ICrud
         if($primary_key !== null) {
             $field = $primary_key;
         } else {
-            $fields = $model->schema('fields');
+            $fields = $model->table('fields');
             $field = $fields[0];
         }
         if ($model->dataset('from') !== null) {

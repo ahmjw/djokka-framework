@@ -92,7 +92,7 @@ abstract class ActiveRecord extends Model
         }
         $this->_dataset['driver'] = 'Djokka\\Database\\Drivers\\' . $driver;
 
-        $this->schema('labels', $this->labels());
+        $this->table('labels', $this->labels());
         if (!TableCollection::getInstance()->exists($this->tableName()))
         {
             $desc = $this->getDriver('Table')->desc($this->tableName());
@@ -117,7 +117,7 @@ abstract class ActiveRecord extends Model
                 }
                 $temp['fields'] = $fields;
                 $temp['primary_key'] = $pkey;
-                $this->schema($temp);
+                $this->table($temp);
             }
         }
     }
@@ -127,7 +127,7 @@ abstract class ActiveRecord extends Model
      * @since 1.0.2
      * @return mixed
      */
-    public function schema()
+    public function table()
     {
         $data = TableCollection::getInstance()->table($this->tableName());
         switch (func_num_args()) {
@@ -173,7 +173,7 @@ abstract class ActiveRecord extends Model
      */
     public function getPrimaryKey()
     {
-        $pkey = $this->schema('primary_key');
+        $pkey = $this->table('primary_key');
         return $pkey !== null ? $pkey : $this->dataset('primary_key');
     }
 
