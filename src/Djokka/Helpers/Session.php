@@ -51,7 +51,7 @@ class Session
      */
     public function getSession() 
     {
-        return $_SESSION['djokka'];
+        return $_SESSION;
     }
 
     /**
@@ -61,7 +61,7 @@ class Session
      */
     public function getData($data) 
     {
-        return isset($_SESSION['djokka'][$data]) ? $_SESSION['djokka'][$data] : null;
+        return isset($_SESSION[$data]) ? $_SESSION[$data] : null;
     }
 
     /**
@@ -71,7 +71,17 @@ class Session
      */
     public function setData($data, $value) 
     {
-        $_SESSION['djokka'][$data] = $value;
+        $_SESSION[$data] = $value;
+    }
+
+    /**
+     * Memasukkan session secara merge
+     * @since 1.0.5
+     * @param $data adalah data session yang akan dimasukkan dalam bentuk array
+     */
+    public function merge($data = array())
+    {
+         $_SESSION = array_merge($_SESSION, $data);
     }
 
     /**
@@ -84,15 +94,15 @@ class Session
             case 1:
                 $params = func_get_arg(0);
                 if (!is_array($params)) {
-                    unset($_SESSION['djokka'][$params]);
+                    unset($_SESSION[$params]);
                 } else {
                     foreach ($params as $key) {
-                        unset($_SESSION['djokka'][$key]);
+                        unset($_SESSION[$key]);
                     }
                 }
                 break;
             case 2:
-                unset($_SESSION['djokka'][func_get_arg(0)][func_get_arg(1)]);
+                unset($_SESSION[func_get_arg(0)][func_get_arg(1)]);
                 break;
         }
     }
@@ -105,6 +115,6 @@ class Session
      */
     public function isExists($key)
     {
-        return isset($_SESSION['djokka'][$key]);
+        return isset($_SESSION[$key]);
     }
 }
