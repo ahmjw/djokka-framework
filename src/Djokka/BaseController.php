@@ -82,12 +82,26 @@ class BaseController extends Shortcut
 
     public function getView($name, array $vars = array())
     {
-        $hmvc = $this->_data['info'];
-        $path = $hmvc->module_dir.'views'.DS.$name . '.php';
+        if (isset($this->_data['info'])) {
+            $hmvc = $this->_data['info'];
+            $path = $hmvc->module_dir . 'views' . DS . $name . '.php';
+        } else {
+            $path = $this->config('dir') . 'application' . DS . $this->config('modules') . DS . 'views' . DS . $name . '.php';
+        }
         if (!file_exists($path)) {
             throw new \Exception("View of module '{$hmvc->route}' is not found: $path", 404);
         }
         return $this->outputBuffering($path, $vars);
+    }
+
+    public function loadView($name)
+    {
+        $module = $this->config('module');
+        $path = $this->config('dir') . 'application' . DS . 'modules' . DS . $module . DS . 'views' . DS . $name . '.php';
+        if (!file_exists($path)) {
+            throw new \Exception("View of module '$module' is not found: $path", 404);
+        }
+        include($path);
     }
 
     /**
@@ -413,5 +427,48 @@ class BaseController extends Shortcut
     public function appendTo($element, $content)
     {
         View::getInstance()->addAppendItem($element, $content);
+    }
+
+    public function inputGet(array $fields = array())
+    {
+        $data = array();
+        foreach ($fields as $field) {
+            $data[$field] = htmlspecialchars($_GET[$field]);
+        }
+        return $data;
+    }
+
+    public function inputRequest(array $fields = array())
+    {
+        $data = array();
+        foreach ($fields as $field) {
+            if (isset($_REQUEST[$field])) {
+                if (!is_array($_REQUEST[$field])) {
+                    $data[$field] = htmlspecialchars($_REQUEST[$field]);
+                } else {
+                    $data[$field] = $_REQUEST[$field];
+                }
+            } else {
+                $data[$field] = null;
+            }
+        }
+        return $data;
+    }
+
+    public function inputPost(array $fields = array())
+    {
+        $data = array();
+        foreach ($fields as $field) {
+            if (isset($_POST[$field])) {
+                if (!is_array($_POST[$field])) {
+                    $data[$field] = htmlspecialchars($_POST[$field]);
+                } else {
+                    $data[$field] = $_POST[$field];
+                }
+            } else {
+                $data[$field] = null;
+            }
+        }
+        return $data;
     }
 }
