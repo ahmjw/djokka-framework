@@ -303,7 +303,11 @@ class Shortcut
             case 0:
                 return Session::getInstance()->getSession();
             case 1:
-                return Session::getInstance()->getData(func_get_arg(0));
+                if (!is_array(func_get_arg(0))) {
+                    return Session::getInstance()->getData(func_get_arg(0));
+                } else {
+                    Session::getInstance()->merge(func_get_arg(0));
+                }
             case 2:
                 Session::getInstance()->setData(func_get_arg(0), func_get_arg(1));
                 break;
@@ -356,21 +360,22 @@ class Shortcut
             $class = 'Djokka\\Models\\'.$name;
         }
 
+        $path = $this->realPath($path);
+        if (!file_exists($path)) {
+            throw new \Exception("Model file not found in path $path", 404);
+        }
+        include_once($path);
         if ($this->config('application') === true) {
-            $path = $this->realPath($path);
-            if (!file_exists($path)) {
-                throw new \Exception("Model file not found in path $path", 404);
-            }
-            include_once($path);
             if (!class_exists($class)) {
                 throw new \Exception("Class $class is not defined in file $path", 500);
             }
         }
+
         $object = new $class;
         $object->dataset('module', $name);
         if ((bool)$is_new && $object instanceof ActiveRecord) {
             $object->setAsNew();
-            foreach ($object->schema('fields') as $field) {
+            foreach ($object->table('fields') as $field) {
                 if (!isset($object->{$field})) {
                     $object->{$field} = null;
                 }
