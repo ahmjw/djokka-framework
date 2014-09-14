@@ -247,4 +247,12 @@ abstract class Model extends Shortcut
             Validation::getInstance()->unvalidate = true;
         }
     }
+
+    public function scriptValidate()
+    {
+        $script = '<script language="javascript">';
+        $script .= Validation::getInstance()->getScript($this);
+        $script .= '</script>';
+        return $script;
+    }
 }
