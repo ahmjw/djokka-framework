@@ -82,6 +82,15 @@ class View
         return $this->content;
     }
 
+    /**
+     * Mengeset konten web
+     * @return string
+     */
+    public function setContent($content)
+    {
+        return $this->content = $content;
+    }
+
     public function isActivated()
     {
         return $this->is_activated;
@@ -142,14 +151,20 @@ class View
 
     public function showOutput()
     {
-        if (!$this->is_activated) return;
+        if (!$this->is_activated && Config::getInstance()->getData('application') === false) return;
 
         $path = View::getInstance()->getLayoutPath();
         if(!file_exists($path)) {
             throw new \Exception("Layout file not found in path {$path}", 404);
         }
+        
+        $core = BaseController::getCore();
+        if ($core === null) {
+            $core->outputBuffering($path);
+        } else {
+            $content = BaseController::getCore()->outputBuffering($path);
+        }
 
-        $content = BaseController::getCore()->outputBuffering($path);
         libxml_use_internal_errors(true);
         DomHtml::getInstance()->loadHtml($content);
         libxml_clear_errors();
