@@ -119,6 +119,39 @@ class Validation
         return !$model->hasError();
     }
 
+    public function getScript($model)
+    {
+        // Mengumpulkan informasi validasi
+        if($this->unvalidate) return true;
+        $rules = $model->rules();
+        if (is_array($rules)) {
+            if (!empty($this->rules)) {
+                $rules = array_merge($this->rules, $rules);
+            }
+        }
+        if($rules === null) return true;
+
+        // Memecah aturan validasi
+        $script = 'function validateForm(form){';
+        foreach ($rules as $rule) {
+            if ($rule === null) continue;
+            $fields = $rule[0];
+            $action = $rule[1];
+            $params = array_slice($rule, 2);
+            
+            if(preg_match('/,/i', $rule[1])) {
+                foreach (explode(',', $rule[1]) as $action) {
+                    $script .= $this->createScript($model, $action, $fields, $params);
+                }
+            } else {
+                $script .= $this->createScript($model, $action, $fields, $params);
+                
+            }
+        }
+        $script .= '}';
+        return $script;
+    }
+
     /**
      * Melakukan validasi terhadap suatu model
      * @param mixed $model object Objek model yang akan divalidasi
@@ -169,6 +202,30 @@ class Validation
                 ));
             }
         }
+    }
+
+    private function createScript($model, $action, $fields, $params)
+    {
+        // Searching single validation with parameters
+        if(preg_match('/^([a-zA-Z][a-zA-Z0-9]*)\((.*)\)$/i', $action, $match)) {
+            $action = $match[1];
+            $params = explode(',', $match[2]);
+        }
+        $action = trim($action);
+
+        $script = null;
+        // If no validation
+        if(in_array($action, get_class_methods($this))) {
+            // Reading all fields
+            foreach (explode(',', $fields) as $field) {
+                $field = trim($field);
+                // Skip when any conditions
+                if(($this->unvalidates && in_array($field, $this->unvalidates)) ||
+                    $field == '' || $model->error($field) != null) continue;
+                $script .= 'if(form.' . $field . '.value == \'\'){alert(\'' . $params['message'] . '\');form.' . $field . '.focus();return false;}';
+            }
+        }
+        return $script;
     }
 
     /**
