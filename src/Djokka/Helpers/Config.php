@@ -30,6 +30,7 @@ class Config
         'plugin_path'    => 'plugins', // Lokasi folder plugin
         'component_path' => 'application/components', // Lokasi folder komponen
         'model_path'     => 'application/models', // Lokasi folder model
+        'view_path'      => 'views',
         'data_path'      => 'application/data', // Lokasi folder model
         'config_path'    => 'application/config', // Lokasi folder konfigurasi
         'app_path'       => null, // Lokasi folder project/aplikasi web
@@ -56,7 +57,7 @@ class Config
         'layout'           => 'index', // Nama layout yang sedang digunakan web
         'json'             => false, // Menandai apakah output web menggunakan format JSON atau tidak
         'use_html_layout'  => false,
-        'application'      => true,
+        'application'      => false,
         'html_content_id'  => 'main',
 
         'connection'       => 0, // Indeks koneksi database yang akan digunakan pada fitur multi-database
