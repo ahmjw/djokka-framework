@@ -109,32 +109,42 @@ class Boot extends Shortcut
 
     /**
      * Show the caught exception as HTML document
-     * @param object $e The exception object. The object must be instance of Exception class
+     * @param object $error The exception object. The object must be instance of Exception class
      * @since 1.0.3
      */
-    public function handleException(\Exception $e)
+    public function handleException(\Exception $error)
     {
         if (Config::getInstance()->getData('json') === false) {
             $path = SYSTEM_DIR . 'resources' . DIRECTORY_SEPARATOR . 'views' . DIRECTORY_SEPARATOR . 'exception.php';
             $use_default_view = false;
             try {
                 if (Config::getInstance()->getData('error_redirect') === true) {
-                    if ($e->getCode() == 403) {
+                    if ($error->getCode() == 403) {
                         // Forbidden access
                         $page = Config::getInstance()->getData('module').'/'.Config::getInstance()->getData('action');
                         if ($page != ($redirect = Config::getInstance()->getData('module_forbidden'))) {
                             BaseController::getInstance()->redirect('/' . $redirect);
                         }
                     } else {
-                        // Show error with defined view
-                        $this->found_error = true;
-                        $moduleName = Config::getInstance()->getData('module_error');
-                        BaseController::getInstance()->import($moduleName, array('error' => $e), true);
-                        $this->found_error = false;
-                        if (ob_get_level() > 0) {
-                            ob_end_clean();
+                        if (Config::getInstance()->getData('application') === false) {
+                            // Show error with defined view
+                            $this->found_error = true;
+                            $moduleName = Config::getInstance()->getData('module_error');
+                            BaseController::getInstance()->import($moduleName, array('error' => $error), true);
+                            $this->found_error = false;
+                            if (ob_get_level() > 0) {
+                                ob_end_clean();
+                            }
+                            View::getInstance()->showOutput();
+                        } else {
+                            $path = Config::getInstance()->getData('dir') . Config::getInstance()->getData('component_path') . '/error.php';
+                            $path = $this->realPath($path);
+                            if (!file_exists($path)) {
+                                throw new \Exception("Boot file is not found in path: $path", 404);
+                            }
+                            Config::getInstance()->setData('found_error', true);
+                            include($path);
                         }
-                        View::getInstance()->showOutput();
                     }
                 } else {
                     $use_default_view = true;
@@ -147,7 +157,7 @@ class Boot extends Shortcut
                 if (ob_get_level() > 0) {
                     ob_end_clean();
                 }
-                print BaseController::getInstance()->outputBuffering($path, array('e'=>$e));
+                print BaseController::getInstance()->outputBuffering($path, array('e'=>$error));
             }
         } else {
             // Show error with JSON view
@@ -212,8 +222,17 @@ class Boot extends Shortcut
             Route::getInstance()->load();
             $route = $this->config('route');
         }
-        BaseController::getInstance()->import($route);
-        View::getInstance()->showOutput();
+        if (Config::getInstance()->getData('application') === false) {
+            BaseController::getInstance()->import($route);
+            View::getInstance()->showOutput();
+        } else {
+            $path = Config::getInstance()->getData('dir') . Config::getInstance()->getData('component_path') . '/boot.php';
+            $path = $this->realPath($path);
+            if (!file_exists($path)) {
+                throw new \Exception("Boot file is not found in path: $path", 404);
+            }
+            include($path);
+        }
     }
 
     public function jsonOutput(array $data = array())
