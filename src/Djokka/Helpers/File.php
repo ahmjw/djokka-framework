@@ -218,14 +218,22 @@ class File
      */
     public function download($path, $name, $mime = 'application/octet-stream')
     {
-        $info = pathinfo($path);
-        $name = String::getInstance()->slugify($name).'.'.$info['extension'];
-        header('Content-type: '.$mime);
-        header('Content-Disposition: attachment; filename="'.$name.'"');
+        header('Content-type: ' . $mime);
+        header('Content-Disposition: attachment; filename="' . $name . '"');
         header('Content-Length: ' . filesize($path));
         header("Cache-Control: no-cache, must-revalidate");
         header("Expires: Sat, 26 Jul 1997 05:00:00 GMT");
         echo file_get_contents($path);
+    }
+
+    public function downloadText($data, $name, $mime = 'application/octet-stream')
+    {
+        header('Content-type: '.$mime);
+        header('Content-Disposition: attachment; filename="'.$name.'"');
+        header('Content-Length: ' . strlen($data));
+        header("Cache-Control: no-cache, must-revalidate");
+        header("Expires: Sat, 26 Jul 1997 05:00:00 GMT");
+        echo $data;
     }
 
     /**
