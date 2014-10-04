@@ -85,11 +85,13 @@ class BaseController extends Shortcut
         if (isset($this->_data['info'])) {
             $hmvc = $this->_data['info'];
             $path = $hmvc->module_dir . 'views' . DS . $name . '.php';
+            $route = $hmvc->route;
         } else {
-            $path = $this->config('dir') . 'application' . DS . $this->config('modules') . DS . 'views' . DS . $name . '.php';
+            $path = $this->config('dir') . 'application' . DS . 'modules' . DS . $this->config('module') . DS . 'views' . DS . $name . '.php';
+            $route = $this->config('module');
         }
         if (!file_exists($path)) {
-            throw new \Exception("View of module '{$hmvc->route}' is not found: $path", 404);
+            throw new \Exception("View of module '$route' is not found: $path", 404);
         }
         return $this->outputBuffering($path, $vars);
     }
