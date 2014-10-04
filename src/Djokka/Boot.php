@@ -157,7 +157,9 @@ class Boot extends Shortcut
                 if (ob_get_level() > 0) {
                     ob_end_clean();
                 }
-                print BaseController::getInstance()->outputBuffering($path, array('e'=>$error));
+                print BaseController::getInstance()->outputBuffering($path, array(
+                    'error'=>$error,
+                ));
             }
         } else {
             // Show error with JSON view
