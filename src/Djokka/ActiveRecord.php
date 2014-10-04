@@ -273,6 +273,12 @@ abstract class ActiveRecord extends Model
         return $this->getDriver('Crud')->deleteImpl($this->tableName(), $this->dataset('condition'));
     }
 
+    public function isExists()
+    {
+        $count = $this->getDriver('Crud')->countImpl($this->tableName(), $this->getPrimaryKey(), func_get_args());
+        return $count > 0;
+    }
+
     /**
      * Counts the records
      * @since 1.0.1
