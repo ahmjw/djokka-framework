@@ -1,0 +1,25 @@
+#treeview-component {
+	margin-left: -40px;
+	list-style: none;
+}
+#treeview-component ul {
+	margin-left: -10px;
+	list-style: none;
+}
+.treeview-container {
+	background: #fff;
+}
+#treeview-component a {
+	text-decoration: none;
+}
+#treeview-component .treeview-has-child {
+	margin-left: -11px;
+}
+.treeview-child-node {
+	list-style: none;
+	margin-left: -20px;
+	display: none;
+}
+.treeview-root-leaf {
+	padding-left: 11px;
+}
