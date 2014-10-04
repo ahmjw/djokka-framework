@@ -120,7 +120,7 @@ class Connection
      * @param $sql adalah query SQL yang akan dieksekusi
      * @return objek resource hasil eksekusi
      */
-    public function query($sql)
+    public function query($sql, $handle_error = true)
     {
         if(!is_string($sql) && !is_array($sql)) {
             throw new \Exception("Query just allow string or array data type", 500);
@@ -140,7 +140,7 @@ class Connection
         }
         if($this->_connection && !$this->_connection->connect_error) {
             $resource = $this->_connection->query($sql);
-            if($this->_connection->error) {
+            if($handle_error === true && $this->_connection->error) {
                 throw new \Exception($this->_connection->error . ' -> ' . $sql, 500);
             }
             return $resource;
