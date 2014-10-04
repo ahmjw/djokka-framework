@@ -360,17 +360,16 @@ class Shortcut
             $class = 'Djokka\\Models\\'.$name;
         }
 
-        $path = $this->realPath($path);
-        if (!file_exists($path)) {
-            throw new \Exception("Model file not found in path $path", 404);
-        }
-        include_once($path);
         if ($this->config('application') === true) {
+            $path = $this->realPath($path);
+            if (!file_exists($path)) {
+                throw new \Exception("Model file not found in path $path", 404);
+            }
+            include_once($path);
             if (!class_exists($class)) {
                 throw new \Exception("Class $class is not defined in file $path", 500);
             }
         }
-
         $object = new $class;
         $object->dataset('module', $name);
         if ((bool)$is_new && $object instanceof ActiveRecord) {
