@@ -57,7 +57,7 @@ class Config
         'layout'           => 'index', // Nama layout yang sedang digunakan web
         'json'             => false, // Menandai apakah output web menggunakan format JSON atau tidak
         'use_html_layout'  => false,
-        'application'      => false,
+        'application'      => true,
         'html_content_id'  => 'main',
 
         'connection'       => 0, // Indeks koneksi database yang akan digunakan pada fitur multi-database
